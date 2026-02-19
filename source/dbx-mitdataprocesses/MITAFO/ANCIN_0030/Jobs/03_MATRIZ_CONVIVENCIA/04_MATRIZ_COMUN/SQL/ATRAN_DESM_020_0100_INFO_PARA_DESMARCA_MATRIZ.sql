@@ -1,0 +1,9 @@
+-- Query para informacion de VAL MATRIZ a desmarcar
+SELECT
+    DISTINCT
+    D.FTC_FOLIO,
+    D.FTN_NUM_CTA_INVDUAL,
+    D.FTN_ID_MARCA,
+    0 AS FTC_ESTATUS_MARCA,
+    'DATABRICKS' AS FCC_USU_ACT
+   FROM #DELTA_TABLA_NAME1# D

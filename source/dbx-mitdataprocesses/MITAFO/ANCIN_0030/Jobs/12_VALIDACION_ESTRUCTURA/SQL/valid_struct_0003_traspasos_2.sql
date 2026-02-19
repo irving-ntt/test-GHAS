@@ -1,0 +1,535 @@
+WITH temp_view AS (
+       SELECT
+        SR_ID_ARCHIVO,
+        FECHA_CARGA,
+        FTC_CONTROL,
+        SIG_CONTROL ,
+        --VAL_ESTATUS,
+        FTC_LINEA AS VALOR_CAMPO,
+        FTN_NO_LINEA,
+        --FTC_LINEA,
+        FTN_NO_LINEA + 1 AS SIG_NO_LINEA,
+        SIG_LINEA,
+        CASE    
+            WHEN FTC_CONTROL IN ('02') 
+            THEN 'Error de orden de los detalles incorrecto'
+            ELSE CONCAT('Error en tipo de registro:', FTC_CONTROL)
+        END AS DESC_ERROR
+    FROM #DELTA_002#
+    WHERE VAL_ESTATUS = 0
+    AND (FTC_CONTROL NOT IN ('01','02','09')
+    AND (SIG_CONTROL NOT IN ('09' ) OR SIG_CONTROL IS NULL OR LENGTH(TRIM(SIG_CONTROL)) = 0))
+    OR (FTC_CONTROL NOT IN ('02','01','09' )
+    AND (SIG_CONTROL IN ('09' )))
+)
+
+Select 
+DISTINCT
+    FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    FTC_CONTROL,
+    FTN_NO_LINEA,
+    CAMPO,
+    VALIDACION AS VALIDACION,
+    VALOR_CAMPO,
+    COD_ERROR,
+    DESC_ERROR,
+    VALOR_A_VALIDAR AS VALOR_A_VALIDAR
+
+from(
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    CASE 
+    WHEN FTC_CONTROL IS NULL OR LENGTH(TRIM(FTC_CONTROL)) = 0 THEN '00' 
+      WHEN FTN_NO_LINEA=1 then '01'
+      WHEN FTN_NO_LINEA=FTN_NO_LINEA_MAX THEN '09'
+        ELSE '02' 
+    END AS FTC_CONTROL,
+    FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+   CASE 
+   WHEN FTC_CONTROL IS NULL OR LENGTH(TRIM(FTC_CONTROL)) = 0 THEN  
+   'El archivo no deberá presentar líneas completamente vacías' 
+  WHEN FTN_NO_LINEA=1 then   'La primer línea del archivo siempre deberá iniciar con tipo de registro  "01"'
+  WHEN FTN_NO_LINEA=FTN_NO_LINEA_MAX THEN 'La última línea del archivo siempre deberá iniciar con tipo de registro "09"'
+  ELSE 'Al menos deberá existir una línea que inicie con tipo de registro "02"'
+  END AS VALIDACION,
+    VALOR_CAMPO,
+    0 AS COD_ERROR,
+    DESC_ERROR,
+    CASE WHEN FTC_CONTROL IS NULL OR LENGTH(TRIM(FTC_CONTROL)) = 0 THEN 'N/A'  
+     WHEN FTN_NO_LINEA=1 then  '01' 
+  WHEN FTN_NO_LINEA=FTN_NO_LINEA_MAX THEN '09'
+  ELSE '02' END VALOR_A_VALIDAR
+FROM temp_view
+  CROSS JOIN(
+  SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA_MAX FROM #DELTA_002#
+  )TMP3 
+
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    FTC_CONTROL  AS FTC_CONTROL,
+    FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'Todas las líneas del archivo deberán contar con un total de '|| #MAX_LENGTH# || ' caracteres' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en longitud de registro: ' || FTC_LONG_REG AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE 
+    FTC_LONG_REG > 0 AND FTC_LONG_REG <> #MAX_LENGTH#
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '01' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'La primer línea del archivo siempre deberá iniciar con tipo de registro  "01"' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    CONCAT('Error en tipo de registro:', FTC_CONTROL) AS DESC_ERROR,
+    '01' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE 
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL <> '01'
+    AND FTC_LONG_REG=#MAX_LENGTH#
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '01' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    CONCAT('Error en tipo de registro:', FTC_CONTROL) AS DESC_ERROR,
+    '01' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE 
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL <> '01'
+
+UNION ALL
+    
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '02' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'Al menos deberá existir una línea que inicie con tipo de registro "02"' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+   CONCAT('Error en tipo de registro:', FTC_CONTROL) AS DESC_ERROR,
+    '02' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE 
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL = '01'
+    AND SIG_CONTROL IS NULL
+    AND FTC_LONG_REG=#MAX_LENGTH#
+
+UNION ALL 
+
+    SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '02' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'Al menos deberá existir una línea que inicie con tipo de registro "02"' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    CONCAT('Error en tipo de registro:', FTC_CONTROL) AS DESC_ERROR,
+    '02' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE 
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL = '01'
+    AND SIG_CONTROL IS NULL
+    AND FTC_LONG_REG<>#MAX_LENGTH#
+
+UNION ALL 
+
+    SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '02' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro'  AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    CONCAT('Error en tipo de registro:', FTC_CONTROL) AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE 
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL = '01'
+    AND SIG_CONTROL IS NULL
+    AND FTC_LONG_REG=#MAX_LENGTH#
+
+UNION ALL 
+
+    SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '02' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro'  AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+   CONCAT('Error en tipo de registro:', FTC_CONTROL)  AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE 
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL = '01'
+    AND SIG_CONTROL IS NULL
+    AND FTC_LONG_REG<>#MAX_LENGTH#
+
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '09' AS FTC_CONTROL,
+    TMP.FTN_NO_LINEA AS FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'La última línea del archivo siempre deberá iniciar con tipo de registro "09"' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    CONCAT('Error en tipo de registro:', FTC_CONTROL) AS DESC_ERROR,
+    '09' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002# TMP
+JOIN 
+    (SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA FROM #DELTA_002#) MAX_REC
+    ON TMP.FTN_NO_LINEA = MAX_REC.FTN_NO_LINEA
+WHERE 
+    TMP.FTC_CONTROL <> '09' 
+    AND FTC_LONG_REG=#MAX_LENGTH#
+
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '01' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'La primer línea del archivo siempre deberá iniciar con tipo de registro  "01"' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    CONCAT('Error en tipo de registro:', FTC_CONTROL) AS DESC_ERROR,
+    '01' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE 
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL <> '01'
+    AND FTC_LONG_REG<>#MAX_LENGTH#
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '09' AS FTC_CONTROL,
+    TMP.FTN_NO_LINEA AS FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'La última línea del archivo siempre deberá iniciar con tipo de registro "09"' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    '09' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002# TMP
+JOIN 
+    (SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA FROM #DELTA_002#) MAX_REC
+    ON TMP.FTN_NO_LINEA = MAX_REC.FTN_NO_LINEA
+WHERE 
+    TMP.FTC_CONTROL <> '09' 
+    AND FTC_LONG_REG<>#MAX_LENGTH#
+
+
+    UNION ALL
+
+    
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '09' AS FTC_CONTROL,
+    TMP.FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+   'Error en tipo de registro' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002# TMP
+JOIN 
+    (SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA FROM #DELTA_002#) MAX_REC
+    ON TMP.FTN_NO_LINEA = MAX_REC.FTN_NO_LINEA
+WHERE 
+    TMP.FTC_CONTROL <> '09' 
+    AND FTC_LONG_REG<>#MAX_LENGTH#
+
+    UNION ALL
+
+    SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '09' AS FTC_CONTROL,
+    TMP.FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+   'Error en tipo de registro' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002# TMP
+JOIN 
+    (SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA FROM #DELTA_002#) MAX_REC
+    ON TMP.FTN_NO_LINEA = MAX_REC.FTN_NO_LINEA
+WHERE 
+    TMP.FTC_CONTROL <> '09' 
+    AND FTC_LONG_REG=#MAX_LENGTH#
+
+
+UNION ALL
+
+    SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '02' AS FTC_CONTROL,
+    FTN_NO_LINEA+1 AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    'N/A' AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL = '01'
+    AND SIG_CONTROL='09'
+    AND FTC_LONG_REG=#MAX_LENGTH#
+
+    
+    UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '02' AS FTC_CONTROL,
+    FTN_NO_LINEA+1   AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    SIG_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    '02' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE
+    FTC_CONTROL = '02'
+    AND SIG_CONTROL='01'
+    AND FTC_LONG_REG=#MAX_LENGTH#
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '02' AS FTC_CONTROL,
+    FTN_NO_LINEA  AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE
+    FTC_CONTROL = '09'
+    AND SIG_CONTROL='01'
+    AND FTC_LONG_REG=#MAX_LENGTH# 
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '02' AS FTC_CONTROL,
+    FTN_NO_LINEA  AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    '02' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE
+    FTC_CONTROL = '09'
+    AND SIG_CONTROL='02'
+    AND FTC_LONG_REG=#MAX_LENGTH# 
+
+UNION ALL
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '01' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    'N/A' AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL = '02'
+    AND SIG_CONTROL='02'
+    AND FTC_LONG_REG=#MAX_LENGTH# 
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '09' AS FTC_CONTROL,
+    TMP.FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    'N/A' AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002# TMP
+JOIN 
+    (SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA FROM #DELTA_002#) MAX_REC
+    ON TMP.FTN_NO_LINEA = MAX_REC.FTN_NO_LINEA-1
+WHERE
+     FTC_CONTROL = '02'
+    AND SIG_CONTROL='02'
+    AND FTC_LONG_REG=#MAX_LENGTH# 
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '01' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    'N/A' AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL = '01'
+    AND SIG_CONTROL='01'
+    AND FTC_LONG_REG=#MAX_LENGTH# 
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '01' AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Orden de presentacion de registro' AS VALIDACION,
+    'N/A' AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_002#
+WHERE
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL = '01'
+    AND SIG_CONTROL='01'
+    AND FTC_LONG_REG<>#MAX_LENGTH# 
+    
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    "02" AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'Al menos deberá existir una línea que inicie con tipo de registro "02"' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    '02' AS VALOR_A_VALIDAR
+FROM #DELTA_002#
+    CROSS JOIN(
+  SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA_MAX FROM #DELTA_002#
+  )TMP3 
+  WHERE FTC_CONTROL  IN ('01','09')
+  AND FTN_NO_LINEA < FTN_NO_LINEA_MAX AND FTN_NO_LINEA >1
+AND FTC_LONG_REG<>#MAX_LENGTH# 
+
+UNION ALL
+
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    "02" AS FTC_CONTROL,
+    FTN_NO_LINEA AS FTN_NO_LINEA,
+    'Registro' AS CAMPO,
+    'Al menos deberá existir una línea que inicie con tipo de registro "02"' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro' AS DESC_ERROR,
+    '02' AS VALOR_A_VALIDAR
+FROM #DELTA_002#
+    CROSS JOIN(
+  SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA_MAX FROM #DELTA_002#
+  )TMP3 
+  WHERE FTC_CONTROL  IN ('01','09')
+  AND FTN_NO_LINEA < FTN_NO_LINEA_MAX AND FTN_NO_LINEA >1
+AND FTC_LONG_REG=#MAX_LENGTH# 
+
+)X
+

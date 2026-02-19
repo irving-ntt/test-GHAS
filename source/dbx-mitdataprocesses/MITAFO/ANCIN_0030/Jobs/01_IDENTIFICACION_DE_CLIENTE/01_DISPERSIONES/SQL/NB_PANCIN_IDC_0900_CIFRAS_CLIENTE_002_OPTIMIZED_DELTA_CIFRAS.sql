@@ -1,0 +1,39 @@
+-- NB_PANCIN_IDC_0900_CIFRAS_CLIENTE_002_OPTIMIZED_DELTA_CIFRAS.sql
+-- Propósito: Calcular cifras de control en un solo query optimizado
+-- Tipo: Delta (Databricks)
+
+WITH totales AS (
+    SELECT 
+        FTC_FOLIO,
+        COUNT(*) as TOTALES
+    FROM #CATALOG_SCHEMA#.TEMP_VAL_IDENT_CTE_#SR_ID_ARCHIVO#
+    GROUP BY FTC_FOLIO
+),
+errores AS (
+    SELECT 
+        FTC_FOLIO,
+        COUNT(*) as TOTAL_ERROR
+    FROM #CATALOG_SCHEMA#.TEMP_VAL_IDENT_CTE_#SR_ID_ARCHIVO#
+    WHERE FTN_ESTATUS_DIAG <> 1
+    GROUP BY FTC_FOLIO
+),
+join_completo AS (
+    SELECT 
+        t.FTC_FOLIO,
+        t.TOTALES,
+        COALESCE(e.TOTAL_ERROR, 0) as TOTAL_ERROR
+    FROM totales t
+    LEFT JOIN errores e ON t.FTC_FOLIO = e.FTC_FOLIO
+)
+SELECT 
+    #SR_SUBETAPA# as FTC_ID_SUBETAPA,
+    TOTALES as FLN_TOTAL_REGISTROS,
+    (TOTALES - TOTAL_ERROR) as FLN_REG_CUMPLIERON,
+    TOTAL_ERROR as FLN_REG_NO_CUMPLIERON,
+    '#SR_USUARIO#' as FLC_USU_REG,
+    NULL as FLC_DETALLE,
+    '93' as FLC_VALIDACION,
+    CURRENT_TIMESTAMP() as FLD_FEC_REG,
+    0 as FLN_TOTAL_ERRORES,
+    FTC_FOLIO
+FROM join_completo

@@ -1,0 +1,48 @@
+resources:
+  jobs:
+    WF_INFON_SOL_MARCA_CUENTA_43_BIS:
+      name: WF_INFON_SOL_MARCA_CUENTA_43_BIS
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_CARGA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_CARGA"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_ACRED_01
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_CARGA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0080_VAL_CONT_INFONAVIT_SOL_MARCA_CUENTA_43_BIS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_ACRED_02
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_CARGA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0081_VAL_CONT_INFONAVIT_SOL_MARCA_CUENTA_43_BIS_02"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_ACRED_09
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_CARGA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0082_VAL_CONT_INFONAVIT_SOL_MARCA_CUENTA_43_BIS_09"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_ANCIN_VAL_CONT_CIFRAS_CONTROL
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_ACRED_01
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_ACRED_02
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_ACRED_09
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_CIFRAS_CONTROL_GEN_ARCH_RESP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

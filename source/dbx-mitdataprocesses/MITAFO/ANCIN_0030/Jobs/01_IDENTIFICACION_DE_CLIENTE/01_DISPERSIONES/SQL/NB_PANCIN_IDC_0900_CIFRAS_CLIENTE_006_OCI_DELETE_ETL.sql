@@ -1,0 +1,7 @@
+-- NB_PANCIN_IDC_0900_CIFRAS_CLIENTE_006_OCI_DELETE_ETL.sql
+-- Propósito: Eliminar registros existentes en tabla ETL
+-- Tipo: OCI (Oracle)
+
+DELETE /*+ PARALLEL(8) */ FROM #CX_CRE_ESQUEMA#.#TL_CRE_VAL_CIFRAS_CTRL#
+WHERE FTC_FOLIO = '#SR_FOLIO#'
+  AND FTC_ID_SUBETAPA = #SR_SUBETAPA#

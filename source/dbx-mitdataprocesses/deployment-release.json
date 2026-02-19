@@ -1,0 +1,71 @@
+{
+  "version_tag": "2.1.1",
+  "clusteres": {
+    "qa": [
+      {
+        "name": "Expanded Cluster - QA",
+        "id": "ID_EXPANDED_CLUSTER_DEV"
+      },
+      {
+        "name": "Expanded Cluster - QA",
+        "id": "ID_CLUSTER"
+      }
+    ],
+    "prod": [
+      {
+        "name": "Expanded Cluster - PROD",
+        "id": "ID_EXPANDED_CLUSTER_DEV"
+      },
+      {
+        "name": "Expanded Cluster - PROD",
+        "id": "ID_CLUSTER"
+      }
+    ]
+  },
+  "pool": {
+    "qa": [
+      {
+        "type": "Driver Pool",
+        "poolNameToAssing": "Operaciones5.0_NCI_DriversPool",
+        "poolIdToReplace": "ID_DRIVER_POOL"
+      },
+      {
+        "type": "instance Pool",
+        "poolNameToAssing": "Operaciones5.0_NCI_WorkersPool",
+        "poolIdToReplace": "ID_INSTANCE_POOL"
+      }
+    ],
+    "prod": [
+      {
+        "type": "Driver Pool",
+        "poolNameToAssing": "Operaciones5.0_NCI_DriversPool",
+        "poolIdToReplace": "ID_DRIVER_POOL"
+      },
+      {
+        "type": "instance Pool",
+        "poolNameToAssing": "Operaciones5.0_NCI_WorkersPool",
+        "poolIdToReplace": "ID_INSTANCE_POOL"
+      }
+    ]
+  },
+  "policy": {
+    "qa": [
+      {
+        "policyNameToAssing": "OP5.0_NCI_JOB_CLUSTER_POLICY",
+        "policyIdToReplace": "ID_JOB_CLUSTER_POLICY"
+      }
+    ],
+    "prod": [
+      {
+        "policyNameToAssing": "OP5.0_NCI_JOB_CLUSTER_POLICY",
+        "policyIdToReplace": "ID_JOB_CLUSTER_POLICY"
+      }
+    ]
+  },
+  "workflows_hijos": [
+
+  ],
+  "workflows_padres": [
+    
+  ]
+}

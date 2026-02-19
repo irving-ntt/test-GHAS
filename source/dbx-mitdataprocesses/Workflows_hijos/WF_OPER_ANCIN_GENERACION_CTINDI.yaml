@@ -1,0 +1,575 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_GENERACION_CTINDI:
+      name: WF_OPER_ANCIN_GENERACION_CTINDI
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: GOBISSSTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '210'
+        - task_key: ITREISSSTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '122'
+        - task_key: NB_GARBAGE_CLEANER
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0080_GEN_ARCH_ACLAR_ESPECIALES
+            - task_key: NB_OPER_ANCIN_GAR_0040_GEN_ARCH_CTINDI_VIV92
+            - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_ITREIMSS
+            - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_GOBIMSS
+            - task_key: NB_OPER_ANCIN_GAR_0070_GEN_ARCH_CTINDI
+            - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_ITREISSSTE
+            - task_key: NB_OPER_ANCIN_GAR_0060_GEN_ARCH_DOIMSS_FINAL_05
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_JS_GARBAGE_CLEANER"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA
+          depends_on:
+            - task_key: TKS_VALIDATION_01
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/Notebooks/NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA_02
+          depends_on:
+            - task_key: TKS_VALIDATION_02
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/Notebooks/NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA_03
+          depends_on:
+            - task_key: TKS_VALIDATION_03
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/Notebooks/NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0010_GEN_ARCHIVO_GRAL_IND_02
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0010_GEN_ARCHIVO_GRAL_MOV_01
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0010_GEN_ARCHIVO_GRAL_IND_02"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0010_GEN_ARCHIVO_GRAL_MOV_01
+          depends_on:
+            - task_key: NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0010_GEN_ARCHIVO_GRAL_MOV_01"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVO_SUBSEC
+          depends_on:
+            - task_key: NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA_03
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVO_SUBSEC"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_SUA_03
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0010_GEN_ARCHIVO_GRAL_IND_02
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_SUA_03"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_SUA_03
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_CTINDI_RCV
+          depends_on:
+            - task_key: SUBPROCESO_DOISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0030_GEN_ARCH_CTINDI_RCV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_CTINDI_SAR
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_CTINDI_RCV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0030_GEN_ARCH_CTINDI_SAR"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_GOBIMSS
+          depends_on:
+            - task_key: SUBPROCESO_GOBIMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0030_GEN_ARCH_GOBIMSS"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_ITREIMSS
+          depends_on:
+            - task_key: SUBPROCESO_ITREIMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0030_GEN_ARCH_ITREIMSS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_ITREISSSTE
+          depends_on:
+            - task_key: ITREISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0030_GEN_ARCH_ITREISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0040_GEN_ARCH_CTINDI_VIV92
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0040_GEN_ARCH_CTINDI_VIV98
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0050_GEN_ARCH_CTINDI_VIV92"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0040_GEN_ARCH_CTINDI_VIV98
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0030_GEN_ARCH_CTINDI_SAR
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0040_GEN_ARCH_CTINDI_VIV98"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0040_GEN_ARCH_SUBSEC_92
+          depends_on:
+            - task_key: TKS_VALIDATION_04
+              outcome: 'false'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0040_GEN_ARCH_SUBSEC"
+            base_parameters:
+              p_CODMOV: '855'
+              p_TIPO_SUBCTA: VIV
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0040_GEN_ARCH_SUBSEC_98
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0040_GEN_ARCH_SUBSEC_92
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0040_GEN_ARCH_SUBSEC"
+            base_parameters:
+              p_CODMOV: '831'
+              p_TIPO_SUBCTA: VIV
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0060_GEN_ARCH_DOIMSS_FINAL_05
+          depends_on:
+            - task_key: SUBPROCESO_DOIMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0060_GEN_ARCH_DOIMSS_FINAL_05"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0060_GEN_ARCH_DOIMSS_FINAL_SUB
+          depends_on:
+            - task_key: TKS_VALIDATION_04
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0060_GEN_ARCH_DOIMSS_FINAL_05"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0070_GEN_ARCH_CTINDI
+          depends_on:
+            - task_key: GOBISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0070_GEN_ARCH_CTINDI"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0080_GEN_ARCH_ACLAR_ESPECIALES
+          depends_on:
+            - task_key: SUBPROCESO_ACLAR_ESPECIALES
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0080_GEN_ARCH_ACLAR_ESPECIALES"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0090_SUBSEC_AEIMSS
+          depends_on:
+            - task_key: PPA_AEIM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0090_SUBSEC_AEIMSS"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0090_SUBSEC_IMSS
+          depends_on:
+            - task_key: PPA_DOIMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0090_SUBSEC_IMSS"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_GAR_0090_SUBSEC_ISSSTE
+          depends_on:
+            - task_key: PPA_DOISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GAR_0090_SUBSEC_ISSSTE"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: PPA_AEIM
+          depends_on:
+            - task_key: NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA_02
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '118'
+        - task_key: PPA_DOIMSS
+          depends_on:
+            - task_key: NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA_02
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '8'
+        - task_key: PPA_DOISSSTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA_02
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '120'
+        - task_key: SUBPROCESO_ACLAR_ESPECIALES
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '118'
+        - task_key: SUBPROCESO_DOIMSS
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '8'
+        - task_key: SUBPROCESO_DOISSSTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '120'
+        - task_key: SUBPROCESO_GOBIMSS
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '439'
+        - task_key: SUBPROCESO_ITREIMSS
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0025_GEN_ARCHIVO_GRAL_UNION_04
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '121'
+        - task_key: TKS_VALIDATION_01
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_stage}}"
+            right: CTINDI
+        - task_key: TKS_VALIDATION_02
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_stage}}"
+            right: PPA_RCDI
+        - task_key: TKS_VALIDATION_03
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_stage}}"
+            right: SVIC1
+        - task_key: TKS_VALIDATION_04
+          depends_on:
+            - task_key: NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVO_SUBSEC
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_GAR_0020_GEN_ARCHIVOS.values.sr_subproceso}}"
+            right: '9'
+      queue:
+        enabled: true

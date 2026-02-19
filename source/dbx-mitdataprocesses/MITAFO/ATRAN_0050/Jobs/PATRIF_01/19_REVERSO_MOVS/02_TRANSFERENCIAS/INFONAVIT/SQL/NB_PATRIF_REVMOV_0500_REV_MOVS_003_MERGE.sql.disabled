@@ -1,0 +1,24 @@
+-- NB_PATRIF_REVMOV_0500_REV_MOVS_003_MERGE.sql
+-- ========================================================================
+-- Propósito: MERGE desde tabla AUX hacia tabla final (APPROACH ALTERNATIVO)
+-- ========================================================================
+-- NOTA: Este archivo está deshabilitado (.disabled)
+--       Para usarlo:
+--       1. Renombrar a .sql (quitar .disabled)
+--       2. Crear tabla AUX en Oracle
+--       3. Descomentar código en notebook
+--       4. Comentar approach DELETE + INSERT
+-- ========================================================================
+
+MERGE INTO #CX_CRE_ESQUEMA#.#TL_PRE_MOVIMIENTOS# target
+USING #CX_DATAUX_ESQUEMA#.TTSISGRAL_ETL_PRE_MOVIMIENTOS_AUX source
+ON (target.FTC_FOLIO = source.FTC_FOLIO
+    AND target.FTN_NUM_CTA_INVDUAL = source.FTN_NUM_CTA_INVDUAL
+    AND target.FTN_ID_MARCA = source.FTN_ID_MARCA
+    AND target.FCN_ID_SUBPROCESO = source.FCN_ID_SUBPROCESO)
+WHEN MATCHED THEN
+    UPDATE SET
+        target.FCD_FEH_ACT = source.FCD_FEH_ACT,
+        target.FCC_USU_ACT = source.FCC_USU_ACT,
+        target.FTN_PRE_MOV_GENERADO = source.FTN_PRE_MOV_GENERADO
+

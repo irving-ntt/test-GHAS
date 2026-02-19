@@ -1,0 +1,273 @@
+resources:
+  jobs:
+    WF_PATRIF_DMC_0130:
+      name: WF_PATRIF_DMC_0130
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: DESMARCA_DE_CREDITO_DE_VIVIENDA_POR_43_BIS
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: DESMARCA DE CREDITO DE VIVIENDA POR 43 BIS RECHAZADO
+        - task_key: DESMARCA_DE_CREDITO_DE_VIVIENDA_POR_43_BIS_RECHAZADO
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: DESMARCA DE CREDITO DE VIVIENDA POR 43 BIS
+        - task_key: DESMARCA_FOVISSSTE
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: DESMARCA FOVISSSTE
+        - task_key: DEVOLUCION_DE_EXCEDENTES_POR_43_BIS_Y_SALDOS_EXCEDENTES_POR_T_A_A_G
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: DEVOLUCION DE EXCEDENTES POR 43 BIS Y SALDOS EXCEDENTES POR T.
+              A. A. G.
+        - task_key: DEVOLUCION_DE_EXCEDENTES_POR_T_A_FOVISSSTE
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: DEVOLUCION DE EXCEDENTES POR T A FOVISSSTE
+        - task_key: DEVOLUCION_DE_PAGO_SIN_JUSTIFICACION_LEGAL_IMSS
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: DEVOLUCION DE PAGO SIN JUSTIFICACION LEGAL IMSS
+        - task_key: Finalizacion_desmarca
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_2
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND_2.values.sr_stage}}"
+            right: Finalizacion desmarca
+        - task_key: GENERAL_PARA_ACREDITADOS_INFONAVIT_ANUALIDAD_Y_43_BIS
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: GENERAL PARA ACREDITADOS INFONAVIT ANUALIDAD Y 43 BIS
+        - task_key: Generacion_de_archivo
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_2
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND_2.values.sr_stage}}"
+            right: Generacion de archivo
+        - task_key: SOLICITUD_DE_MARCA_DE_CUENTAS_POR_43_BIS
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: SOLICITUD DE MARCA DE CUENTAS POR 43 BIS
+        - task_key: TRANSFERENCIA_DE_ACREDITADOS_FOVISSSTE
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: TRANSFERENCIA DE ACREDITADOS FOVISSSTE
+        - task_key: TRANSFERENCIA_DE_RECURSOS_POR_PORTABILIDAD
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND.values.sr_stage}}"
+            right: TRANSFERENCIA DE RECURSOS POR PORTABILIDAD
+        - task_key: TSK_NB_OPER_ATRAN_0010_DESMARCA
+          depends_on:
+            - task_key: SOLICITUD_DE_MARCA_DE_CUENTAS_POR_43_BIS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0010_DESMARCA"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0010_DESMARCA_TI
+          depends_on:
+            - task_key: GENERAL_PARA_ACREDITADOS_INFONAVIT_ANUALIDAD_Y_43_BIS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0010_DESMARCA_TI"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0010_DESM_SDSMF
+          depends_on:
+            - task_key: DESMARCA_FOVISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0010_DESM_SDSMF"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0010_DESM_SOL_DESM
+          depends_on:
+            - task_key: DESMARCA_DE_CREDITO_DE_VIVIENDA_POR_43_BIS_RECHAZADO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0010_DESM_SOL_DESM"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0010_DESM_SOL_DESM_2
+          depends_on:
+            - task_key: DESMARCA_DE_CREDITO_DE_VIVIENDA_POR_43_BIS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0010_DESM_SOL_DESM"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0010_DESM_SOL_DSEF
+          depends_on:
+            - task_key: DEVOLUCION_DE_EXCEDENTES_POR_T_A_FOVISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0010_DESM_SOL_DSEF"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0010_DEV_SLDOS_EXC
+          depends_on:
+            - task_key: DEVOLUCION_DE_EXCEDENTES_POR_43_BIS_Y_SALDOS_EXCEDENTES_POR_T_A_A_G
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0010_DEV_SLDOS_EXC"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0020_DESMARCA_MC
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_0060_DESMARCA_DPSJL
+            - task_key: TSK_NB_OPER_ATRAN_0010_DESMARCA
+            - task_key: TSK_NB_OPER_ATRAN_0050_TRP
+            - task_key: TSK_NB_OPER_ATRAN_0010_DESMARCA_TI
+            - task_key: TSK_NB_OPER_ATRAN_0010_DESM_SOL_DESM
+            - task_key: TSK_NB_OPER_ATRAN_0020_DESMARCA_TFOV
+          run_if: NONE_FAILED
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0020_DESMARCA_MC"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0020_DESMARCA_MC_2
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_0010_DESM_SDSMF
+            - task_key: TSK_NB_OPER_ATRAN_0010_DESM_SOL_DESM_2
+            - task_key: TSK_NB_OPER_ATRAN_0010_DESM_SOL_DSEF
+            - task_key: TSK_NB_OPER_ATRAN_0010_DEV_SLDOS_EXC
+          run_if: NONE_FAILED
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0020_DESMARCA_MC_2"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0020_DESMARCA_TFOV
+          depends_on:
+            - task_key: TRANSFERENCIA_DE_ACREDITADOS_FOVISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0020_DESMARCA_TFOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0030_DESMARCA_ARC
+          depends_on:
+            - task_key: Generacion_de_archivo
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0030_DESMARCA_ARC"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0050_TRP
+          depends_on:
+            - task_key: TRANSFERENCIA_DE_RECURSOS_POR_PORTABILIDAD
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0050_TRP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0060_DESMARCA_DPSJL
+          depends_on:
+            - task_key: DEVOLUCION_DE_PAGO_SIN_JUSTIFICACION_LEGAL_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0060_DESMARCA_DPSJL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_DESMARCA_COND"
+            base_parameters:
+              sr_conv_ingty: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_path_arch: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_2
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_0020_DESMARCA_MC
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_DESMARCA_COND_2"
+            base_parameters:
+              sr_bandera: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_path_arch: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_DESMARCA_FINAL
+          depends_on:
+            - task_key: Finalizacion_desmarca
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_DESMARCA_FINAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

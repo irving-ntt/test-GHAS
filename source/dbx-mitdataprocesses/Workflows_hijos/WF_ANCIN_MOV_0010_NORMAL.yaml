@@ -1,0 +1,143 @@
+resources:
+  jobs:
+    WF_ANCIN_MOV_0010_NORMAL:
+      name: WF_ANCIN_MOV_0010_NORMAL
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_PANCIN_MOV_0003_EXT_PREMOVS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACREDco_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0003_EXT_PREMOVS
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0006_EXT_PREMOVS
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0003_EXT_PREMOVS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0006_EXT_PREMOVS
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS_CONCEP_MOV
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0006_EXT_PREMOVS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0010_EXT_PREMOVS_CONCEP_MOV
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS_MOV_SUBCTA
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0006_EXT_PREMOVS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0010_EXT_PREMOVS_MOV_SUBCTA
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS_TIPO_SUBCTA
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0006_EXT_PREMOVS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0010_EXT_PREMOVS_TIPO_SUBCTA
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS_VAL_ACCION
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0006_EXT_PREMOVS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0010_EXT_PREMOVS_VAL_ACCION
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS_CONCEP_MOV
+            - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS_MOV_SUBCTA
+            - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS_TIPO_SUBCTA
+            - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS_VAL_ACCION
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0010_EXT_PREMOVS
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0016_SUF_SALDO
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0010_EXT_PREMOVS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0016_SUF_SALDO
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0020_SUF_SALDO
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0016_SUF_SALDO
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0020_SUF_SALDO
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0020_SUF_SALDO
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0030_MOVS_BALANCE
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE_DATASET
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0030_MOVS_BALANCE_DATASET
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE_ORACLE
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0030_MOVS_BALANCE_ORACLE
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE_SEMAFOROS
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0030_MOVS_BALANCE_SEMAFOROS
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_0060_CIFRAS_CONTROL
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE_SEMAFOROS
+            - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE_ORACLE
+            - task_key: NB_PANCIN_MOV_0030_MOVS_BALANCE_DATASET
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0060_CIFRAS_CONTROL
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PANCIN_MOV_EC_SEM_ROJO_2
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0060_CIFRAS_CONTROL
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_EC_SEM_ROJO
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: HAS_RED
+          depends_on:
+            - task_key: NB_PANCIN_MOV_EC_SEM_ROJO_2
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_PANCIN_MOV_EC_SEM_ROJO_2.values.has_red}}"
+            right: "0"
+        - task_key: NB_PANCIN_MOV_0035_BALANCE
+          depends_on:
+            - task_key: HAS_RED
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_MOV_0035_BALANCE
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_ANCIN_MOV_0010_CLEANER
+          depends_on:
+            - task_key: NB_PANCIN_MOV_0035_BALANCE
+            - task_key: HAS_RED
+              outcome: "false"
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_ANCIN_MOV_0010_CLEANER
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      tags:
+        GAMC: NORMAL
+      queue:
+        enabled: true

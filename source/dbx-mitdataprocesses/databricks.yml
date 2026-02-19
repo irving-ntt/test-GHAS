@@ -1,0 +1,30 @@
+bundle:
+  name: Deploy-ID_SUB_CARPETA-01
+# include:
+#   - Workflows_hijos/*.yaml
+
+targets:
+  qa:
+    mode: production
+    permissions:
+      - group_name : developers-mit
+        level: CAN_MANAGE
+    workspace:
+      host: https://adb-3925217763478917.17.azuredatabricks.net/
+      root_path: /Users/${workspace.current_user.userName}/ID_RUTA/
+      file_path: /Users/${workspace.current_user.userName}/ID_RUTA/
+      artifact_path: /Users/${workspace.current_user.userName}/${bundle.name}/${bundle.target}/ID_RUTA
+      state_path: /Users/${workspace.current_user.userName}/${bundle.name}/${bundle.target}/ID_RUTA
+    run_as:
+      service_principal_name: ${workspace.current_user.userName}
+
+  prod:
+    mode: production
+    permissions:
+      - group_name : prod-operaciones5.0-soporte
+        level: CAN_MANAGE
+    workspace:
+      host: https://adb-1051909841828239.19.azuredatabricks.net/
+      root_path: /Users/${workspace.current_user.userName}/deploy/workflows_padres/${bundle.name}/${bundle.target}
+    run_as:
+      service_principal_name: ${workspace.current_user.userName}

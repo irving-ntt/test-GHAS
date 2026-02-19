@@ -1,0 +1,88 @@
+WITH temp_view AS (
+       SELECT
+        SR_ID_ARCHIVO,
+        FECHA_CARGA,
+        FTC_CONTROL,
+        SIG_CONTROL ,
+        --VAL_ESTATUS,
+        FTC_LINEA AS VALOR_CAMPO,
+        FTN_NO_LINEA,
+        --FTC_LINEA,
+        FTN_NO_LINEA + 1 AS SIG_NO_LINEA,
+        CASE    
+            WHEN FTC_CONTROL IN (#ESTADOS_DETALLE#)
+            THEN 'Error de orden de los detalles incorrecto'
+            ELSE CONCAT('Error en tipo de registro:', FTC_CONTROL)
+        END AS DESC_ERROR
+    FROM #DELTA_TABLE_NAME_001#
+    WHERE VAL_ESTATUS = 0
+    AND FTC_CONTROL NOT IN ('01' )
+    AND (SIG_CONTROL NOT IN ('09' ) OR SIG_CONTROL IS NULL OR LENGTH(TRIM(SIG_CONTROL)) = 0)
+)
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    CASE 
+        WHEN FTC_CONTROL IS NULL OR LENGTH(TRIM(FTC_CONTROL)) = 0 THEN '00' 
+        ELSE FTC_CONTROL 
+    END AS FTC_CONTROL,
+    FTN_NO_LINEA,
+    'Tipo de registro' AS CAMPO,
+    'Error en tipo de registro' AS VALIDACION,
+    VALOR_CAMPO ,
+    0 AS COD_ERROR,
+    DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM temp_view
+UNION ALL
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    CASE WHEN LENGTH(TRIM(FTC_CONTROL)) = 0 THEN '00' ELSE FTC_CONTROL END AS FTC_CONTROL,
+    FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Error en longitud de registro' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en longitud de registro: ' || FTC_LONG_REG AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_TABLE_NAME_001#
+WHERE 
+    VAL_LENGTH_RECORD = 0
+UNION ALL
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '01' AS FTC_CONTROL,
+    '' AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Error en tipo de registro' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro falta detalle 01' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_TABLE_NAME_001#
+WHERE 
+    FTN_NO_LINEA = 1
+    AND FTC_CONTROL <> '01'
+UNION ALL
+SELECT
+    SR_ID_ARCHIVO AS FTN_ID_ARCHIVO,
+    FECHA_CARGA,
+    '09' AS FTC_CONTROL,
+    '' AS FTN_NO_LINEA,
+    '' AS CAMPO,
+    'Error en tipo de registro' AS VALIDACION,
+    FTC_LINEA AS VALOR_CAMPO,
+    0 AS COD_ERROR,
+    'Error en tipo de registro falta detalle 09' AS DESC_ERROR,
+    'N/A' AS VALOR_A_VALIDAR
+FROM 
+    #DELTA_TABLE_NAME_001# TMP
+JOIN 
+    (SELECT MAX(FTN_NO_LINEA) AS FTN_NO_LINEA FROM #DELTA_TABLE_NAME_001#) MAX_REC
+    ON TMP.FTN_NO_LINEA = MAX_REC.FTN_NO_LINEA
+WHERE 
+    TMP.FTC_CONTROL <> '09';

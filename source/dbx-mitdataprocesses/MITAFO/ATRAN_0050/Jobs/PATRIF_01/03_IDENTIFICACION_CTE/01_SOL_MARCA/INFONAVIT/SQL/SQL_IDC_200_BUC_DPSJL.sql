@@ -1,0 +1,20 @@
+SELECT 
+    CASE WHEN B.FTC_NSS IS NULL 
+       THEN B.FTC_CURP 
+       ELSE B.FTC_NSS 
+       END AS FTC_NSS_CURP                        ,
+    B.FTC_NSS AS FTC_NSS                          ,
+    B.FTC_CURP FTC_CURP_BUC                       ,
+    B.FTN_NUM_CTA_INVDUAL FTN_NUM_CTA_INVDUAL_BUC ,
+    B.FTC_NOMBRE FTC_NOMBRE_BUC                   ,
+    B.FTC_AP_PATERNO FTC_AP_PATERNO_BUC           ,
+    B.FTC_AP_MATERNO FTC_AP_MATERNO_BUC           ,
+    B.FTC_RFC FTC_RFC_BUC                         ,
+    B.FTC_BANDERA FTC_BANDERA_BUC                 ,
+    B.FTN_CELULAR,FTC_CORREO_ELEC
+FROM (
+     SELECT FTC_NSS
+     FROM CIERREN_ETL.TTAFOTRAS_ETL_DEV_PAG_SJL
+     WHERE FTC_FOLIO= '#SR_FOLIO#') A 
+LEFT JOIN CIERREN_ETL.TLSISGRAL_ETL_BUC B 
+     ON (A.FTC_NSS=B.FTC_NSS)

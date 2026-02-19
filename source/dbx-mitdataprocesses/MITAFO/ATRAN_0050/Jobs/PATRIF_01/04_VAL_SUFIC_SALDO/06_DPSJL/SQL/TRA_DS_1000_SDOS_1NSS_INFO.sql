@@ -1,0 +1,81 @@
+WITH joined AS (
+    SELECT
+        ds500.FTN_NUM_CTA_INVDUAL,
+        ds500.FTN_NUM_APLI_VIV_APOR_PAT_DEV,
+        ds500.FTC_NSS,
+        ds500.FTN_CONSE_REG_LOTE,
+        ds300.SDO_DISPONIBLE,
+        ds300.FCN_ID_TIPO_SUBCTA,
+        ds300.FCN_ID_SIEFORE
+    FROM
+        #DS_500_SDO_SOL_INFON# ds500
+    LEFT JOIN
+        #DS_300_SDO_DISP_VIV97# ds300
+        ON ds500.FTN_NUM_CTA_INVDUAL = ds300.FTN_NUM_CTA_INVDUAL
+    WHERE
+        ds300.SDO_DISPONIBLE > 0
+),
+agg AS (
+    SELECT
+        FTC_NSS,
+        COUNT(FTN_NUM_CTA_INVDUAL) AS CONTEO
+    FROM
+        joined
+    GROUP BY
+        FTC_NSS
+),
+main_stream AS (
+    SELECT
+        j.*,
+        a.CONTEO
+    FROM
+        joined j
+    LEFT JOIN
+        agg a
+        ON j.FTC_NSS = a.FTC_NSS
+),
+valor_accion AS (
+    SELECT
+        FCN_ID_VALOR_ACCION,
+        FCD_FEH_ACCION,
+        FCN_VALOR_ACCION,
+        FCN_ID_SIEFORE,
+        FCN_ID_REGIMEN
+    FROM
+        #DB_600_CAT_VALOR_ACCION#
+)
+SELECT
+    m.FTN_CONSE_REG_LOTE,
+    m.FTN_NUM_CTA_INVDUAL,
+    1 AS FCN_ESTATUS,
+    CASE
+        WHEN COALESCE(m.FTN_NUM_APLI_VIV_APOR_PAT_DEV, 0) <= COALESCE(m.SDO_DISPONIBLE, 0)
+            THEN COALESCE(m.FTN_NUM_APLI_VIV_APOR_PAT_DEV, 0)
+        ELSE
+            COALESCE(m.SDO_DISPONIBLE, 0)
+    END AS FTN_SDO_ACCIONES,
+    CASE
+        WHEN COALESCE(m.FTN_NUM_APLI_VIV_APOR_PAT_DEV, 0) <= COALESCE(m.SDO_DISPONIBLE, 0)
+            THEN COALESCE(m.FTN_NUM_APLI_VIV_APOR_PAT_DEV, 0)
+        ELSE
+            COALESCE(m.SDO_DISPONIBLE, 0)
+    END * COALESCE(v.FCN_VALOR_ACCION, 0) AS FTN_SDO_PESOS,
+    COALESCE(v.FCN_VALOR_ACCION, 0) AS FTN_VALOR_AIVS,
+    v.FCD_FEH_ACCION,
+    v.FCN_ID_VALOR_ACCION,
+    m.FCN_ID_TIPO_SUBCTA,
+    m.FCN_ID_SIEFORE,
+    4072 AS FFN_ID_CONCEPTO_MOV,
+    CASE
+        WHEN COALESCE(m.FTN_NUM_APLI_VIV_APOR_PAT_DEV, 0) <= COALESCE(m.SDO_DISPONIBLE, 0)
+            THEN '01'
+        ELSE
+            '04'
+    END AS FTC_DIAG_DEV
+FROM
+    main_stream m
+LEFT JOIN
+    valor_accion v
+    ON m.FCN_ID_SIEFORE = v.FCN_ID_SIEFORE
+WHERE
+    m.CONTEO = 1

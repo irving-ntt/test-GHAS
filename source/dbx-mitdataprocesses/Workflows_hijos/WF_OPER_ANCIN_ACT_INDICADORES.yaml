@@ -1,0 +1,92 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_ACT_INDICADORES:
+      name: WF_OPER_ANCIN_ACT_INDICADORES
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: NB_OPER_ANCIN_0020_ACT_INDICADOR_01_MOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/02_ACT_INDICADORES/Notebooks/NB_OPER_ANCIN_0020_ACT_INDICADOR_01_MOV"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_etapa: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_0020_ACT_INDICADOR_02_INDI
+          depends_on:
+            - task_key: NB_OPER_ANCIN_0020_ACT_INDICADOR_01_MOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/02_ACT_INDICADORES/Notebooks/NB_OPER_ANCIN_0020_ACT_INDICADOR_02_INDI"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_etapa: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_0020_ACT_INDICADOR_03_UNION
+          depends_on:
+            - task_key: NB_OPER_ANCIN_0020_ACT_INDICADOR_02_INDI
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/02_ACT_INDICADORES/Notebooks/NB_OPER_ANCIN_0020_ACT_INDICADOR_03_UNION"
+            base_parameters:
+              sr_accion: ""
+              sr_dt_org_arc: ""
+              sr_estatus_mov: ""
+              sr_etapa: ""
+              sr_fecha_acc: ""
+              sr_fecha_lote: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_sec_lote: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_0020_ACT_INDICADOR_04_FINAL
+          depends_on:
+            - task_key: NB_OPER_ANCIN_0020_ACT_INDICADOR_03_UNION
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/02_ACT_INDICADORES/Notebooks/NB_OPER_ANCIN_0020_ACT_INDICADOR_04_FINAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

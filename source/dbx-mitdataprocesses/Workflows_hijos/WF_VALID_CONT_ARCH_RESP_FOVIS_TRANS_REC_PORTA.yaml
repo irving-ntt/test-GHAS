@@ -1,0 +1,48 @@
+resources:
+  jobs:
+    WF_VALID_CONT_ARCH_RESP_FOVIS_TRANS_REC_PORTA:
+      name: WF_VALID_CONT_ARCH_RESP_FOVIS_TRANS_REC_PORTA
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_CARGA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_CARGA"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_REC_PORTA_09
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_CARGA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0062_VAL_CONT_FOVISSSTE_TRANS_REC_PORTA_09"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_REC_PORTA_01
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_CARGA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0060_VAL_CONT_FOVISSSTE_TRANS_REC_PORTA_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_REC_PORTA_02
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_CARGA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0061_VAL_CONT_FOVISSSTE_TRANS_REC_PORTA_02"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_ANCIN_VAL_CONT_CIFRAS_CONTROL
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_REC_PORTA_01
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_REC_PORTA_02
+            - task_key: TSK_NB_OPER_ANCIN_VALID_CONT_TRANS_REC_PORTA_09
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_CIFRAS_CONTROL_GEN_ARCH_RESP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

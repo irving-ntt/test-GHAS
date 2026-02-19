@@ -1,0 +1,20 @@
+SELECT
+  a.FTN_NSS_CURP,
+  a.FTN_NUM_CTA_INVDUAL
+FROM
+  (
+    SELECT
+      CASE
+        WHEN 3 = #p_ind# THEN FTN_NSS ELSE (CASE WHEN 2=#p_ind# THEN FTC_CURP ELSE '0' END) END AS FTN_NSS_CURP,
+        FTN_NUM_CTA_INVDUAL
+        FROM
+          CIERREN.TTAFOGRAL_CTA_INVDUAL
+      ) a
+      INNER JOIN (
+        SELECT
+          DISTINCT FTC_NSS_CURP
+        FROM
+          CIERREN_ETL.TTSISGRAL_ETL_DISPERSION_CTAS
+        WHERE
+          FTC_FOLIO = '#sr_folio#'
+      ) b ON a.FTN_NSS_CURP = b.FTC_NSS_CURP

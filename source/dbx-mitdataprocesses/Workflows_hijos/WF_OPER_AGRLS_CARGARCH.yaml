@@ -1,0 +1,21 @@
+resources:
+  jobs:
+    WF_OPER_AGRLS_CARGARCH:
+      name: WF_OPER_AGRLS_CARGARCH
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_OPER_AGRLS_CARGA_ARCH
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/01_CARGA_ARCHIVO/Notebooks/NB_OPER_AGRLS_CGA_0010_CARGA_ARCH"
+            base_parameters:
+              sr_id_archivo: ""
+              sr_origen_arc: ""
+              sr_path_arch: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

@@ -1,0 +1,66 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_DESACTIVA_INDICADORES:
+      name: WF_OPER_ANCIN_DESACTIVA_INDICADORES
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: TSK_DESACTIVA_INDICADORES_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/20_DESACTIVAR_INDICADOR/NOTEBOOKS/NB_PATRIF_DESACTIVA_INDICADORES_COND"
+            base_parameters:
+              sr_folio: ""
+              sr_proceso: ""
+              sr_subproceso: ""
+              sr_instancia_proceso: ""
+              sr_etapa: ""
+              sr_subetapa: ""
+              sr_id_snapshot: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_3283
+          depends_on:
+            - task_key: TSK_DESACTIVA_INDICADORES_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_DESACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: DESMARCA_FOVISSSTE
+        - task_key: NB_PATRIF_AIN_0100_DES_IND_DSM_FOV
+          depends_on:
+            - task_key: COND_3283
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/20_DESACTIVAR_INDICADOR/04_SOL_DESM/FOVISSSTE/Notebooks/NB_PATRIF_AIN_0100_DES_IND_DSM_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_347
+          depends_on:
+            - task_key: TSK_DESACTIVA_INDICADORES_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_DESACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: DESMARCA_INFONAVIT
+        - task_key: NB_PATRIF_AIN_0100_DES_IND_DSM_INFONAVIT
+          depends_on:
+            - task_key: COND_347
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/20_DESACTIVAR_INDICADOR/04_SOL_DESM/INFONAVIT/Notebooks/NB_PATRIF_AIN_0100_DES_IND_DSM_INFONAVIT"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_CONCLUSION
+          depends_on:
+            - task_key: NB_PATRIF_AIN_0100_DES_IND_DSM_FOV
+            - task_key: NB_PATRIF_AIN_0100_DES_IND_DSM_INFONAVIT
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/20_DESACTIVAR_INDICADOR/NOTEBOOKS/NB_PATRIF_DESACTIVA_INDICADORES_CONCLUSION"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

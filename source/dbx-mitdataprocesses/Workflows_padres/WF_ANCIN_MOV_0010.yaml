@@ -1,0 +1,204 @@
+resources:
+  jobs:
+    WF_ANCIN_MOV_0010:
+      name: WF_ANCIN_MOV_0010
+      description: >-
+        Flujos del Proceso
+
+
+        1. Flujo Normal
+
+        Condiciones: SR_ETAPA = 1 | SR_REPROCESO = 1
+
+        Descripción:
+
+        Genera los movimientos por primera vez y crea el archivo de control
+        correspondiente.
+
+        Este archivo impide que los movimientos se vuelvan a calcular
+        nuevamente.
+
+
+        ⸻
+
+
+        2. Flujo de Rechazo
+
+        Condiciones: SR_ETAPA = 2 | SR_REPROCESO = 2
+
+        Descripción:
+
+        Elimina los movimientos previamente generados y borra el registro de
+        control, desbloqueando el folio.
+
+        De esta manera, el sistema puede recalcular los movimientos como si
+        fuera la primera ejecución.
+
+
+        ⸻
+
+
+        3. Flujo de Recalculo
+
+        Condiciones: SR_ETAPA = 3 | SR_REPROCESO = 3
+
+        Descripción:
+
+        Permite recalcular los movimientos manteniendo el registro de control
+        activo.
+
+        Este registro bloquea el cálculo inicial (como si fuera la primera vez),
+        pero permite realizar recalculos tantas veces como sea necesario.
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_PANCIN_GEN_ACR_0030
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_PANCIN_GEN_ACR_0030
+            base_parameters:
+              sr_paso: ""
+              sr_etapa: ""
+              sr_instancia_proceso: ""
+              sr_usuario: ""
+              sr_id_snapshot: ""
+              sr_folio: ""
+              sr_fec_liq: ""
+              sr_proceso: ""
+              sr_subproceso: ""
+              sr_fec_acc: ""
+              sr_tipo_mov: ""
+              sr_subetapa: ""
+              sr_reproceso: ""
+              sr_etapa_bit: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: ejecutar_acreditacion
+          depends_on:
+            - task_key: NB_PANCIN_GEN_ACR_0030
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_subetapa}}"
+            right: "27"
+        - task_key: WF_ANCIN_ACRE_0010
+          depends_on:
+            - task_key: ejecutar_acreditacion
+              outcome: "true"
+          run_job_task:
+            job_id: OPER_ANCIN_COMUN_MOV_ACRED_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_proceso}}"
+              sr_fec_liq: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_fec_liq}}"
+              sr_tipo_mov: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_usuario}}"
+              sr_etapa_bit: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_etapa_bit}}"
+              sr_instancia_proceso: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_instancia_proceso}}"
+              sr_etapa: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_paso}}"
+              sr_fec_acc: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_fec_acc}}"
+              sr_folio: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.sr_subetapa}}"
+        - task_key: ejecutar_movimientos
+          depends_on:
+            - task_key: NB_PANCIN_GEN_ACR_0030
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_PANCIN_GEN_ACR_0030.values.workflow_ejecutar}}"
+            right: JQ_MOV_0010
+        - task_key: NB_ANCIN_MOV_0010
+          depends_on:
+            - task_key: ejecutar_movimientos
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA/Notebooks/NB_ANCIN_MOV_0010
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: FLUJO_NORMAL
+          depends_on:
+            - task_key: NB_ANCIN_MOV_0010
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_ANCIN_MOV_0010.values.stage}}"
+            right: FLUJO_NORMAL
+        - task_key: WF_ANCIN_MOV_0010_NORMAL
+          depends_on:
+            - task_key: FLUJO_NORMAL
+              outcome: "true"
+          run_job_task:
+            job_id: ANCIN_MOV_0010_NORMAL_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_proceso}}"
+              sr_fec_liq: "{{tasks.NB_ANCIN_MOV_0010.values.sr_fec_liq}}"
+              sr_tipo_mov: "{{tasks.NB_ANCIN_MOV_0010.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_ANCIN_MOV_0010.values.sr_usuario}}"
+              sr_etapa_bit: "{{tasks.NB_ANCIN_MOV_0010.values.sr_etapa_bit}}"
+              sr_instancia_proceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_instancia_proceso}}"
+              sr_etapa: "{{tasks.NB_ANCIN_MOV_0010.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_ANCIN_MOV_0010.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_paso}}"
+              sr_fec_acc: "{{tasks.NB_ANCIN_MOV_0010.values.sr_fec_acc}}"
+              sr_folio: "{{tasks.NB_ANCIN_MOV_0010.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_ANCIN_MOV_0010.values.sr_subetapa}}"
+        - task_key: FLUJO_RECALCULO
+          depends_on:
+            - task_key: NB_ANCIN_MOV_0010
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_ANCIN_MOV_0010.values.stage}}"
+            right: FLUJO_RECALCULO
+        - task_key: WF_ANCIN_MOV_0010_RECALCULO
+          depends_on:
+            - task_key: FLUJO_RECALCULO
+              outcome: "true"
+          run_job_task:
+            job_id: ANCIN_MOV_0010_RECALCULO_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_proceso}}"
+              sr_fec_liq: "{{tasks.NB_ANCIN_MOV_0010.values.sr_fec_liq}}"
+              sr_tipo_mov: "{{tasks.NB_ANCIN_MOV_0010.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_ANCIN_MOV_0010.values.sr_usuario}}"
+              sr_etapa_bit: "{{tasks.NB_ANCIN_MOV_0010.values.sr_etapa_bit}}"
+              sr_instancia_proceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_instancia_proceso}}"
+              sr_etapa: "{{tasks.NB_ANCIN_MOV_0010.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_ANCIN_MOV_0010.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_paso}}"
+              sr_fec_acc: "{{tasks.NB_ANCIN_MOV_0010.values.sr_fec_acc}}"
+              sr_folio: "{{tasks.NB_ANCIN_MOV_0010.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_ANCIN_MOV_0010.values.sr_subetapa}}"
+        - task_key: FLUJO_RECHAZO
+          depends_on:
+            - task_key: NB_ANCIN_MOV_0010
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_ANCIN_MOV_0010.values.stage}}"
+            right: FLUJO_RECHAZO
+        - task_key: WF_ANCIN_MOV_0010_RECHAZO
+          depends_on:
+            - task_key: FLUJO_RECHAZO
+              outcome: "true"
+          run_job_task:
+            job_id: ANCIN_MOV_0010_RECHAZO_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_proceso}}"
+              sr_fec_liq: "{{tasks.NB_ANCIN_MOV_0010.values.sr_fec_liq}}"
+              sr_tipo_mov: "{{tasks.NB_ANCIN_MOV_0010.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_ANCIN_MOV_0010.values.sr_usuario}}"
+              sr_etapa_bit: "{{tasks.NB_ANCIN_MOV_0010.values.sr_etapa_bit}}"
+              sr_instancia_proceso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_instancia_proceso}}"
+              sr_etapa: "{{tasks.NB_ANCIN_MOV_0010.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_ANCIN_MOV_0010.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_ANCIN_MOV_0010.values.sr_paso}}"
+              sr_fec_acc: "{{tasks.NB_ANCIN_MOV_0010.values.sr_fec_acc}}"
+              sr_folio: "{{tasks.NB_ANCIN_MOV_0010.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_ANCIN_MOV_0010.values.sr_subetapa}}"
+      tags:
+        GAMC: ""
+      queue:
+        enabled: true

@@ -1,0 +1,18 @@
+SELECT '#sr_folio#' FTC_FOLIO
+       ,#sr_id_archivo# FTN_ID_ARCHIVO
+       ,FTC_ID_SERVICIO
+       ,FTC_ID_OPERACION
+       ,TO_DATE(FTD_FEH_PRESEN, 'yyyyMMdd') AS FTD_FEH_PRESEN
+       ,FTC_ID_TIPO_REGIST
+       ,CAST(FTN_LINEA_CREDIT AS INT) AS FTN_LINEA_CREDIT
+       ,CAST(FTN_TIPTRA AS INT) AS FTN_TIPTRA
+       ,FTC_CURP
+       ,FTC_ID_PROCESAR
+       ,FTC_NSS
+       ,FTC_RFC
+       ,to_timestamp(from_utc_timestamp(CURRENT_TIMESTAMP, 'GMT-6')) AS FTD_FEH_CRE
+       , 'DATABRICKS' FCC_USU_CRE
+       , NULL FTD_FEH_ACT
+       , NULL FCC_USU_ACT
+       , FTC_TIPO_MAR_CRE_FOV
+FROM #DELTA_TABLA_NAME1#

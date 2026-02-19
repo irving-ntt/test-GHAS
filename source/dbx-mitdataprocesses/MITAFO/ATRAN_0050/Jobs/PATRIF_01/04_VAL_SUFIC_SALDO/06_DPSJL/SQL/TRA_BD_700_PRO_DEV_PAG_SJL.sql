@@ -1,0 +1,110 @@
+WITH
+-- Step 1: Union all input DataSets
+all_inputs AS (
+    SELECT FTN_CONSE_REG_LOTE, FTN_NUM_CTA_INVDUAL, SDO_SOL, FTN_SDO_PESOS, FFN_ID_CONCEPTO_MOV
+      FROM #DS_600_SDOS_IMSS#
+    UNION ALL
+    SELECT FTN_CONSE_REG_LOTE, FTN_NUM_CTA_INVDUAL, SDO_SOL, FTN_SDO_PESOS, FFN_ID_CONCEPTO_MOV
+      FROM #DS_700_CTAS_SIN_DISP_IMSS#
+),
+
+-- Step 2: Remove duplicates for SDO_SOL aggregation
+dedup_sdo_sol AS (
+    SELECT
+        FTN_CONSE_REG_LOTE,
+        FTN_NUM_CTA_INVDUAL,
+        SDO_SOL,
+        FFN_ID_CONCEPTO_MOV,
+        ROW_NUMBER() OVER (
+            PARTITION BY FTN_CONSE_REG_LOTE, FTN_NUM_CTA_INVDUAL, FFN_ID_CONCEPTO_MOV
+            ORDER BY FTN_CONSE_REG_LOTE, FTN_NUM_CTA_INVDUAL, FFN_ID_CONCEPTO_MOV
+        ) as rn
+    FROM all_inputs
+),
+unique_sdo_sol AS (
+    SELECT
+        FTN_CONSE_REG_LOTE,
+        FTN_NUM_CTA_INVDUAL,
+        SDO_SOL
+    FROM dedup_sdo_sol
+    WHERE rn = 1
+),
+
+-- Step 3: Aggregate FTN_SDO_PESOS
+agg_sdo_pesos AS (
+    SELECT
+        FTN_CONSE_REG_LOTE,
+        FTN_NUM_CTA_INVDUAL,
+        SUM(FTN_SDO_PESOS) AS FTN_SDO_PESOS
+    FROM all_inputs
+    GROUP BY FTN_CONSE_REG_LOTE, FTN_NUM_CTA_INVDUAL
+),
+
+-- Step 4: Aggregate SDO_SOL
+agg_sdo_sol AS (
+    SELECT
+        FTN_CONSE_REG_LOTE,
+        FTN_NUM_CTA_INVDUAL,
+        SUM(SDO_SOL) AS SDO_SOL
+    FROM unique_sdo_sol
+    GROUP BY FTN_CONSE_REG_LOTE, FTN_NUM_CTA_INVDUAL
+),
+
+-- Step 5: Join both aggregations
+joined_agg AS (
+    SELECT
+        p.FTN_CONSE_REG_LOTE,
+        p.FTN_NUM_CTA_INVDUAL,
+        p.FTN_SDO_PESOS,
+        s.SDO_SOL
+    FROM agg_sdo_pesos p
+    INNER JOIN agg_sdo_sol s
+        ON p.FTN_CONSE_REG_LOTE = s.FTN_CONSE_REG_LOTE
+       AND p.FTN_NUM_CTA_INVDUAL = s.FTN_NUM_CTA_INVDUAL
+),
+
+-- Step 6: Apply business rules (TFN_700_DIAGNOSTICO logic)
+diagnostico AS (
+    SELECT
+        FTN_CONSE_REG_LOTE,
+        FTN_NUM_CTA_INVDUAL,
+        CASE WHEN FTN_SDO_PESOS > 0 THEN 1 ELSE 0 END AS FTN_ESTATUS,
+        CASE
+            WHEN FTN_SDO_PESOS = 0 THEN '02'
+            WHEN SDO_SOL = FTN_SDO_PESOS THEN '01'
+            ELSE '04'
+        END AS FTC_DIAG_DEV
+    FROM joined_agg
+)
+
+-- Step 7: Prepare output for TFN_900_GENERA_CAMPOS
+SELECT
+    '#sr_folio#' AS FTC_FOLIO,
+    d.FTN_CONSE_REG_LOTE,
+    d.FTN_NUM_CTA_INVDUAL,
+    d.FTN_ESTATUS AS FTC_ESTATUS,
+    d.FTC_DIAG_DEV,
+    CASE WHEN d.FTN_ESTATUS = 0 THEN 382 ELSE NULL END AS FCN_ID_MOTIVO_RECHAZO,
+    CURRENT_TIMESTAMP AS FTD_FEH_ACT,
+    'DATABRICKS' AS FTC_USU_ACT,
+    3832 AS FCN_ID_SUBPROCESO
+FROM diagnostico d
+
+UNION ALL
+
+-- Step 8: Add records from DS_13_INS_SDOS_INFO (already in output format)
+SELECT
+    '#sr_folio#' AS FTC_FOLIO,
+    FTN_CONSE_REG_LOTE,
+    FTN_NUM_CTA_INVDUAL,
+    FTN_ESTATUS AS FTC_ESTATUS,
+    FTC_DIAG_DEV,
+    CASE WHEN FTN_ESTATUS = 0 THEN 382 ELSE NULL END AS FCN_ID_MOTIVO_RECHAZO,
+    CURRENT_TIMESTAMP AS FTD_FEH_ACT,
+    'DATABRICKS' AS FTC_USU_ACT,
+    3832 AS FCN_ID_SUBPROCESO
+FROM #DS_13_INS_SDOS_INFO#
+
+
+
+

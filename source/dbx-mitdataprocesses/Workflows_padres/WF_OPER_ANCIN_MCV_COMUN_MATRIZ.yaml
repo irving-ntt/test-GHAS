@@ -1,0 +1,264 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_MCV_COMUN_MATRIZ:
+      name: WF_OPER_ANCIN_MCV_COMUN_MATRIZ
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: CONVIVENCIA_INTEGRITY
+          depends_on:
+            - task_key: WF_MCV_01_02_ABONO
+            - task_key: WF_MCV__01_02_CARGO
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.var_genera_64}}"
+            right: GENERA_ARCHIVO_64
+        - task_key: GENERA_ARCHIVO_64_O_65_VACIO
+          depends_on:
+            - task_key: NB_ANCIN_COMUN_MCV_0010_DECISION_TREE_64_O_65
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_ANCIN_COMUN_MCV_0010_DECISION_TREE_64_O_65.values.var_existe_marca}}"
+            right: EXISTE_MARCA
+        - task_key: NB_ANCIN_COMUN_MCV_00100_VAL_MARCA
+          depends_on:
+            - task_key: VALIDA_CONVIVENCIA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/04_MATRIZ_COMUN/Notebooks/NB_ANCIN_COMUN_MCV_0100_VAL_MARCA"
+            base_parameters:
+              sr_conv_ingty: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_conv_ingty}}"
+              sr_etapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_etapa}}"
+              sr_folio: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_folio}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_id_snapshot}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_instancia_proceso}}"
+              sr_paso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_paso}}"
+              sr_path_arch: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_path_arch}}"
+              sr_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_proceso}}"
+              sr_subetapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subetapa}}"
+              sr_subproceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subproceso}}"
+              sr_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_ejecucion}}"
+              sr_tipo_mov: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_mov}}"
+              sr_usuario: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_usuario}}"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_ANCIN_COMUN_MCV_0010_DECISION_TREE_64_O_65
+          depends_on:
+            - task_key: CONVIVENCIA_INTEGRITY
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/04_MATRIZ_COMUN/Notebooks/NB_ANCIN_COMUN_MCV_0010_DECISION_TREE_64_O_65"
+            base_parameters:
+              sr_conv_ingty: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_conv_ingty}}"
+              sr_etapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_etapa}}"
+              sr_folio: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_folio}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_id_snapshot}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_instancia_proceso}}"
+              sr_paso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_paso}}"
+              sr_path_arch: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_path_arch}}"
+              sr_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_proceso}}"
+              sr_subetapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subetapa}}"
+              sr_subproceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subproceso}}"
+              sr_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_ejecucion}}"
+              sr_tipo_mov: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_mov}}"
+              sr_usuario: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_usuario}}"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_ANCIN_COMUN_MCV_0140_ARCHIVO_INTEGRITY
+          depends_on:
+            - task_key: GENERA_ARCHIVO_64_O_65_VACIO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/04_MATRIZ_COMUN/Notebooks/NB_ANCIN_COMUN_MCV_0140_ARCHIVO_INTEGRITY"
+            base_parameters:
+              sr_conv_ingty: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_conv_ingty}}"
+              sr_etapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_etapa}}"
+              sr_folio: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_folio}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_id_snapshot}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_instancia_proceso}}"
+              sr_paso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_paso}}"
+              sr_path_arch: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_path_arch}}"
+              sr_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_proceso}}"
+              sr_subetapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subetapa}}"
+              sr_subproceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subproceso}}"
+              sr_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_ejecucion}}"
+              sr_tipo_mov: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_mov}}"
+              sr_usuario: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_usuario}}"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_ANCIN_COMUN_MCV_0160_ARCHIVO_CSV
+          depends_on:
+            - task_key: CONVIVENCIA_INTEGRITY
+              outcome: 'false'
+            - task_key: GENERA_ARCHIVO_64_O_65_VACIO
+              outcome: 'false'
+            - task_key: WF_MCV_COMUN_MATRIZ__03_PROCESA_ARCHIVO_65
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/04_MATRIZ_COMUN/Notebooks/NB_ANCIN_COMUN_MCV_0160_ARCHIVO_CSV"
+            base_parameters:
+              sr_conv_ingty: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_conv_ingty}}"
+              sr_etapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_etapa}}"
+              sr_folio: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_folio}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_id_snapshot}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_instancia_proceso}}"
+              sr_paso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_paso}}"
+              sr_path_arch: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_path_arch}}"
+              sr_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_proceso}}"
+              sr_subetapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subetapa}}"
+              sr_subproceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subproceso}}"
+              sr_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_ejecucion}}"
+              sr_tipo_mov: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_mov}}"
+              sr_usuario: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_usuario}}"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_ANCIN_COMUN_MCV_9000_CLEAN_TABLAS_DELTA
+          depends_on:
+            - task_key: NB_ANCIN_COMUN_MCV_0160_ARCHIVO_CSV
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/04_MATRIZ_COMUN/Notebooks/NB_ANCIN_COMUN_MCV_9000_CLEAN_TABLAS_DELTA"
+            base_parameters:
+              sr_conv_ingty: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_conv_ingty}}"
+              sr_etapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_etapa}}"
+              sr_folio: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_folio}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_id_snapshot}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_instancia_proceso}}"
+              sr_paso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_paso}}"
+              sr_path_arch: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_path_arch}}"
+              sr_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_proceso}}"
+              sr_subetapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subetapa}}"
+              sr_subproceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subproceso}}"
+              sr_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_ejecucion}}"
+              sr_tipo_mov: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_mov}}"
+              sr_usuario: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_usuario}}"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/04_MATRIZ_COMUN/Notebooks/NB_ANCIN_COMUN_MCV_0000_DECISION_TREE"
+            base_parameters:
+              sr_conv_ingty: '1'
+              sr_etapa: '1'
+              sr_folio: '202503141620124822'
+              sr_id_snapshot: '3'
+              sr_instancia_proceso: '2'
+              sr_paso: '1'
+              sr_path_arch: /INTEGRITY/
+              sr_proceso: '97'
+              sr_subetapa: '25'
+              sr_subproceso: '365'
+              sr_tipo_ejecucion: '0'
+              sr_tipo_mov: '180'
+              sr_usuario: DATABRICKSDEV
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: PROCESA_180_CARGO
+          depends_on:
+            - task_key: NB_ANCIN_COMUN_MCV_00100_VAL_MARCA
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.var_tipo_ejecucion}}"
+            right: PROCESA_CARGO
+        - task_key: PROCESA_181_ABONO
+          depends_on:
+            - task_key: NB_ANCIN_COMUN_MCV_00100_VAL_MARCA
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.var_tipo_ejecucion}}"
+            right: PROCESA_ABONO
+        - task_key: RESPUESTA_ITGY
+          depends_on:
+            - task_key: VALIDA_CONVIVENCIA
+              outcome: 'false'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.var_tipo_ejecucion}}"
+            right: RESPUESTA_ITGY
+        - task_key: VALIDA_CONVIVENCIA
+          depends_on:
+            - task_key: NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.var_valida_convivencia}}"
+            right: VALIDA_CONVIVENCIA
+        - task_key: WF_MCV_01_02_ABONO
+          depends_on:
+            - task_key: PROCESA_181_ABONO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_COMUN_MATRIZ_01_02_ABONO_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_mov}}"
+              sr_path_arch: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_instancia_proceso}}"
+              sr_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_ejecucion}}"
+              sr_conv_ingty: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_conv_ingty}}"
+              var_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.var_tipo_ejecucion}}"
+              sr_etapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subetapa}}"
+        - task_key: WF_MCV_COMUN_MATRIZ__03_PROCESA_ARCHIVO_65
+          depends_on:
+            - task_key: RESPUESTA_ITGY
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: MCV_COMUN_MATRIZ__03_PROCESA_ARCHIVO_65_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_mov}}"
+              sr_path_arch: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_instancia_proceso}}"
+              sr_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_ejecucion}}"
+              sr_conv_ingty: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_conv_ingty}}"
+              var_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.var_tipo_ejecucion}}"
+              sr_etapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subetapa}}"
+        - task_key: WF_MCV__01_02_CARGO
+          depends_on:
+            - task_key: PROCESA_180_CARGO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_COMUN_MATRIZ_01_02_CARGO_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_mov}}"
+              sr_path_arch: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_instancia_proceso}}"
+              sr_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_tipo_ejecucion}}"
+              sr_conv_ingty: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_conv_ingty}}"
+              var_tipo_ejecucion: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.var_tipo_ejecucion}}"
+              sr_etapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ANCIN_COMUN_MCV_0000_DECISION_TREE.values.sr_subetapa}}"
+      tags:
+        COMUN: ""
+        MCV: Matriz de Convivencia
+      queue:
+        enabled: true

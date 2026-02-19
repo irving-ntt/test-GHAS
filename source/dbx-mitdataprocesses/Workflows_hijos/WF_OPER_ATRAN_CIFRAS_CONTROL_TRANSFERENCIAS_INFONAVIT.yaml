@@ -1,0 +1,110 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_CIFRAS_CONTROL_TRANSFERENCIAS_INFONAVIT:
+      name: WF_OPER_ATRAN_CIFRAS_CONTROL_TRANSFERENCIAS_INFONAVIT
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: TASK_COND_RECALCULO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CIFRASCONTROL_TRANS_COND"
+            base_parameters:
+              sr_proceso: ""
+              sr_subproceso: ""
+              sr_subetapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_instancia_proceso: ""
+              sr_usuario: ""
+              sr_etapa: ""
+              sr_id_snapshot: ""
+              sr_tipo_archivo: ""
+              sr_recalculo: ""
+              sr_tipo_layout: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: RECALCULO
+          depends_on:
+            - task_key: TASK_COND_RECALCULO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TASK_COND_RECALCULO.values.sr_recalculo}}"
+            right: '0'
+        - task_key: TSK_NB_DATRAN_TRANS_100_TI
+          depends_on:
+            - task_key: RECALCULO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TI_0_1"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_TRANS_100_TI_ACT
+          depends_on:
+            - task_key: RECALCULO
+              outcome: 'false'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TI_ACT_1_1"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_TRANS_200_TI
+          depends_on:
+            - task_key: TSK_NB_DATRAN_TRANS_100_TI
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TI_0_2"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_TRANS_200_TI_ACT
+          depends_on:
+            - task_key: TSK_NB_DATRAN_TRANS_100_TI_ACT
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TI_ACT_1_2"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_TRANS_200_TI_CIFCTRL
+          depends_on:
+            - task_key: TSK_NB_DATRAN_TRANS_200_TI
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TI_CCTRL_0_2"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_TRANS_200_TI_SUMARCH
+          depends_on:
+            - task_key: TSK_NB_DATRAN_TRANS_200_TI
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TI_TRANS_SUMARCH_0_2"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_TRANS_200_TI_CIFCTRL_FINAL
+          depends_on:
+            - task_key: TSK_NB_DATRAN_TRANS_200_TI_SUMARCH
+            - task_key: TSK_NB_DATRAN_TRANS_200_TI_CIFCTRL
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TRANS_FINAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_TRANS_TIPO_ARCH
+          depends_on:
+            - task_key: TSK_NB_DATRAN_TRANS_200_TI_ACT
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TI_ACT_TIPOARCH"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_TRANS_200_TI_TRANSINFONA_FINAL
+          depends_on:
+            - task_key: TSK_NB_DATRAN_TRANS_TIPO_ARCH
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_TRANS_FINAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

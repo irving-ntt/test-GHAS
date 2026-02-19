@@ -1,0 +1,20 @@
+SELECT
+   FTN_NUM_CTA_INVDUAL        ,
+   FTC_RFC_BUC                ,
+   FTC_FOLIO                  ,
+   FTN_ID_ARCHIVO             ,
+   FTC_NSS                    ,
+   FTC_CURP                   ,
+   FTC_RFC                    ,
+   FTC_APELLIDO_PATER_AFORE   ,
+   FTC_APELLIDO_MATER_AFORE   ,
+   FTC_NOMBRE_AFORE           ,
+   FTC_CORREO_ELEC            ,
+   FTN_CELULAR                ,
+   ' ' AS FTC_IDENTIFICADOS   ,
+   375 AS FTN_ID_DIAGNOSTICO  ,
+   0 AS FTN_VIGENCIA
+FROM #DELTA_TABLA_NAME#
+WHERE FTN_NUM_CTA_INVDUAL IS NULL
+  OR ( FCC_VALOR_IND NOT IN (0, 1)
+  OR FCC_VALOR_IND IS NULL )

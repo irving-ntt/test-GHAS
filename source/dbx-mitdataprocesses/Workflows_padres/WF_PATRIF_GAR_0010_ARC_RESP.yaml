@@ -1,0 +1,247 @@
+resources:
+  jobs:
+    WF_PATRIF_GAR_0010_ARC_RESP:
+      name: WF_PATRIF_GAR_0010_ARC_RESP
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_OPER_ANCIN_VAL_CONT_CONCLUSION
+          depends_on:
+            - task_key: WF_OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_365
+            - task_key: WF_OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_368
+            - task_key: WF_OPER_ATRAN_GEN_ARCH_TRANSF_FOVISSSTE
+            - task_key: WF_OPER_ATRAN_GEN_ARCH_DPSJL_3832
+            - task_key: WF_OPER_ATRAN_GEN_ARCH_TRP_3286
+            - task_key: WF_OPER_ATRAN_GEN_ARCH_SOL_MARCA
+            - task_key: WF_OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_364
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/NOTIFICACION/Notebooks/NB_OPER_ATRAN_CONCLUSION"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_PARAMETROS_IN
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/NOTIFICACION/Notebooks/NB_OPER_ATRAN_PARAMETROS"
+            base_parameters:
+              sr_etapa: ""
+              sr_fec_arc: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_archivo_06: ""
+              sr_id_archivo_09: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_SUBPROCESO_3286
+          depends_on:
+            - task_key: NB_OPER_ATRAN_PARAMETROS_IN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+            right: '3286'
+        - task_key: TKS_SUBPROCESO_354
+          depends_on:
+            - task_key: NB_OPER_ATRAN_PARAMETROS_IN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+            right: '354'
+        - task_key: TKS_SUBPROCESO_363
+          depends_on:
+            - task_key: NB_OPER_ATRAN_PARAMETROS_IN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+            right: '363'
+        - task_key: TKS_SUBPROCESO_364
+          depends_on:
+            - task_key: NB_OPER_ATRAN_PARAMETROS_IN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+            right: '364'
+        - task_key: TKS_SUBPROCESO_365
+          depends_on:
+            - task_key: NB_OPER_ATRAN_PARAMETROS_IN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+            right: '365'
+        - task_key: TKS_SUBPROCESO_368
+          depends_on:
+            - task_key: NB_OPER_ATRAN_PARAMETROS_IN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+            right: '368'
+        - task_key: TKS_SUBPROCESO_3832
+          depends_on:
+            - task_key: NB_OPER_ATRAN_PARAMETROS_IN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+            right: '3832'
+        - task_key: WF_OPER_ATRAN_GEN_ARCH_DPSJL_3832
+          depends_on:
+            - task_key: TKS_SUBPROCESO_3832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ATRAN_GEN_ARCH_DPSJL_3832_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_proceso}}"
+              sr_id_archivo_06: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_06}}"
+              sr_subproceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_instancia_proceso}}"
+              sr_id_archivo_09: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_09}}"
+              sr_etapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subetapa}}"
+        - task_key: WF_OPER_ATRAN_GEN_ARCH_SOL_MARCA
+          depends_on:
+            - task_key: TKS_SUBPROCESO_354
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ATRAN_GEN_ARCH_SOL_MARCA_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_proceso}}"
+              sr_id_archivo_06: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_06}}"
+              sr_subproceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_instancia_proceso}}"
+              sr_id_archivo_09: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_09}}"
+              sr_etapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subetapa}}"
+        - task_key: WF_OPER_ATRAN_GEN_ARCH_TRANSF_FOVISSSTE
+          depends_on:
+            - task_key: TKS_SUBPROCESO_363
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ATRAN_GEN_ARCH_TRANSF_FOVISSSTE_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_proceso}}"
+              sr_id_archivo_06: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_06}}"
+              sr_subproceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_instancia_proceso}}"
+              sr_id_archivo_09: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_09}}"
+              sr_etapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subetapa}}"
+        - task_key: WF_OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_364
+          depends_on:
+            - task_key: TKS_SUBPROCESO_364
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_364_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_proceso}}"
+              sr_id_archivo_06: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_06}}"
+              sr_subproceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_instancia_proceso}}"
+              sr_id_archivo_09: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_09}}"
+              sr_etapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subetapa}}"
+        - task_key: WF_OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_365
+          depends_on:
+            - task_key: TKS_SUBPROCESO_365
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_365_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_proceso}}"
+              sr_id_archivo_06: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_06}}"
+              sr_subproceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_instancia_proceso}}"
+              sr_id_archivo_09: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_09}}"
+              sr_etapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_folio}}"
+              sr_paso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subetapa}}"
+        - task_key: WF_OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_368
+          depends_on:
+            - task_key: TKS_SUBPROCESO_368
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_368_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_proceso}}"
+              sr_id_archivo_06: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_06}}"
+              sr_subproceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_instancia_proceso}}"
+              sr_id_archivo_09: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_09}}"
+              sr_etapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subetapa}}"
+        - task_key: WF_OPER_ATRAN_GEN_ARCH_TRP_3286
+          depends_on:
+            - task_key: TKS_SUBPROCESO_3286
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ATRAN_GEN_ARCH_TRP_3286_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_proceso}}"
+              sr_id_archivo_06: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_06}}"
+              sr_subproceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_instancia_proceso}}"
+              sr_id_archivo_09: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo_09}}"
+              sr_etapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_paso}}"
+              sr_folio: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_OPER_ATRAN_PARAMETROS_IN.values.sr_subetapa}}"
+      tags:
+        GEN_ARCH_RESP: ""
+      queue:
+        enabled: true

@@ -1,0 +1,98 @@
+resources:
+  jobs:
+    WF_OPER_AGRLS_GENERACION_CIFRAS:
+      name: WF_OPER_AGRLS_GENERACION_CIFRAS
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_OPER_AGRLS_CON_0020_CONCILIA_01_DISPERSION
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/02_CIFRAS_CONTROL/Notebooks/NB_OPER_AGRLS_CON_0020_CONCILIA_01_DISPERSION"
+            base_parameters:
+              sr_dt_org_arc: '1'
+              sr_etapa: ""
+              sr_fec_arc: '0'
+              sr_fec_liq: '0'
+              sr_folio: '202409241144463243'
+              sr_id_archivo: '29288'
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: '1'
+              sr_proceso: '7'
+              sr_subetapa: '1'
+              sr_subproceso: '101'
+              sr_tipo_reporte: '0'
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_AGRLS_CON_0020_CONCILIA_02_CONCILIACION
+          depends_on:
+            - task_key: NB_OPER_AGRLS_CON_0020_CONCILIA_01_DISPERSION
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/02_CIFRAS_CONTROL/Notebooks/NB_OPER_AGRLS_CON_0020_CONCILIA_02_CONCILIACION"
+            base_parameters:
+              sr_dt_org_arc: '1'
+              sr_etapa: ""
+              sr_fec_arc: '0'
+              sr_fec_liq: '0'
+              sr_folio: '202409241144463243'
+              sr_id_archivo: '29288'
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: '1'
+              sr_proceso: '7'
+              sr_subetapa: '1'
+              sr_subproceso: '101'
+              sr_tipo_reporte: '0'
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_AGRLS_CON_0020_CONCILIA_03_CONTEO
+          depends_on:
+            - task_key: NB_OPER_AGRLS_CON_0020_CONCILIA_02_CONCILIACION
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/02_CIFRAS_CONTROL/Notebooks/NB_OPER_AGRLS_CON_0020_CONCILIA_03_CONTEO"
+            base_parameters:
+              sr_dt_org_arc: '1'
+              sr_etapa: ""
+              sr_fec_arc: '0'
+              sr_fec_liq: '0'
+              sr_folio: '202409241144463243'
+              sr_id_archivo: '29288'
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: '1'
+              sr_proceso: '7'
+              sr_subetapa: '1'
+              sr_subproceso: '101'
+              sr_tipo_reporte: '0'
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_AGRLS_CON_0020_CONCILIA_04_UNION
+          depends_on:
+            - task_key: NB_OPER_AGRLS_CON_0020_CONCILIA_03_CONTEO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/02_CIFRAS_CONTROL/Notebooks/NB_OPER_AGRLS_CON_0020_CONCILIA_04_UNION"
+            base_parameters:
+              sr_dt_org_arc: '1'
+              sr_etapa: ""
+              sr_fec_arc: '0'
+              sr_fec_liq: '0'
+              sr_folio: '202409241144463243'
+              sr_id_archivo: '29288'
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: '1'
+              sr_proceso: '7'
+              sr_subetapa: '1'
+              sr_subproceso: '101'
+              sr_tipo_reporte: '0'
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

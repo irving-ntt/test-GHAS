@@ -1,0 +1,327 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_GEN_MOV:
+      name: WF_OPER_ANCIN_GEN_MOV
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: GEN_MOV_ABONO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_stage}}"
+            right: ABONO
+        - task_key: GEN_MOV_ABONO_AEIM
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_stage}}"
+            right: AEIM_ABONO
+        - task_key: GEN_MOV_ABONO_RECALCULO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_stage}}"
+            right: ABONO RECALCULO
+        - task_key: GEN_MOV_ABONO_RECALCULO_AEIM
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_stage}}"
+            right: AEIM_ABONO_RECALCULO
+        - task_key: GEN_MOV_ABONO_RECHAZO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_stage}}"
+            right: ABONO RECHAZO
+        - task_key: GEN_MOV_CARGO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_stage}}"
+            right: CARGO
+        - task_key: GEN_MOV_CARGO_RECALCULO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_stage}}"
+            right: CARGO RECALCULO
+        - task_key: GEN_MOV_CARGO_RECHAZO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_stage}}"
+            right: CARGO RECHAZO
+        - task_key: TSK_OPER_ANCIN_GEN_MOV_FILTRO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_GEN_MOV_COND"
+            base_parameters:
+              sr_fecha_acc: ""
+              sr_fecha_liq: ""
+              sr_folio: ""
+              sr_folio_rel: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_reproceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+          max_retries: 1
+          min_retry_interval_millis: 30000
+        - task_key: TSK_WF_OPER_ANCIN_GEN_MOV_ABONO
+          depends_on:
+            - task_key: GEN_MOV_ABONO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: GEN_MOV_ABONO_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_proceso}}"
+              sr_fecha_liq: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_liq}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_reproceso}}"
+              sr_fcc_usu_cre: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fcc_usu_cre}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_instancia_proceso}}"
+              sr_flc_usu_reg: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_flc_usu_reg}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_id_snapshot}}"
+              cx_cre_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_cre_esquema}}"
+              tl_cre_dispersion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_cre_dispersion}}"
+              sr_factor: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_factor}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_GEN_MOV_ABONO_AEIM
+          depends_on:
+            - task_key: GEN_MOV_ABONO_AEIM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: GEN_MOV_ABONO_AEIM_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_proceso}}"
+              sr_fecha_liq: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_liq}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_reproceso}}"
+              sr_fcc_usu_cre: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fcc_usu_cre}}"
+              tl_pro_aeim: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_pro_aeim}}"
+              tl_crn_valor_accion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_crn_valor_accion}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_instancia_proceso}}"
+              sr_flc_usu_reg: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_flc_usu_reg}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_origen_arc}}"
+              cx_pro_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_pro_esquema}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_id_snapshot}}"
+              cx_cre_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_cre_esquema}}"
+              cx_crn_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_crn_esquema}}"
+              tl_cre_dispersion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_cre_dispersion}}"
+              tl_crn_config_concep_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_crn_config_concep_mov}}"
+              sr_factor: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_factor}}"
+              tl_crn_tipo_subcta: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_crn_tipo_subcta}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_acc}}"
+              tl_crn_matriz_convivencia: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_crn_matriz_convivencia}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_GEN_MOV_ABONO_RECALCULO
+          depends_on:
+            - task_key: GEN_MOV_ABONO_RECALCULO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: GEN_MOV_ABONO_RECALCULO_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_proceso}}"
+              sr_fecha_liq: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_liq}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_reproceso}}"
+              sr_fcc_usu_cre: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fcc_usu_cre}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_instancia_proceso}}"
+              sr_flc_usu_reg: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_flc_usu_reg}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_id_snapshot}}"
+              cx_cre_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_cre_esquema}}"
+              tl_cre_dispersion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_cre_dispersion}}"
+              sr_factor: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_factor}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_GEN_MOV_ABONO_RECALCULO_AEIM
+          depends_on:
+            - task_key: GEN_MOV_ABONO_RECALCULO_AEIM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: GEN_MOV_ABONO_RECALCULO_AEIM_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_proceso}}"
+              sr_fecha_liq: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_liq}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_reproceso}}"
+              sr_fcc_usu_cre: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fcc_usu_cre}}"
+              tl_pro_aeim: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_pro_aeim}}"
+              tl_crn_valor_accion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_crn_valor_accion}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_instancia_proceso}}"
+              sr_flc_usu_reg: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_flc_usu_reg}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_origen_arc}}"
+              cx_pro_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_pro_esquema}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_id_snapshot}}"
+              cx_cre_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_cre_esquema}}"
+              cx_crn_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_crn_esquema}}"
+              tl_cre_dispersion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_cre_dispersion}}"
+              tl_crn_config_concep_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_crn_config_concep_mov}}"
+              sr_factor: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_factor}}"
+              tl_crn_tipo_subcta: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_crn_tipo_subcta}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_acc}}"
+              tl_crn_matriz_convivencia: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_crn_matriz_convivencia}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_GEN_MOV_ABONO_RECHAZO
+          depends_on:
+            - task_key: GEN_MOV_ABONO_RECHAZO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: GEN_MOV_ABONO_RECHAZO_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_proceso}}"
+              sr_fecha_liq: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_liq}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_reproceso}}"
+              sr_fcc_usu_cre: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fcc_usu_cre}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_instancia_proceso}}"
+              sr_flc_usu_reg: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_flc_usu_reg}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_id_snapshot}}"
+              cx_cre_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_cre_esquema}}"
+              tl_cre_dispersion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_cre_dispersion}}"
+              sr_factor: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_factor}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_GEN_MOV_CARGO
+          depends_on:
+            - task_key: GEN_MOV_CARGO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: GEN_MOV_CARGO_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_proceso}}"
+              sr_fecha_liq: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_liq}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_reproceso}}"
+              sr_fcc_usu_cre: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fcc_usu_cre}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_instancia_proceso}}"
+              sr_flc_usu_reg: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_flc_usu_reg}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_id_snapshot}}"
+              cx_cre_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_cre_esquema}}"
+              tl_cre_dispersion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_cre_dispersion}}"
+              sr_factor: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_factor}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_GEN_MOV_CARGO_RECALCULO
+          depends_on:
+            - task_key: GEN_MOV_CARGO_RECALCULO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: GEN_MOV_CARGO_RECALCULO_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_proceso}}"
+              sr_fecha_liq: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_liq}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_reproceso}}"
+              sr_fcc_usu_cre: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fcc_usu_cre}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_instancia_proceso}}"
+              sr_flc_usu_reg: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_flc_usu_reg}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_id_snapshot}}"
+              cx_cre_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_cre_esquema}}"
+              tl_cre_dispersion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_cre_dispersion}}"
+              sr_factor: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_factor}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_GEN_MOV_CARGO_RECHAZO
+          depends_on:
+            - task_key: GEN_MOV_CARGO_RECHAZO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: GEN_MOV_CARGO_RECHAZO_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_proceso}}"
+              sr_fecha_liq: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_liq}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_reproceso}}"
+              sr_fcc_usu_cre: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fcc_usu_cre}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_instancia_proceso}}"
+              sr_flc_usu_reg: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_flc_usu_reg}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_id_snapshot}}"
+              cx_cre_esquema: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.cx_cre_esquema}}"
+              tl_cre_dispersion: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.tl_cre_dispersion}}"
+              sr_factor: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_factor}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_GEN_MOV_FILTRO.values.sr_subetapa}}"
+      tags:
+        BU: MOV
+        PO: RECA
+      queue:
+        enabled: true

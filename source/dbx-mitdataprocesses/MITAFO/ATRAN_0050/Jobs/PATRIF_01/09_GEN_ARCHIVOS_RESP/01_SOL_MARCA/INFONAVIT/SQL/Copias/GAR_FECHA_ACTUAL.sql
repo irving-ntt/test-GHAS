@@ -1,0 +1,1 @@
+SELECT date_format(current_date(), 'yyyyMMdd') AS fecha_actual

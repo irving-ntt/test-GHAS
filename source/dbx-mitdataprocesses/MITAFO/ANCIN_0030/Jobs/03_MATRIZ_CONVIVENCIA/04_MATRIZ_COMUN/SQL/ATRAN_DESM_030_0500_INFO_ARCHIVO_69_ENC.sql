@@ -1,0 +1,20 @@
+-- Query para generar ENCABEZADO DE ARCHIVO  69 desde tabla delta 
+WITH ED AS 
+( 
+SELECT 
+  TOTAL AS CUANTOS 
+  FROM #DELTA_TABLA_NAME1# D
+  LIMIT 1
+  )
+SELECT 
+1 AS POSICION,
+CONCAT 
+  (
+    '01'
+    ,#FECHA_PROCESO#
+    ,NVL2(ED.CUANTOS,LPAD(CUANTOS,9,'0'),'0000000000')   -- 10 POSICIONES
+    ,LPAD(' ',109) 
+  ) AS DETALLE
+  -- , #FECHA_PROCESO# AS FECHA 
+  -- ,ED.* 
+  FROM ED

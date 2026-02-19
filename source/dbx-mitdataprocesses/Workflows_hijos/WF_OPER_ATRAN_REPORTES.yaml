@@ -1,0 +1,208 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_REPORTES:
+      name: WF_OPER_ATRAN_REPORTES
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_OPER_ATRAN_REP_COND
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/Notebooks/NB_OPER_ATRAN_REP_COND
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_3283_REP_SOL_DESMARCA_FOV
+          depends_on:
+            - task_key: NB_OPER_ATRAN_REP_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_REP_COND.values.sr_stage}}"
+            right: SDSM_FOV
+        - task_key: NB_REP_0020_REP_SDSM_FOV
+          depends_on:
+            - task_key: TSK_3283_REP_SOL_DESMARCA_FOV
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/04_SOL_DESM/FOVISSSTE/Notebooks/NB_PATRIF_REP_0020_REP_SDSM_FOV
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_347_REP_SOL_DESMARCA
+          depends_on:
+            - task_key: NB_OPER_ATRAN_REP_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_REP_COND.values.sr_stage}}"
+            right: DESM
+        - task_key: NB_REP_0020_REP_SOL_DESM
+          depends_on:
+            - task_key: TSK_347_REP_SOL_DESMARCA
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/04_SOL_DESM/INFONAVIT/Notebooks/NB_JP_PATRIF_REP_0020_REP_SOL_DESM
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_REP_0030_REP_CTE_INFONAVIT_347
+          depends_on:
+            - task_key: NB_REP_0020_REP_SOL_DESM
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/01_SOL_MARCA/Notebooks/NB_PATRIF_REP_0030_REP_CTE_INFONAVIT
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_348_349_REP_DSE
+          depends_on:
+            - task_key: NB_OPER_ATRAN_REP_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_REP_COND.values.sr_stage}}"
+            right: DSE
+        - task_key: NB_REP_0010_DSE
+          depends_on:
+            - task_key: TSK_348_349_REP_DSE
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/03_DEV_SALDOS/INFONAVIT/Notebooks/NB_PATRIF_REP_0010_DSE
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_REP_0020_CAT_CLIENTE
+          depends_on:
+            - task_key: NB_REP_0010_DSE
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/03_DEV_SALDOS/INFONAVIT/Notebooks/NB_PATRIF_REP_0020_CAT_CLIENTE
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_350_REP_SOL_DEV_EXED_FOV
+          depends_on:
+            - task_key: NB_OPER_ATRAN_REP_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_REP_COND.values.sr_stage}}"
+            right: DSEF
+        - task_key: NB_REP_0010_DSEF
+          depends_on:
+            - task_key: TSK_350_REP_SOL_DEV_EXED_FOV
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/03_DEV_SALDOS/FOVISSSTE/Notebooks/NB_PATRIF_REP_0010_DSEF
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_354_REP_SOL_MARCA
+          depends_on:
+            - task_key: NB_OPER_ATRAN_REP_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_REP_COND.values.sr_stage}}"
+            right: DESMAR
+        - task_key: NB_REP_0020_REP_MARCA_DESMAR
+          depends_on:
+            - task_key: TSK_354_REP_SOL_MARCA
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/01_SOL_MARCA/Notebooks/NB_PATRIF_REP_0020_REP_MARCA_DESMAR
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_REP_0030_REP_CTE_INFONAVIT
+          depends_on:
+            - task_key: NB_REP_0020_REP_MARCA_DESMAR
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/01_SOL_MARCA/Notebooks/NB_PATRIF_REP_0030_REP_CTE_INFONAVIT
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_363_REP_TRANSF_FOV
+          depends_on:
+            - task_key: NB_OPER_ATRAN_REP_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_REP_COND.values.sr_stage}}"
+            right: TFOV
+        - task_key: NB_0010_REP_TRANS_FOV
+          depends_on:
+            - task_key: TSK_363_REP_TRANSF_FOV
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_PATRIF_REP_0010_REP_TRANS_FOV
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_REP_0020_REP_TRANS_FOV
+          depends_on:
+            - task_key: NB_0010_REP_TRANS_FOV
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_PATRIF_REP_0020_REP_TRANS_FOV
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_364_365_368_REP_TRASFERENCIAS
+          depends_on:
+            - task_key: NB_OPER_ATRAN_REP_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_REP_COND.values.sr_stage}}"
+            right: TRN
+        - task_key: NB_REP_0020_REP_TRANSFERENCIAS
+          depends_on:
+            - task_key: TSK_364_365_368_REP_TRASFERENCIAS
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_REP_0020_REP_TRANSFERENCIAS
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_REP_0030_REP_TRANSFERENCIAS
+          depends_on:
+            - task_key: NB_REP_0020_REP_TRANSFERENCIAS
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_REP_0030_REP_CTE_INFONAV
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_3832_REP_DSJL
+          depends_on:
+            - task_key: NB_OPER_ATRAN_REP_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_REP_COND.values.sr_stage}}"
+            right: DPSJL
+        - task_key: NB_REP_0010_REP_MOV_DPSJL
+          depends_on:
+            - task_key: TSK_3832_REP_DSJL
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/06_DPSJL/Notebooks/NB_PATRIF_REP_0010_REP_MOV_DPSJL
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_REP_0020_REP_MOV_RCV_VIV
+          depends_on:
+            - task_key: NB_REP_0010_REP_MOV_DPSJL
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/06_DPSJL/Notebooks/NB_PATRIF_REP_0020_REP_MOV_RCV_VIV
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_REP_0030_REP_CRG_DPSJL
+          depends_on:
+            - task_key: NB_REP_0020_REP_MOV_RCV_VIV
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/06_DPSJL/Notebooks/NB_PATRIF_REP_0030_REP_CRG_DPSJL
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_REP_0040_REP_CTE_DPSJL
+          depends_on:
+            - task_key: NB_REP_0030_REP_CRG_DPSJL
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/06_DPSJL/Notebooks/NB_PATRIF_REP_0040_REP_CTE_DPSJL
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_CONCLUSION
+          depends_on:
+            - task_key: NB_REP_0020_REP_TRANS_FOV
+            - task_key: NB_REP_0040_REP_CTE_DPSJL
+            - task_key: NB_REP_0020_CAT_CLIENTE
+            - task_key: NB_REP_0030_REP_CTE_INFONAVIT_347
+            - task_key: NB_REP_0030_REP_CTE_INFONAVIT
+            - task_key: NB_REP_0010_DSEF
+            - task_key: NB_REP_0030_REP_TRANSFERENCIAS
+            - task_key: NB_REP_0020_REP_SDSM_FOV
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/17_REPORTES/Notebooks/NB_OPER_ATRAN_REP_CONCLUSION
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

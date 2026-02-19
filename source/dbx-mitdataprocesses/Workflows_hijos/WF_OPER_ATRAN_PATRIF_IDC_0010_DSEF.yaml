@@ -1,0 +1,78 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_PATRIF_IDC_0010_DSEF:
+      name: WF_OPER_ATRAN_PATRIF_IDC_0010_DSEF
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_IDC_0100_BUC_CTE_DSEF
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/03_DEV_SALDOS/FOVISSSTE/Notebooks/NB_IDC_0100_BUC_CTE_DSEF"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0300_INDIC_CTE_FOV
+          depends_on:
+            - task_key: NB_IDC_0100_BUC_CTE_DSEF
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/FOVISSSTE/Notebooks/NB_IDC_0300_INDIC_CTE_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0400_CUENTAS_VIG_CTE_FOV
+          depends_on:
+            - task_key: NB_IDC_0300_INDIC_CTE_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/FOVISSSTE/Notebooks/NB_IDC_0400_CUENTAS_VIG_CTE_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0500_CRG_CTE_FOV
+          depends_on:
+            - task_key: NB_IDC_0400_CUENTAS_VIG_CTE_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/FOVISSSTE/Notebooks/NB_IDC_0500_ARCH_CRG_CTE_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0600_CRG_ID_CTE_FOV
+          depends_on:
+            - task_key: NB_IDC_0500_CRG_CTE_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/FOVISSSTE/Notebooks/NB_IDC_0600_CRG_ID_CTE_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0700_CARGA_DSEF
+          depends_on:
+            - task_key: NB_IDC_0600_CRG_ID_CTE_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/03_DEV_SALDOS/FOVISSSTE/Notebooks/NB_IDC_0700_CARGA_DSEF"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0800_CTES_NO_IDENT
+          depends_on:
+            - task_key: NB_IDC_0700_CARGA_DSEF
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/INFONAVIT/Notebooks/NB_IDC_0800_CTES_NO_IDENT"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_CLEANER
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0900_CIFRAS_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/INFONAVIT/Notebooks/NB_IDC_CLEANER"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0900_CIFRAS_CTE
+          depends_on:
+            - task_key: NB_IDC_0800_CTES_NO_IDENT
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0900_CIFRAS_CTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

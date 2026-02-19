@@ -1,0 +1,38 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_COMUN_MOV_ACRED:
+      name: WF_OPER_ANCIN_COMUN_MOV_ACRED
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: TSK_ANCIN_COMUN_MOV_ACRED_0020
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA_ACRE_0020/Notebooks/NB_ANCIN_ACRE_0020
+            base_parameters:
+              sr_etapa: ""
+              sr_fec_acc: ""
+              sr_fec_liq: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_ANCIN_COMUN_MOV_ACRED_0010
+          depends_on:
+            - task_key: TSK_ANCIN_COMUN_MOV_ACRED_0020
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA_ACRE_0020/Notebooks/NB_ANCIN_ACRE_0010
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_ACRE_0030_UPT_MOV
+          depends_on:
+            - task_key: TSK_ANCIN_COMUN_MOV_ACRED_0010
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/02_ACREDITACION_UNIFICADA_ACRE_0020/Notebooks/NB_ANCIN_0030_UPT_MOV
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

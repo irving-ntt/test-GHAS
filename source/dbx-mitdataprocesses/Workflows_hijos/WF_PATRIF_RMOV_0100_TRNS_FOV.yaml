@@ -1,0 +1,74 @@
+resources:
+  jobs:
+    WF_PATRIF_RMOV_0100_TRNS_FOV:
+      name: WF_PATRIF_RMOV_0100_TRNS_FOV
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_PATRIF_REVMOV_0100_EXT_TRN_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_PATRIF_REVMOV_0100_EXT_TRN_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI
+          depends_on:
+            - task_key: NB_PATRIF_REVMOV_0100_EXT_TRN_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_REVMOV_0200_DESM_NCI"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI_DETALLE
+          depends_on:
+            - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_REVMOV_0200_DESM_NCI_DETALLE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI_NCI
+          depends_on:
+            - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_REVMOV_0200_DESM_NCI_NCI"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI_SUMARIO
+          depends_on:
+            - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_REVMOV_0200_DESM_NCI_SUMARIO"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_REVMOV_0300_ARCH_INGTY
+          depends_on:
+            - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI_DETALLE
+            - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI_NCI
+            - task_key: NB_PATRIF_REVMOV_0200_DESM_NCI_SUMARIO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_REVMOV_0300_ARCH_INGTY"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_REVMOV_0500_REV_MOVS
+          depends_on:
+            - task_key: NB_PATRIF_REVMOV_0300_ARCH_INGTY
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_REVMOV_0500_REV_MOVS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_RMOV_0190_REVERSO_MOVS_CLEANER
+          depends_on:
+            - task_key: NB_PATRIF_REVMOV_0500_REV_MOVS
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_RMOV_0190_REVERSO_MOVS_CLEANER"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      tags:
+        RMOV: FOV
+      queue:
+        enabled: true

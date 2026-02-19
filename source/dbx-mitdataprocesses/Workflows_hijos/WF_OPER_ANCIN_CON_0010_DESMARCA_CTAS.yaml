@@ -1,0 +1,26 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_CON_0010_DESMARCA_CTAS:
+      name: WF_OPER_ANCIN_CON_0010_DESMARCA_CTAS
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_OPER_ANCIN_0010_DESMARCA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/03_DESMAR_CUENTA/Notebooks/NB_OPER_ANCIN_DESMARCA_0010_MOVTOS"
+            base_parameters:
+              sr_accion: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true
