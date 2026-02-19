@@ -3,7 +3,7 @@ name: Notificar PR de pre-release-qa a release-qa
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [release-qa]
+    branches: [release-qa-disable]
 
 jobs:
   notify_pr:
