@@ -17,7 +17,7 @@ targets:
       artifact_path: /Users/${workspace.current_user.userName}/${bundle.name}/${bundle.target}/ID_RUTA
       state_path: /Users/${workspace.current_user.userName}/${bundle.name}/${bundle.target}/ID_RUTA
     run_as:
-      service_principal_name: ${workspace.current_user.userName}
+      user_name: ${workspace.current_user.userName}
 
   prod:
     mode: production
