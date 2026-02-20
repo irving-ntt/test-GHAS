@@ -1,0 +1,3 @@
+select * 
+FROM CIERREN_ETL.TTAFOTRAS_ETL_MARCA_DESMARCA
+where ftn_id_archivo = 15281

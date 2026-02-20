@@ -1,0 +1,338 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_GENERACION_CTINDI:
+      name: WF_OPER_ATRAN_GENERACION_CTINDI
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_DEV
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_GAR_COND.values.sr_stage}}"
+            right: DEV
+        - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_DPSJL
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_GAR_COND.values.sr_stage}}"
+            right: DPSJL
+        - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_DSEF
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_GAR_COND.values.sr_stage}}"
+            right: FOV
+        - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_TRN
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_GAR_COND.values.sr_stage}}"
+            right: TRN
+        - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_TRP
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_GAR_COND.values.sr_stage}}"
+            right: TRP
+        - task_key: JQ_PATRIF_GAC_0200_GEN_ARC_CTINDI_TFOV
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ATRAN_GAR_COND.values.sr_stage}}"
+            right: TFOV
+        - task_key: NB_OPER_ATRAN_GAR_CONCLUSION
+          depends_on:
+            - task_key: WAIT
+              outcome: 'true'
+            - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_TRP
+            - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_TRANSF
+            - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_SLDC
+            - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_FOV
+            - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_TFOV
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/Notebooks/NB_OPER_ATRAN_GAR_CONCLUSION"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/Notebooks/NB_OPER_ATRAN_GAR_COND"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_EXT_DEV_FOV
+          depends_on:
+            - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_DSEF
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/03_DEV_SALDO_EXCED/FOVISSSTE/Notebooks/NB_OPER_ATRAN_GAR_EXT_DEV_FOV"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_EXT_DEV_SLDC
+          depends_on:
+            - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_DEV
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/03_DEV_SALDO_EXCED/INFONAVIT/Notebooks/NB_OPER_ATRAN_GAR_EXT_DEV_SLDC"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_EXT_DPSJL
+          depends_on:
+            - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_DPSJL
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/06_DPSJL/Notebooks/NB_OPER_ATRAN_GAR_EXT_DPSJL"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_EXT_TFOV
+          depends_on:
+            - task_key: JQ_PATRIF_GAC_0200_GEN_ARC_CTINDI_TFOV
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_OPER_ATRAN_GAR_EXT_TFOV"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_EXT_TRN_TRANSF
+          depends_on:
+            - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_TRN
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_GAR_EXT_TRN_TRANSF"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_EXT_TRP
+          depends_on:
+            - task_key: JQ_PATRIF_GAC_0100_GEN_ARC_CTINDI_TRP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/05_TRP/Notebooks/NB_OPER_ATRAN_GAR_EXT_TRP"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_EXT_VIV_DPSJL
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_EXT_DPSJL
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/06_DPSJL/Notebooks/NB_OPER_ATRAN_GAR_EXT_VIV_DPSJL"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_FOV
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_EXT_DEV_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/03_DEV_SALDO_EXCED/FOVISSSTE/Notebooks/NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_FOV"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_SLDC
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_EXT_DEV_SLDC
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/03_DEV_SALDO_EXCED/INFONAVIT/Notebooks/NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_SLDC"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_TRP
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_EXT_TRP
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/05_TRP/Notebooks/NB_OPER_ATRAN_GAR_GEN_ARCH_DEV_TRP"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_RCV_DPSJL
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_EXT_DPSJL
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/06_DPSJL/Notebooks/NB_OPER_ATRAN_GAR_GEN_ARCH_RCV_DPSJL"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_TFOV
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_EXT_TFOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_OPER_ATRAN_GAR_GEN_ARCH_TFOV"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_TRANSF
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_EXT_TRN_TRANSF
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_GAR_GEN_ARCH_TRANSF"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_VIV97_DPSJL
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_EXT_VIV_DPSJL
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/21_GENERACION_ARCH_CTINDI/06_DPSJL/Notebooks/NB_OPER_ATRAN_GAR_GEN_ARCH_VIV97_DPSJL"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: WAIT
+          depends_on:
+            - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_RCV_DPSJL
+            - task_key: NB_OPER_ATRAN_GAR_GEN_ARCH_VIV97_DPSJL
+          run_if: ALL_DONE
+          condition_task:
+            op: EQUAL_TO
+            left: 'True'
+            right: 'True'
+      queue:
+        enabled: true

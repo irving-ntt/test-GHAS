@@ -1,0 +1,32 @@
+resources:
+  jobs:
+    WF_PATRIF_0100_GMO_DEV_FOV:
+      name: WF_PATRIF_0100_GMO_DEV_FOV
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_PATRIF_0800_GMO_CLEANER
+          depends_on:
+            - task_key: NB_PATRIF_MOV_TRANS_INFO_02
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_0800_GMO_CLEANER"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GMO_0100_DEV_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/03_DEV_SALDO_EXCED/FOVISSSTE/Notebooks/NB_PATRIF_GMO_0100_DEV_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_TRANS_INFO_02
+          depends_on:
+            - task_key: NB_PATRIF_GMO_0100_DEV_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_MOV_TRANS_INFO_02"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      tags:
+        PRE_MOVS: TRANSFERENCIAS_FOVISSSTE
+      queue:
+        enabled: true

@@ -1,0 +1,85 @@
+resources:
+  jobs:
+    WF_PATRIF_0080_GMO_DEV_PSJL:
+      name: WF_PATRIF_0080_GMO_DEV_PSJL
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_PATRIF_0800_GMO_CLEANER
+          depends_on:
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_02_07_PROCESS_FINAL
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_0800_GMO_CLEANER"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_DEV_PSJL_01
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/06_DPSJL/Notebooks/NB_PATRIF_MOV_DEV_PSJL_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_DEV_PSJL_02_01_EXTRACT_VALOR_ACCION
+          depends_on:
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_01
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/06_DPSJL/Notebooks/NB_PATRIF_MOV_DEV_PSJL_02_01_EXTRACT_VALOR_ACCION"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_DEV_PSJL_02_02_EXTRACT_TIPO_SUBCTA
+          depends_on:
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_01
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/06_DPSJL/Notebooks/NB_PATRIF_MOV_DEV_PSJL_02_02_EXTRACT_TIPO_SUBCTA"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_DEV_PSJL_02_03_EXTRACT_MOV_SUBCTA
+          depends_on:
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_01
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/06_DPSJL/Notebooks/NB_PATRIF_MOV_DEV_PSJL_02_03_EXTRACT_MOV_SUBCTA"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_DEV_PSJL_02_04_EXTRACT_MATRIZ_CONV
+          depends_on:
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_01
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/06_DPSJL/Notebooks/NB_PATRIF_MOV_DEV_PSJL_02_04_EXTRACT_MATRIZ_CONV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_DEV_PSJL_02_05_EXTRACT_VAL_SALDOS
+          depends_on:
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_01
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/06_DPSJL/Notebooks/NB_PATRIF_MOV_DEV_PSJL_02_05_EXTRACT_VAL_SALDOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_DEV_PSJL_02_06_VALIDATE_DATASET
+          depends_on:
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_01
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/06_DPSJL/Notebooks/NB_PATRIF_MOV_DEV_PSJL_02_06_VALIDATE_DATASET"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_DEV_PSJL_02_07_PROCESS_FINAL
+          depends_on:
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_02_02_EXTRACT_TIPO_SUBCTA
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_02_01_EXTRACT_VALOR_ACCION
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_02_05_EXTRACT_VAL_SALDOS
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_02_03_EXTRACT_MOV_SUBCTA
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_02_06_VALIDATE_DATASET
+            - task_key: NB_PATRIF_MOV_DEV_PSJL_02_04_EXTRACT_MATRIZ_CONV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/06_DPSJL/Notebooks/NB_PATRIF_MOV_DEV_PSJL_02_07_PROCESS_FINAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      tags:
+        PRE_MOVS: TRANSFERENCIAS_INFONAVIT
+      queue:
+        enabled: true

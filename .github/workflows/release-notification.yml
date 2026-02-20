@@ -1,0 +1,214 @@
+name: Notificar PR de pre-release-qa a release-qa
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [release-qa-disable]
+
+jobs:
+  notify_pr:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'release-qa' && github.event.pull_request.head.ref == 'pre-release-qa'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Obtener detalles del PR
+        id: pr_details
+        run: |
+          # Obtener archivos modificados, agregados y eliminados
+          echo "Obteniendo archivos del PR #${{ github.event.pull_request.number }}"
+          FILES_DATA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files")
+          
+          # Extraer todos los archivos (modificados, agregados, eliminados)
+          FILES=$(echo "$FILES_DATA" | jq -r '.[].filename')
+          
+          # Extraer archivos agregados
+          ADDED_FILES=$(echo "$FILES_DATA" | jq -r '.[] | select(.status == "added") | .filename')
+          
+          # Extraer archivos modificados
+          MODIFIED_FILES=$(echo "$FILES_DATA" | jq -r '.[] | select(.status == "modified") | .filename')
+          
+          # Extraer archivos eliminados
+          DELETED_FILES=$(echo "$FILES_DATA" | jq -r '.[] | select(.status == "removed") | .filename')
+          
+          echo "Archivos encontrados:"
+          echo "$FILES"
+          echo "Archivos agregados:"
+          echo "$ADDED_FILES"
+          echo "Archivos modificados:"
+          echo "$MODIFIED_FILES"
+          echo "Archivos eliminados:"
+          echo "$DELETED_FILES"
+          
+          echo "FILES<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "ADDED_FILES<<EOF" >> $GITHUB_OUTPUT
+          echo "$ADDED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "MODIFIED_FILES<<EOF" >> $GITHUB_OUTPUT
+          echo "$MODIFIED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "DELETED_FILES<<EOF" >> $GITHUB_OUTPUT
+          echo "$DELETED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Separar archivos por categorías (incluyendo eliminados)
+          COMPONENTS=$(echo "$FILES" | grep -E '\.(ipynb|py|env|properties|sql)$' || true)
+          WORKFLOWS=$(echo "$FILES" | grep '^WF_' || true)
+          
+          echo "Componentes encontrados: $COMPONENTS"
+          echo "Workflows encontrados: $WORKFLOWS"
+          
+          # Convertir a JSON array
+          COMPONENTS_JSON=$(echo "$COMPONENTS" | jq -R -s -c 'split("\n")[:-1]' || echo '[]')
+          WORKFLOWS_JSON=$(echo "$WORKFLOWS" | jq -R -s -c 'split("\n")[:-1]' || echo '[]')
+          
+          echo "COMPONENTS=$COMPONENTS_JSON" >> $GITHUB_OUTPUT
+          echo "WORKFLOWS=$WORKFLOWS_JSON" >> $GITHUB_OUTPUT
+
+      - name: Crear datos de archivos para tabla
+        id: files_data
+        run: |
+          FILES='${{ steps.pr_details.outputs.FILES }}'
+          ADDED_FILES='${{ steps.pr_details.outputs.ADDED_FILES }}'
+          MODIFIED_FILES='${{ steps.pr_details.outputs.MODIFIED_FILES }}'
+          DELETED_FILES='${{ steps.pr_details.outputs.DELETED_FILES }}'
+          
+          echo "Archivos recibidos: $FILES"
+          echo "Archivos agregados: $ADDED_FILES"
+          echo "Archivos modificados: $MODIFIED_FILES"
+          echo "Archivos eliminados: $DELETED_FILES"
+          
+          if [ -n "$FILES" ] && [ "$FILES" != "null" ]; then
+            # Crear array JSON para la tabla con header
+            TABLE_ROWS="["
+            # Agregar fila de encabezado
+            TABLE_ROWS+="{\"type\":\"TableRow\",\"cells\":[{\"type\":\"TableCell\",\"items\":[{\"type\":\"TextBlock\",\"text\":\"**Acción**\",\"weight\":\"Bolder\"}]},{\"type\":\"TableCell\",\"items\":[{\"type\":\"TextBlock\",\"text\":\"**Componente**\",\"weight\":\"Bolder\"}]}]}"
+            
+            first=true
+            while IFS= read -r file; do
+              if [ -n "$file" ] && [ "$file" != "null" ]; then
+                # Determinar el estado del archivo
+                if echo "$ADDED_FILES" | grep -q "^$file$"; then
+                  status="➕ Agregado"
+                elif echo "$MODIFIED_FILES" | grep -q "^$file$"; then
+                  status="✏️ Modificado"
+                elif echo "$DELETED_FILES" | grep -q "^$file$"; then
+                  status="❌ Eliminado"
+                else
+                  status="📝 Cambio"
+                fi
+                
+                TABLE_ROWS+=","
+                TABLE_ROWS+="{\"type\":\"TableRow\",\"cells\":[{\"type\":\"TableCell\",\"items\":[{\"type\":\"TextBlock\",\"text\":\"$status\",\"wrap\":true}]},{\"type\":\"TableCell\",\"items\":[{\"type\":\"TextBlock\",\"text\":\"\`$file\`\",\"wrap\":true,\"fontType\":\"Monospace\"}]}]}"
+                echo "Procesando archivo: $file con estado: $status"
+              fi
+            done <<< "$FILES"
+            TABLE_ROWS+="]"
+            
+            echo "TABLE_ROWS<<EOF" >> $GITHUB_OUTPUT
+            echo "$TABLE_ROWS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "TABLE_ROWS=[]" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Enviar notificación a Teams
+        run: |
+          # Crear el JSON para Teams
+          cat > message.json << 'EOF'
+          {
+            "type": "message",
+            "attachments": [
+              {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "content": {
+                  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                  "version": "1.4",
+                  "type": "AdaptiveCard",
+                  "body": [
+                    {
+                      "type": "TextBlock",
+                      "size": "Medium",
+                      "weight": "Bolder",
+                      "text": "🚀 PR Listo para QA: pre-release-qa → release-qa"
+                    },
+                    {
+                      "type": "FactSet",
+                      "facts": [
+                        {
+                          "title": "📝 Título:",
+                          "value": "${{ github.event.pull_request.title }}"
+                        },
+                        {
+                          "title": "👤 Autor:",
+                          "value": "@${{ github.event.pull_request.user.login }}"
+                        },
+                        {
+                          "title": "🔗 PR #:",
+                          "value": "#${{ github.event.pull_request.number }}"
+                        },
+                        {
+                          "title": "📅 Fecha:",
+                          "value": "${{ github.event.pull_request.created_at }}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "**📋 Descripción:**",
+                      "weight": "Bolder"
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "${{ github.event.pull_request.body || 'Sin descripción' }}",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "**📁 Archivos Afectados:**",
+                      "weight": "Bolder",
+                      "spacing": "Medium"
+                    },
+                    {
+                      "type": "Table",
+                      "columns": [
+                        {
+                          "type": "TableColumnDefinition",
+                          "width": "auto"
+                        },
+                        {
+                          "type": "TableColumnDefinition",
+                          "width": "stretch"
+                        }
+                      ],
+                      "firstRowAsHeaders": true,
+                      "rows": ${{ steps.files_data.outputs.TABLE_ROWS }}
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": "Action.OpenUrl",
+                      "title": "🔗 Ver PR",
+                      "url": "${{ github.event.pull_request.html_url }}"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+          EOF
+          
+          # Enviar a Teams
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d @message.json \
+               "https://everisgroup.webhook.office.com/webhookb2/a37145c7-1cbb-40b0-a2ae-a1b6c738e22c@3048dc87-43f0-4100-9acb-ae1971c79395/IncomingWebhook/cdbbc3d7e6b645c6bd75dcac2060ea34/c7f795d5-d893-44d0-8df7-dcb98012f57b/V2oXeIs_FoWS3S7BuKFi0eutMraWuQjNXl61UjvaYFnUs1"

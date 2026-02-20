@@ -1,0 +1,267 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_INTERP_CONT:
+      name: WF_OPER_ATRAN_INTERP_CONT
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: 3283_DESMARCA_FOVISSSTE
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: SDDF
+        - task_key: 3286_TRANSF_REC_PORTA
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: TRP
+        - task_key: 347_DESMARCA_CREDITO
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: SDD
+        - task_key: 348_DEVOLUCION_43_BIS
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: DSE_UG
+        - task_key: 349_DEVOLUCION_TAAG
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: DSE_AG_TA
+        - task_key: 350_DEV_EXC_TA_FOVISSSTE
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: DSEF
+        - task_key: 354_SOLICITUD_DE_MARCA
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: SDM
+        - task_key: 363_TRANF_ACRE_FOV
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: FOV
+        - task_key: 364_SOL_TRANSF_ACRE
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: STA
+        - task_key: 365_TRANSF_ANUA_GRT
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: SAG
+        - task_key: 368_SOL_USO_GARANTIA
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: SUG
+        - task_key: 3832_DEV_PAGO_SIN_JUST_LEGAL
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: DPSJL
+        - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/Notebooks/NB_OPER_ATRAN_ICO_COND"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_mask_rec_trp: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_archivo: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_AFOV
+          depends_on:
+            - task_key: 363_TRANF_ACRE_FOV
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_OPER_ATRAN_ICO_TRANF_AFOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_CONCLUSION
+          depends_on:
+            - task_key: TSK_INTERP_CONT_SAG
+            - task_key: TSK_INTERP_CONT_AFOV
+            - task_key: TSK_INTERP_CONT_SDDF
+            - task_key: TSK_INTERP_CONT_STA
+            - task_key: TSK_INTERP_CONT_SUG
+            - task_key: TSK_INTERP_CONT_TRP
+            - task_key: TSK_INTERP_CONT_DEV_EXC_TA
+            - task_key: TSK_INTERP_CONT_SDD
+            - task_key: TSK_INTERP_CONT_SDM
+            - task_key: TSK_INTERP_CONT_DEV_EXC_43_BIS
+            - task_key: TSK_INTERP_CONT_DSE_AG_TA
+            - task_key: TSK_INTERP_CONT_SDDF_0030
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/Notebooks/NB_OPER_ATRAN_ICO_CONCLUSION"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_DEV_EXC_43_BIS
+          depends_on:
+            - task_key: 348_DEVOLUCION_43_BIS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/03_DEV_SALDO_EXCED/INFONAVIT/Notebooks/NB_OPER_ATRAN_ICO_DEV_EXC_43_BIS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_DEV_EXC_TA
+          depends_on:
+            - task_key: 349_DEVOLUCION_TAAG
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/03_DEV_SALDO_EXCED/INFONAVIT/Notebooks/NB_OPER_ATRAN_ICO_DEV_SALDOS_EXC_TAAG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_DPSJL_0010
+          depends_on:
+            - task_key: 3832_DEV_PAGO_SIN_JUST_LEGAL
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/06_DPSJL/Notebooks/NB_OPER_ATRAN_ICO_DEV_SIN_JUST_02"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_DSE_AG_TA
+          depends_on:
+            - task_key: 350_DEV_EXC_TA_FOVISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/03_DEV_SALDO_EXCED/FOVISSSTE/Notebooks/NB_OPER_ATRAN_ICO_DEV_EXC_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_SAG
+          depends_on:
+            - task_key: 365_TRANSF_ANUA_GRT
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_ICO_TRANF_SAG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_SDD
+          depends_on:
+            - task_key: 347_DESMARCA_CREDITO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/04_SOL_DESMARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_ICO_DES_MARC_CRED"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_SDDF
+          depends_on:
+            - task_key: 3283_DESMARCA_FOVISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/04_SOL_DESMARCA/FOVISSSTE/Notebooks/NB_OPER_ATRAN_ICO_DESM_AFOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_SDDF_0020
+          depends_on:
+            - task_key: TSK_INTERP_CONT_DPSJL_0010
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/06_DPSJL/Notebooks/NB_OPER_ATRAN_ICO_DEV_SIN_JUST_08"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_SDDF_0030
+          depends_on:
+            - task_key: TSK_INTERP_CONT_SDDF_0020
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/06_DPSJL/Notebooks/NB_OPER_ATRAN_ICO_DEV_SIN_JUST_SUM"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_SDM
+          depends_on:
+            - task_key: 354_SOLICITUD_DE_MARCA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_ICO_MARC_CUE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_STA
+          depends_on:
+            - task_key: 364_SOL_TRANSF_ACRE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_ICO_TRANF_STA"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_SUG
+          depends_on:
+            - task_key: 368_SOL_USO_GARANTIA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_ICO_TRANF_SUG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_TRP
+          depends_on:
+            - task_key: 3286_TRANSF_REC_PORTA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/02_INTERP_CONTENIDO/05_TRP/INFONAVIT/Notebooks/NB_OPER_ATRAN_ICO_TRANF_REC_PORT"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      tags:
+        INCO: ""
+      queue:
+        enabled: true

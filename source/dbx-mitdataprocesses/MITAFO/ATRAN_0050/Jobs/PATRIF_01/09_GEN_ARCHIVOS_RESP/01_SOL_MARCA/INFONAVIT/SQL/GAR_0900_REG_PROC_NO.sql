@@ -1,0 +1,33 @@
+SELECT
+CASE
+WHEN Tot_Reg_Proc >= 1 AND Tot_Reg_No_Proc = 0 Then '1' 
+WHEN Tot_Reg_Proc >= 1 AND Tot_Reg_No_Proc >= 1 Then '3' 
+WHEN Tot_Reg_Proc = 0 AND Tot_Reg_No_Proc >= 1 Then '2' 
+ELSE '4'  END AS INDICADOR
+FROM
+(
+SELECT 
+ CAST(A.Tot_Reg_Proc AS INT) AS Tot_Reg_Proc
+,CAST(B.Tot_Reg_No_Proc AS INT) AS Tot_Reg_No_Proc
+FROM(
+ SELECT 
+   COUNT(*) Tot_Reg_Proc
+   , 1 CAMPO
+ FROM 
+   PROCESOS.TTCRXGRAL_MARCA_DESMARCA_INFO
+  WHERE
+ FTC_FOLIO_BITACORA = '#SR_FOLIO#'
+ AND FTC_ESTA_REGI = 1
+)A, 
+(
+ SELECT 
+   COUNT(*) Tot_Reg_No_Proc
+   , 1 CAMPO
+ FROM 
+   PROCESOS.TTCRXGRAL_MARCA_DESMARCA_INFO
+ WHERE
+ FTC_FOLIO_BITACORA = '#SR_FOLIO#'
+ AND FTC_ESTA_REGI = 0
+)B
+WHERE A.CAMPO = B.CAMPO
+)

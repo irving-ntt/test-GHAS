@@ -1,0 +1,164 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_ACTIVA_INDICADORES:
+      name: WF_OPER_ANCIN_ACTIVA_INDICADORES
+      tasks:
+        - task_key: TSK_ACTIVA_INDICADORES_COND
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/NOTEBOOKS/NB_PATRIF_VALIDA_INDICADORES_COND
+            base_parameters:
+              sr_folio: ""
+              sr_subproceso: ""
+              ind_vigencia: ""
+              config_indi: ""
+              sr_reproceso: ""
+              sr_instancia_proceso: ""
+              sr_etapa: ""
+              sr_id_snapshot: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0050_DESM_FOV_3283
+          depends_on:
+            - task_key: TSK_ACTIVA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: Desmarca_Fovissste
+        - task_key: TSK_MEJORA_DESM_FOV
+          depends_on:
+            - task_key: COND_0050_DESM_FOV_3283
+              outcome: "true"
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/06_MEJORA/Notebooks/NB_
+              PATRIF_AIN_0100_ACT_IND_MARCA_MEJORA_05_DESM_FOVISSSTE
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0050_TRP_3286
+          depends_on:
+            - task_key: TSK_ACTIVA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: JP_PATRIF_AIN_0050_ACT_IND_TRP
+        - task_key: TSK_MEJORA_TRP
+          depends_on:
+            - task_key: COND_0050_TRP_3286
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/06_MEJORA/Notebooks/NB_
+              PATRIF_AIN_0100_ACT_IND_MARCA_MEJORA_03_TRP
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0100_MARCA_354
+          depends_on:
+            - task_key: TSK_ACTIVA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: JP_PATRIF_AIN_0100_ACT_IND_MARCA
+        - task_key: TSK_SOL_MARCA_INFONAVIT
+          depends_on:
+            - task_key: COND_0100_MARCA_354
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/06_MEJORA/Notebooks/NB_
+              PATRIF_AIN_0100_ACT_IND_MARCA_MEJORA_01_SOL_MARCA_INFONAVIT
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0100_TRANF_FOVISSSTE_363
+          depends_on:
+            - task_key: TSK_ACTIVA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: JP_PATRIF_AIN_0100_ACT_IND_TRANF_FOVI
+        - task_key: TSK_MEJORA_TRANS_FOV
+          depends_on:
+            - task_key: COND_0100_TRANF_FOVISSSTE_363
+              outcome: "true"
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/06_MEJORA/Notebooks/NB_
+              PATRIF_AIN_0100_ACT_IND_MARCA_MEJORA_04_TRANS_FOVISSSTE
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_0100_TRANS_FOVISSTE
+          depends_on:
+            - task_key: TSK_MEJORA_TRANS_FOV
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_PATRIF_AIN_0100_ACT_IND_TRANS_FOV_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0100_TRANF_INFONA_364
+          depends_on:
+            - task_key: TSK_ACTIVA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: JP_PATRIF_AIN_0100_ACT_IND_TRANF_INFO
+        - task_key: COND_0100_TRANF_INFONA_365
+          depends_on:
+            - task_key: TSK_ACTIVA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: JP_PATRIF_AIN_0100_ACT_IND_TRANF_INFO
+        - task_key: COND_0100_TRANF_INFONA_368
+          depends_on:
+            - task_key: TSK_ACTIVA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ACTIVA_INDICADORES_COND.values.sr_stage}}"
+            right: JP_PATRIF_AIN_0100_ACT_IND_TRANF_INFO
+        - task_key: TSK_MEJORA_TRANSF_INFONAVIT
+          depends_on:
+            - task_key: COND_0100_TRANF_INFONA_365
+              outcome: "true"
+            - task_key: COND_0100_TRANF_INFONA_368
+              outcome: "true"
+            - task_key: COND_0100_TRANF_INFONA_364
+              outcome: "true"
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/06_MEJORA/Notebooks/NB_
+              PATRIF_AIN_0100_ACT_IND_MARCA_MEJORA_02_TRANS_INFONAVIT
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_ACTIVA_INDICADORES_MARCA_INFONA
+          depends_on:
+            - task_key: TSK_SOL_MARCA_INFONAVIT
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/01_SOL_MARCA/INFONAVIT/Notebooks/NB_
+              PATRIF_AIN_0100_ACT_IND_MARCA_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_ACTIVA_INDICADORES_TRANS_INFONA
+          depends_on:
+            - task_key: TSK_MEJORA_TRANSF_INFONAVIT
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_AIN_0100_ACT_IND_TRANS_INFO_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_ACTIVA_INDICADORES_TRP
+          depends_on:
+            - task_key: TSK_MEJORA_TRP
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/05_TRP/INFONAVIT/Notebooks/NB_
+              PATRIF_AIN_0050_ACT_IND_TRP_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_CONCLUSION
+          depends_on:
+            - task_key: TSK_MEJORA_DESM_FOV
+            - task_key: TSK_ACTIVA_INDICADORES_TRP
+            - task_key: TSK_ACTIVA_INDICADORES_MARCA_INFONA
+            - task_key: TSK_ACTIVA_INDICADORES_TRANS_INFONA
+            - task_key: TSK_0100_TRANS_FOVISSTE
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/12_ACTIVAR_INDICADOR/NOTEBOOKS/NB_PATRIF_VALIDA_INDICADORES_CONCLUSION
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

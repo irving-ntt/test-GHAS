@@ -1,0 +1,127 @@
+resources:
+  jobs:
+    WF_OPER_AGRLS_ARCH_RESPUESTA:
+      name: WF_OPER_AGRLS_ARCH_RESPUESTA
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: AEIM
+          depends_on:
+            - task_key: TSK_NB_ACL_ESP_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subproceso}}"
+            right: '118'
+        - task_key: DITISSSTE
+          depends_on:
+            - task_key: TSK_NB_ACL_ESP_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subproceso}}"
+            right: '122'
+        - task_key: DOISSSTE
+          depends_on:
+            - task_key: TSK_NB_ACL_ESP_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subproceso}}"
+            right: '120'
+        - task_key: TSK_NB_ACL_ESP_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_ACL_ESP_COND"
+            base_parameters:
+              sr_dt_org_arc: '""'
+              sr_etapa: ""
+              sr_fec_arc: ""
+              sr_fec_liq: '""'
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: '""'
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_tipo_reporte: '""'
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: WF_OPER_AGRLS_ARCH_RESPUESTA_AEIM
+          depends_on:
+            - task_key: AEIM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_AGRLS_ARCH_RESPUESTA_AEIM_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_proceso}}"
+              sr_tipo_layout: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_tipo_layout}}"
+              sr_fec_liq: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_fec_liq}}"
+              sr_subproceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_fec_arc}}"
+              sr_tipo_reporte: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_tipo_reporte}}"
+              sr_id_snapshot: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subetapa}}"
+        - task_key: WF_OPER_AGRLS_ARCH_RESPUESTA_DITISSSTE
+          depends_on:
+            - task_key: DITISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_AGRLS_ARCH_RESPUESTA_DITISSSTE_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_proceso}}"
+              sr_tipo_layout: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_tipo_layout}}"
+              sr_fec_liq: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_fec_liq}}"
+              sr_subproceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_fec_arc}}"
+              sr_tipo_reporte: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_tipo_reporte}}"
+              sr_id_snapshot: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subetapa}}"
+        - task_key: WF_OPER_AGRLS_ARCH_RESPUESTA_DOISSSTE
+          depends_on:
+            - task_key: DOISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_AGRLS_ARCH_RESPUESTA_DOISSSTE_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_proceso}}"
+              sr_tipo_layout: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_tipo_layout}}"
+              sr_fec_liq: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_fec_liq}}"
+              sr_subproceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_fec_arc}}"
+              sr_tipo_reporte: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_tipo_reporte}}"
+              sr_id_snapshot: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_NB_ACL_ESP_COND.values.sr_subetapa}}"
+      queue:
+        enabled: true

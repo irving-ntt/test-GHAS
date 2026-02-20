@@ -1,0 +1,22 @@
+SELECT 
+  0 AS FTC_IDENTIFICADOS          ,
+  FTN_NUM_CTA_INVDUAL             ,
+  FTN_ID_DIAGNOSTICO              ,
+  NULL AS FTN_ID_SUBP_NO_CONV     ,
+  NULL AS FTD_FECHA_CERTIFICACION ,
+  NULL AS FTN_CTE_PENSIONADO      ,
+  FTC_RFC_BUC                     ,
+  FTC_FOLIO                       ,
+  FTN_ID_ARCHIVO                  ,
+  FTC_NSS                         ,
+  FTC_CURP                        ,
+  FTC_RFC                         ,
+  FTN_VIGENCIA                    ,
+  NULL AS MARC_DUP                ,
+  FTC_APELLIDO_PATER_AFORE        ,
+  FTC_APELLIDO_MATER_AFORE        ,
+  FTC_NOMBRE_AFORE                ,
+  FTC_CORREO_ELEC                 ,
+  FTN_CELULAR                     ,
+  FTC_NSS_BUC
+FROM #DELTA_TABLA_NO_ENCONTRADOS#

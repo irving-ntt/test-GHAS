@@ -1,0 +1,49 @@
+-- Query que une las tablas delta 01 y 02 del comun de matriz 
+--  
+SELECT 
+   -- D.* 
+         D.FTN_NUM_CTA_INVDUAL
+        ,D.FTN_ID_PROCESO     
+        ,D.FTN_ID_SUBPROCESO  
+        ,D.FTN_ID_SIEFORE     
+        ,D.FTN_ID_TIPO_SUBCTA 
+        ,D.FTN_ID_TIPO_MONTO  
+        ,D.FTN_ID_SALDO_OPERA 
+        ,D.FTN_ID_TIPO_MOV    
+        ,D.FTN_MONTO_ACCIONES 
+        ,D.FTN_MONTO_PESOS  
+        ,D.FCN_ID_PROCESO_CON    
+        ,D.FCN_ID_SUBPROCESO_CON 
+        ,D.FCN_ID_TIPO_SUBCTA_CON
+        ,D.FCN_ID_TIPO_MONTO_CON 
+        ,D.FTD_FECHA_BLOQ        
+        ,D.B_MATRIZ      
+        ,CC.FFB_CONVIVENCIA       
+        ,CC.B_CONVIV             
+FROM  (
+    SELECT 
+        PRE.FTN_NUM_CTA_INVDUAL
+        ,PRE.FTN_ID_PROCESO     
+        ,PRE.FTN_ID_SUBPROCESO  
+        ,PRE.FTN_ID_SIEFORE     
+        ,PRE.FTN_ID_TIPO_SUBCTA 
+        ,PRE.FTN_ID_TIPO_MONTO  
+        ,PRE.FTN_ID_SALDO_OPERA 
+        ,PRE.FTN_ID_TIPO_MOV    
+        ,PRE.FTN_MONTO_ACCIONES 
+        ,PRE.FTN_MONTO_PESOS 
+    --   FTN_NUM_CTA_INVDUAL   
+        ,M.FCN_ID_PROCESO_CON    
+        ,M.FCN_ID_SUBPROCESO_CON 
+        ,M.FCN_ID_TIPO_SUBCTA_CON
+        ,M.FCN_ID_TIPO_MONTO_CON 
+        ,M.FTD_FECHA_BLOQ        
+        ,M.B_MATRIZ                 
+    from #DELTA_TABLA_NAME1#  PRE
+    LEFT JOIN #DELTA_TABLA_NAME2# M 
+    ON PRE.FTN_NUM_CTA_INVDUAL = M.FTN_NUM_CTA_INVDUAL 
+) D
+LEFT JOIN #DELTA_TABLA_NAME3# CC
+ON  D.FCN_ID_PROCESO_CON = CC.FCN_ID_PROCESO_CON
+AND D.FCN_ID_SUBPROCESO_CON = CC.FCN_ID_SUBPROCESO_CON
+AND D.FTN_ID_SUBPROCESO = CC.FTN_ID_SUBPROCESO

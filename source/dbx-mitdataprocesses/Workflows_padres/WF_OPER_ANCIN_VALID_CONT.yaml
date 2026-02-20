@@ -1,0 +1,984 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_VALID_CONT:
+      name: WF_OPER_ANCIN_VALID_CONT
+      max_concurrent_runs: 2
+      tasks:
+        - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_VAL_CONT_COND"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+              sr_folio: ""
+              sr_instancia_proceso: ""
+              sr_usuario: ""
+              sr_etapa: ""
+              sr_id_snapshot: ""
+              sr_paso: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBETAPA_23
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+            right: '23'
+        - task_key: DOIMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: DOMISS
+        - task_key: WF_VALID_CONT_DOIMSS
+          depends_on:
+            - task_key: DOIMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_DOIMSS_JOB_ID
+        - task_key: FOVISSTE_DESMARCA
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_DESMARCA
+        - task_key: WF_OPER_ANCIN_VALID_CONT_FOVISSTE_DESMARCA
+          depends_on:
+            - task_key: FOVISSTE_DESMARCA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_FOVISSTE_DESMARCA_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: FOVISSTE_DEV_EXCE
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_DEV_EXCE
+        - task_key: WF_OPER_ANCIN_VALID_CONT_FOVISSTE_DEV_EXCE
+          depends_on:
+            - task_key: FOVISSTE_DEV_EXCE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_FOVISSTE_DEV_EXCE_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: FOVISSTE_RECURSOS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_RECURSOS
+        - task_key: FOVISSTE_TRANS_ACRE
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_TRANS_ACRE
+        - task_key: WF_OPER_ANCIN_VALID_CONT_FOVISSTE_TRANS_ACRE
+          depends_on:
+            - task_key: FOVISSTE_TRANS_ACRE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_FOVISSTE_TRANS_ACRE_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: FOVISSTE_TRP
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_RECURSOS
+        - task_key: WF_OPER_ANCIN_VALID_CONT_FOVISSTE_TRP
+          depends_on:
+            - task_key: FOVISSTE_TRP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_FOVISSTE_TRP_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_DEV_PAGO_SJL
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_DEV_PAGO_SJL
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_DEV_PAGO_SJL
+          depends_on:
+            - task_key: INFONAVIT_DEV_PAGO_SJL
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_DEV_PAGO_SJL_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_DEV_SAL_EX
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_DEV_SAL_EX
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_DEV_SAL_EX
+          depends_on:
+            - task_key: INFONAVIT_DEV_SAL_EX
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_DEV_SAL_EX_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_DEV_SAL_EX_AG_TA
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_DEV_SAL_EX_AG_TA
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_DEV_SAL_EX_AG_TA
+          depends_on:
+            - task_key: INFONAVIT_DEV_SAL_EX_AG_TA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_DEV_SAL_EX_AG_TA_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_SOL_DESMARCA
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_SOL_DESMARCA
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_DESMARCA
+          depends_on:
+            - task_key: INFONAVIT_SOL_DESMARCA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_DESMARCA_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_SOL_MARCA
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_SOL_MARCA
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_MARCA
+          depends_on:
+            - task_key: INFONAVIT_SOL_MARCA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_MARCA_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_TRANS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_TRANS
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_TRANS
+          depends_on:
+            - task_key: INFONAVIT_TRANS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_TRANS_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_TRANS_ANUAL
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_TRANS_ANUAL
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_TRANS_ANUAL
+          depends_on:
+            - task_key: INFONAVIT_TRANS_ANUAL
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_TRANS_ANUAL_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_USO_GAR
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_USO_GAR
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR
+          depends_on:
+            - task_key: INFONAVIT_USO_GAR
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: VALIDA_69
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: ARCHIVO_69
+        - task_key: WF_ARCH_69
+          depends_on:
+            - task_key: VALIDA_69
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: VALIDA_ARCH_69_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBETAPA_25
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+            right: '25'
+        - task_key: FOVISSTE_RECURSOS_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_RECURSOS
+        - task_key: SUBETAPA_3356
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+            right: '3356'
+        - task_key: FOVISSTE_TRANS_ACRE_
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_TRANS_ACRE
+        - task_key: WF_OPER_ANCIN_VALID_CONT_FOVISSTE_TRANS_ACRE_RECHAZO
+          depends_on:
+            - task_key: FOVISSTE_TRANS_ACRE_
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_FOVISSTE_TRANS_ACRE_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_SOL_MARCA_
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_SOL_MARCA
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_MARCA_RECHAZO
+          depends_on:
+            - task_key: INFONAVIT_SOL_MARCA_
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_MARCA_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_TRANS_
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_TRANS
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_TRANS_RECHAZO
+          depends_on:
+            - task_key: INFONAVIT_TRANS_
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_TRANS_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_TRANS_ANUAL_
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_TRANS_ANUAL
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_TRANS_ANUAL_
+          depends_on:
+            - task_key: INFONAVIT_TRANS_ANUAL_
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_TRANS_ANUAL_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: INFONAVIT_USO_GAR_
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_USO_GAR
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR_RECHAZO
+          depends_on:
+            - task_key: INFONAVIT_USO_GAR_
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBETAPA_4030
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+            right: '4030'
+        - task_key: FOVISSTE_DESMARCA_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_DESMARCA
+        - task_key: FOVISSTE_DEV_EXCE_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_DEV_EXCE
+        - task_key: FOVISSTE_TRANS_ACRE_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: FOVISSTE_TRANS_ACRE
+        - task_key: INFONAVIT_DEV_PAGO_SJL_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_DEV_PAGO_SJL
+        - task_key: INFONAVIT_DEV_SAL_EX_AG_TA_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_DEV_SAL_EX_AG_TA
+        - task_key: INFONAVIT_DEV_SAL_EX_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_DEV_SAL_EX
+        - task_key: INFONAVIT_SOL_DESMARCA_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_SOL_DESMARCA
+        - task_key: INFONAVIT_SOL_MARCA_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_SOL_MARCA
+        - task_key: INFONAVIT_TRANS_ANUAL_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_TRANS_ANUAL
+        - task_key: INFONAVIT_TRANS_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_TRANS
+        - task_key: INFONAVIT_USO_GAR_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: INFONAVIT_USO_GAR
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_DEV_SAL_EX_INTGRTY
+          depends_on:
+            - task_key: INFONAVIT_TRANS_INTGRTY
+              outcome: 'true'
+            - task_key: INFONAVIT_DEV_SAL_EX_INTGRTY
+              outcome: 'true'
+            - task_key: FOVISSTE_DESMARCA_INTGRTY
+              outcome: 'true'
+            - task_key: FOVISSTE_RECURSOS_INTGRTY
+              outcome: 'true'
+            - task_key: INFONAVIT_SOL_DESMARCA_INTGRTY
+              outcome: 'true'
+            - task_key: INFONAVIT_DEV_SAL_EX_AG_TA_INTGRTY
+              outcome: 'true'
+            - task_key: INFONAVIT_USO_GAR_INTGRTY
+              outcome: 'true'
+            - task_key: FOVISSTE_DEV_EXCE_INTGRTY
+              outcome: 'true'
+            - task_key: INFONAVIT_TRANS_ANUAL_INTGRTY
+              outcome: 'true'
+            - task_key: INFONAVIT_SOL_MARCA_INTGRTY
+              outcome: 'true'
+            - task_key: INFONAVIT_DEV_PAGO_SJL_INTGRTY
+              outcome: 'true'
+            - task_key: FOVISSTE_TRANS_ACRE_INTGRTY
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_INFONAVIT_DEV_SAL_EX_INTGRTY_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBETAPA_832
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+            right: '832'
+        - task_key: SUBPROCESO_118
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '118'
+        - task_key: WF_OPER_ANCIN_VALID_CONT_ARCH_RESP_ACLESP
+          depends_on:
+            - task_key: SUBPROCESO_118
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_ACLESP_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_120
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '120'
+        - task_key: WF_OPER_ANCIN_VALID_CONT_ARCH_RESP_DOISSSTE
+          depends_on:
+            - task_key: SUBPROCESO_120
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_DOISSSTE_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_122
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '122'
+        - task_key: WF_OPER_ANCIN_VALID_CONT_ARCH_RESP_ITISSSTE
+          depends_on:
+            - task_key: SUBPROCESO_122
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_ITISSSTE_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_3286
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '3286'
+        - task_key: WF_VALID_CONT_ARCH_RESP_FOVIS_TRANS_REC_PORTA
+          depends_on:
+            - task_key: SUBPROCESO_3286
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_FOVIS_TRANS_REC_PORTA_JOB_ID
+            job_parameters:
+              sr_id_archivo_siguiente: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo_siguiente}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_354
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '354'
+        - task_key: WF_INFON_SOL_MARCA_CUENTA_43_BIS
+          depends_on:
+            - task_key: SUBPROCESO_354
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_INFON_SOL_MARCA_CUENTA_43_BIS_JOB_ID
+            job_parameters:
+              sr_id_archivo_siguiente: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo_siguiente}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_363
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '363'
+        - task_key: WF_VALID_CONT_ARCH_RESP_FOVIS_TRANS_ACRED
+          depends_on:
+            - task_key: SUBPROCESO_363
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_FOVIS_TRANS_ACRED_JOB_ID
+            job_parameters:
+              sr_id_archivo_siguiente: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo_siguiente}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_364
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '364'
+        - task_key: WF_ARCH_RESP_INFON_TRANS_ACRED
+          depends_on:
+            - task_key: SUBPROCESO_364
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_INFON_TRANS_ACRED_JOB_ID
+            job_parameters:
+              sr_id_archivo_siguiente: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo_siguiente}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_365
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '365'
+        - task_key: WF_ARCH_RESP_INFON_TRANS_ANUAL_GARAN
+          depends_on:
+            - task_key: SUBPROCESO_365
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_INFON_TRANS_ANUAL_GARAN_JOB_ID
+            job_parameters:
+              sr_id_archivo_siguiente: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo_siguiente}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_368
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '368'
+        - task_key: WF_ARCH_RESP_INFON_USO_GAR_43_BIS
+          depends_on:
+            - task_key: SUBPROCESO_368
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_INFON_USO_GAR_43_BIS_JOB_ID
+            job_parameters:
+              sr_id_archivo_siguiente: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo_siguiente}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+        - task_key: SUBPROCESO_3832
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+            right: '3832'
+        - task_key: WF_ARCH_RESP_INFON_DEV_PAG_SIN_JUSTIF_LEGAL
+          depends_on:
+            - task_key: SUBPROCESO_3832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_CONT_ARCH_RESP_INFON_DEV_PAG_SIN_JUSTIF_LEGAL_JOB_ID
+            job_parameters:
+              sr_id_archivo_siguiente: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo_siguiente}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_subetapa}}"
+      queue:
+        enabled: true

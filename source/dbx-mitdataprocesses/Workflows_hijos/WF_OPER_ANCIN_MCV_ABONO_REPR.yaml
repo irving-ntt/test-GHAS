@@ -1,0 +1,55 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_MCV_ABONO_REPR:
+      name: WF_OPER_ANCIN_MCV_ABONO_REPR
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_OPER_ANCIN_MCV_0000_NOTIFICACION
+          depends_on:
+            - task_key: NB_OPER_ANCIN_MCV_0060_INS_CIFRAS_CTRL
+            - task_key: NB_OPER_ANCIN_MCV_0070_GEN_ARCH_ERR
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/Notebooks/NB_OPER_ANCIN_MCV_CONCLUSION"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_MCV_0030_INS_VAL_MATRIZ
+          depends_on:
+            - task_key: NB_OPER_ANCIN_MCV_0150_EXT
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/Notebooks/NB_OPER_ANCIN_MCV_0030_INS_VAL_MATRIZ"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_MCV_0050_UPD_VAL_MATRIZ
+          depends_on:
+            - task_key: NB_OPER_ANCIN_MCV_0030_INS_VAL_MATRIZ
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/Notebooks/NB_OPER_ANCIN_MCV_0050_UPD_VAL_MATRIZ"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_MCV_0060_INS_CIFRAS_CTRL
+          depends_on:
+            - task_key: NB_OPER_ANCIN_MCV_0050_UPD_VAL_MATRIZ
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/Notebooks/NB_OPER_ANCIN_MCV_0060_INS_CIFRAS_CTRL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_MCV_0070_GEN_ARCH_ERR
+          depends_on:
+            - task_key: NB_OPER_ANCIN_MCV_0050_UPD_VAL_MATRIZ
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/Notebooks/NB_OPER_ANCIN_MCV_0070_GEN_ARCH_ERR"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_MCV_0150_EXT
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_MCV_0150_EXT_REPR"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

@@ -1,0 +1,274 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_POS_MC:
+      name: WF_OPER_ATRAN_POS_MC
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: TSK_FOVISSSTE_DESMARCA
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: FOVISSSTE_DESMARCA
+        - task_key: TSK_FOVISSSTE_DEVOLUCION_EXCE_TA
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: FOVISSSTE_DEVOLUCION_EXCE_TA
+        - task_key: TSK_FOVISSSTE_TRANSFERENCIA_ACRE
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: FOVISSSTE_TRANSFERENCIA_ACRE
+        - task_key: TSK_INFONAVIT_DEVOLUCION_EXCE
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: INFONAVIT_DEVOLUCION_EXCE
+        - task_key: TSK_INFONAVIT_DEVOLUCION_PAG_SJL
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: INFONAVIT_DEVOLUCION_PAG_SJL
+        - task_key: TSK_INFONAVIT_DEVOLUCION_SALD_EXCE_TAAG
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: INFONAVIT_DEVOLUCION_SALD_EXCE_TAAG
+        - task_key: TSK_INFONAVIT_SOLICITUD_DESM
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: INFONAVIT_SOLICITUD_DESM
+        - task_key: TSK_INFONAVIT_SOLICITUD_DESM_01_REP
+          depends_on:
+            - task_key: TSK_INFONAVIT_SOLICITUD_DESM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_tipo_ejecucion}}"
+            right: '1'
+        - task_key: TSK_INFONAVIT_SOLICITUD_DESM_02_REP
+          depends_on:
+            - task_key: TSK_INFONAVIT_SOLICITUD_DESM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_tipo_ejecucion}}"
+            right: '2'
+        - task_key: TSK_INFONAVIT_SOLICITUD_DESM_NOR
+          depends_on:
+            - task_key: TSK_INFONAVIT_SOLICITUD_DESM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_tipo_ejecucion}}"
+            right: '0'
+        - task_key: TSK_INFONAVIT_SOLICITUD_MC
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: INFONAVIT_SOLICITUD_MC
+        - task_key: TSK_INFONAVIT_TRANSFERENCIA_ACRE
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: INFONAVIT_TRANSFERENCIA_ACRE
+        - task_key: TSK_INFONAVIT_TRANSFERENCIA_ANUA_GAR
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: INFONAVIT_TRANSFERENCIA_ANUA_GAR
+        - task_key: TSK_INFONAVIT_USO_GAR
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: INFONAVIT_USO_GAR
+        - task_key: TSK_MIXTA_TRANSFERENCIA_RECURSOS_PORT
+          depends_on:
+            - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ATRAN_POS_MC_COND.values.sr_stage}}"
+            right: MIXTA_TRANSFERENCIA_RECURSOS_PORT
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_DEV_EXCE
+          depends_on:
+            - task_key: TSK_INFONAVIT_DEVOLUCION_EXCE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_DEV_EXCE_TAAG
+          depends_on:
+            - task_key: TSK_INFONAVIT_DEVOLUCION_SALD_EXCE_TAAG
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_DEV_SJL
+          depends_on:
+            - task_key: TSK_INFONAVIT_DEVOLUCION_PAG_SJL
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_DM
+          depends_on:
+            - task_key: TSK_INFONAVIT_SOLICITUD_DESM_NOR
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_DM_REP_01
+          depends_on:
+            - task_key: TSK_INFONAVIT_SOLICITUD_DESM_01_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_DM_REP_02
+          depends_on:
+            - task_key: TSK_INFONAVIT_SOLICITUD_DESM_02_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_GAR
+          depends_on:
+            - task_key: TSK_INFONAVIT_USO_GAR
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_SM
+          depends_on:
+            - task_key: TSK_INFONAVIT_SOLICITUD_MC
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_TA
+          depends_on:
+            - task_key: TSK_INFONAVIT_TRANSFERENCIA_ACRE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_TAG
+          depends_on:
+            - task_key: TSK_INFONAVIT_TRANSFERENCIA_ANUA_GAR
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA_MCV_POS_01_TRP
+          depends_on:
+            - task_key: TSK_MIXTA_TRANSFERENCIA_RECURSOS_PORT
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA__MCV_POS_01_FOV_DEV_EXCE
+          depends_on:
+            - task_key: TSK_FOVISSSTE_DEVOLUCION_EXCE_TA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA__MCV_POS_01_FOV_DSM
+          depends_on:
+            - task_key: TSK_FOVISSSTE_DESMARCA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_TRA__MCV_POS_01_FOV_TRANS_ACRE
+          depends_on:
+            - task_key: TSK_FOVISSSTE_TRANSFERENCIA_ACRE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_TRA_MCV_POS_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_OPER_ATRAN_POS_MC_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/06_MATRIZ_CONVIVENCIA/00_ATRIF_0010_MC/Notebooks/NB_OPER_ATRAN_POS_MC_COND"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_ejecucion: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

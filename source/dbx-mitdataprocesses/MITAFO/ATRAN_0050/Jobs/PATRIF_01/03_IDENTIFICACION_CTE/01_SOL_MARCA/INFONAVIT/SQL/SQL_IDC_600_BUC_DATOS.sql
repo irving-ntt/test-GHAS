@@ -1,0 +1,16 @@
+SELECT 
+   FTN_NSS             ,
+   FTN_NUM_CTA_INVDUAL ,
+   FTC_CORREO_ELEC     ,
+   FTN_CELULAR         
+FROM (
+   SELECT
+      FTN_NSS             ,
+      FTN_NUM_CTA_INVDUAL ,
+      FTC_CORREO_ELEC     ,
+      FTN_CELULAR         ,
+      ROW_NUMBER() OVER (PARTITION BY FTN_NSS ORDER BY FTN_NSS ASC) AS rn
+   FROM #DELTA_600_BUC#
+   ORDER BY FTN_NSS ASC
+)
+WHERE rn = 1

@@ -1,0 +1,30 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_GEN_ARCH_TRANSF_FOVISSSTE:
+      name: WF_OPER_ATRAN_GEN_ARCH_TRANSF_FOVISSSTE
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: JP_PATRIF_GAR_0300_ARCH_SUM_FOV
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0200_ARCH_DETA_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_PATRIF_GAR_0300_ARCH_SUM_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0100_ARCH_ENCAB_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_PATRIF_GAR_0100_ARCH_ENCAB_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0200_ARCH_DETA_FOV
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0100_ARCH_ENCAB_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_PATRIF_GAR_0200_ARCH_DETA_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

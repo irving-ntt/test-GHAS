@@ -1,0 +1,85 @@
+WITH
+-- 1. Funnel IMSS/CV/CS balances (FN_100_UNE_CTAS)
+fn_100_une_ctas AS (
+    SELECT
+        FTN_CONSE_REG_LOTE,
+        FTN_NUM_CTA_INVDUAL,
+        FTN_ESTATUS_indiv,
+        FTN_SDO_ACCIONES,
+        FTN_SDO_PESOS,
+        FTN_VALOR_AIVS,
+        FCD_FEH_ACCION,
+        FCN_ID_VALOR_ACCION,
+        FCN_ID_TIPO_SUBCTA,
+        FCN_ID_SIEFORE,
+        FFN_ID_CONCEPTO_MOV
+    FROM #DS_600_SDOS_IMSS#
+),
+
+-- 2. Filter accepted records (FL_200_ACEPTADOS)
+fl_200_aceptados AS (
+    SELECT *
+    FROM fn_100_une_ctas
+    WHERE FTN_ESTATUS_indiv = 1
+),
+
+-- 3. Funnel accepted, insufficient, and inserted balances (FN_300_UNE_REG)
+fn_300_une_reg AS (
+    SELECT *
+    FROM fl_200_aceptados
+    UNION ALL
+    SELECT
+        FTN_CONSE_REG_LOTE,
+        FTN_NUM_CTA_INVDUAL,
+        FTN_ESTATUS_indiv,
+        FTN_SDO_ACCIONES,
+        FTN_SDO_PESOS,
+        FTN_VALOR_AIVS,
+        FCD_FEH_ACCION,
+        FCN_ID_VALOR_ACCION,
+        FCN_ID_TIPO_SUBCTA,
+        FCN_ID_SIEFORE,
+        FFN_ID_CONCEPTO_MOV
+    FROM #DS_700_CTAS_SIN_DISP_IMSS#
+    UNION ALL
+    SELECT
+        FTN_CONSE_REG_LOTE,
+        FTN_NUM_CTA_INVDUAL,
+        FTN_ESTATUS_indiv,
+        FTN_SDO_ACCIONES,
+        FTN_SDO_PESOS,
+        FTN_VALOR_AIVS,
+        FCD_FEH_ACCION,
+        FCN_ID_VALOR_ACCION,
+        FCN_ID_TIPO_SUBCTA,
+        FCN_ID_SIEFORE,
+        FFN_ID_CONCEPTO_MOV
+    FROM #DS_13_INS_SDOS_INFO#
+)
+
+-- 4. Apply TF_300_AGREGA_CAMPOS logic
+SELECT
+    '#sr_folio#' AS FTC_FOLIO,
+    FTN_CONSE_REG_LOTE,
+    FTN_NUM_CTA_INVDUAL,
+    FTN_ESTATUS_indiv AS FTN_ESTATUS,
+    FTN_SDO_ACCIONES,
+    FTN_SDO_PESOS,
+    FTN_VALOR_AIVS,
+    to_timestamp(FCD_FEH_ACCION) AS FCD_FEH_ACCION,
+    FCN_ID_VALOR_ACCION,
+    FCN_ID_TIPO_SUBCTA,
+    FCN_ID_SIEFORE,
+    CASE
+        WHEN FTN_ESTATUS_indiv = 1 THEN FFN_ID_CONCEPTO_MOV
+        ELSE NULL
+    END AS FFN_ID_CONCEPTO_MOV,
+    138 AS FCN_ID_REGIMEN,
+    3832 AS FCN_ID_SUBPROCESO,
+    CURRENT_TIMESTAMP AS FTD_FEH_CRE,
+    'DATABRICKS' AS FTC_USU_CRE
+FROM fn_300_une_reg
+
+
+
+

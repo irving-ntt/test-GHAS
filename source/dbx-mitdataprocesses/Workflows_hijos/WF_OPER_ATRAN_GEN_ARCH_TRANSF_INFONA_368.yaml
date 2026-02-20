@@ -1,0 +1,169 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_368:
+      name: WF_OPER_ATRAN_GEN_ARCH_TRANSF_INFONA_368
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: NB_PATRIF_GAR_0100_CONTEO_REGISTROS
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0100_CONTEO_REGISTROS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0200_ARCH_ACEP_ENCAB_AG_UG
+          depends_on:
+            - task_key: TSK_IDENFIFICADOR_3
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0200_ARCH_ACEP_ENCAB_AG_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0200_ARCH_ACEP_ENCAB_AG_UG_
+          depends_on:
+            - task_key: TSK_IDENFIFICADOR_1
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0200_ARCH_ACEP_ENCAB_AG_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0200_ARCH_RECH_ENCAB_UG
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0500_INS_ARCHIVO_ACEPTADOS
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0200_ARCH_RECH_ENCAB_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0200_ARCH_RECH_ENCAB_UG_
+          depends_on:
+            - task_key: TSK_IDENFIFICADOR_2
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0200_ARCH_RECH_ENCAB_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0300_ARCH_ACEP_DETA_UG
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0200_ARCH_ACEP_ENCAB_AG_UG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0300_ARCH_ACEP_DETA_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0300_ARCH_ACEP_DETA_UG_
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0200_ARCH_ACEP_ENCAB_AG_UG_
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0300_ARCH_ACEP_DETA_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0300_ARCH_RECH_DETA_UG
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0200_ARCH_RECH_ENCAB_UG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0300_ARCH_RECH_DETA_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0300_ARCH_RECH_DETA_UG_
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0200_ARCH_RECH_ENCAB_UG_
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0300_ARCH_RECH_DETA_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0400_ARCH_ACEP_SUM_UG
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0300_ARCH_ACEP_DETA_UG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0400_ARCH_ACEP_SUM_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0400_ARCH_ACEP_SUM_UG_
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0300_ARCH_ACEP_DETA_UG_
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0400_ARCH_ACEP_SUM_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0400_ARCH_RECH_SUM_UG
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0300_ARCH_RECH_DETA_UG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0400_ARCH_RECH_SUM_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0400_ARCH_RECH_SUM_UG_
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0300_ARCH_RECH_DETA_UG_
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0400_ARCH_RECH_SUM_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0500_INS_ARCHIVO_ACEPTADOS
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0400_ARCH_ACEP_SUM_UG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0500_INS_ARCHIVO_ACEPTADOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0500_INS_ARCHIVO_ACEPTADOS_
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0400_ARCH_ACEP_SUM_UG_
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0500_INS_ARCHIVO_ACEPTADOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0500_INS_ARCHIVO_RECHAZADOS
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0400_ARCH_RECH_SUM_UG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0500_INS_ARCHIVO_RECHAZADOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0500_INS_ARCHIVO_RECHAZADOS_
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0400_ARCH_RECH_SUM_UG_
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_GAR_0500_INS_ARCHIVO_RECHAZADOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_IDENFIFICADOR_1
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0100_CONTEO_REGISTROS
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_PATRIF_GAR_0100_CONTEO_REGISTROS.values.sr_indicador}}"
+            right: '1'
+        - task_key: TSK_IDENFIFICADOR_2
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0100_CONTEO_REGISTROS
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_PATRIF_GAR_0100_CONTEO_REGISTROS.values.sr_indicador}}"
+            right: '2'
+        - task_key: TSK_IDENFIFICADOR_3
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0100_CONTEO_REGISTROS
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_PATRIF_GAR_0100_CONTEO_REGISTROS.values.sr_indicador}}"
+            right: '3'
+      queue:
+        enabled: true

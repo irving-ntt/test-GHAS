@@ -1,0 +1,242 @@
+resources:
+  jobs:
+    WF_DISP_ACREDITACION:
+      name: WF_DISP_ACREDITACION
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: TKS_DIS_ACRE_0020
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_PA_DIS_ACRE_0020"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_DIS_ACRE_0050_INS_BALANCE
+          depends_on:
+            - task_key: TKS_MOV_0050_DIS_MOV_TAB_2
+            - task_key: TKS_MOV_0050_DIS_MOV_TAB_3
+            - task_key: TKS_MOV_0050_DIS_MOV_TAB_5
+            - task_key: TKS_MOV_0050_DIS_MOV_TAB_6
+            - task_key: TKS_MOV_0050_DIS_MOV_TAB_4
+            - task_key: TKS_MOV_0050_DIS_MOV_TAB_1
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_DIS_ACRE_0050_INS_BALANCE"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_DIS_ACRE_0080_UPT_MOV
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0050_INS_BALANCE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_ANCIN_PA_DIS_ACRE_0080_UPT_MOV"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_DIS_ACRE_0090_INS_SUA
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0080_UPT_MOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/05_CONCLUSION/01_GENERA_ARCHIVOS/Notebooks/NB_OPER_ANCIN_DIS_ACRE_0090_INS_SUA"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_MOV_0050_DIS_MOV_TAB_1
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0020
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0050_DIS_MOV_TAB_1"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_MOV_0050_DIS_MOV_TAB_2
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0020
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0050_DIS_MOV_TAB_2"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_MOV_0050_DIS_MOV_TAB_3
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0020
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0050_DIS_MOV_TAB_3"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_MOV_0050_DIS_MOV_TAB_4
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0020
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0050_DIS_MOV_TAB_4"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_MOV_0050_DIS_MOV_TAB_5
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0020
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0050_DIS_MOV_TAB_5"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TKS_MOV_0050_DIS_MOV_TAB_6
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0020
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0050_DIS_MOV_TAB_6"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_GEN_CONCLUSION
+          depends_on:
+            - task_key: TKS_DIS_ACRE_0090_INS_SUA
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_GEN_MOV_CONCLUSION"
+            base_parameters:
+              sr_etapa: ""
+              sr_fcc_usu_act: ""
+              sr_fcn_id_tipo_mov: ""
+              sr_fnc_usu_cre: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

@@ -1,0 +1,67 @@
+resources:
+  jobs:
+    WF_PATRIF_0080_GMO_TRANS_INFO:
+      name: WF_PATRIF_0080_GMO_TRANS_INFO
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: MOV_TRANS_INFO_01
+          depends_on:
+            - task_key: NB_GMO_TRANS_INFO_NC_100_DECIDE
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_GMO_TRANS_INFO_NC_100_DECIDE.values.run_notebook}}"
+            right: NB_PATRIF_MOV_TRANS_INFO_01
+        - task_key: MOV_TRANS_TA_01
+          depends_on:
+            - task_key: NB_GMO_TRANS_INFO_NC_100_DECIDE
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_GMO_TRANS_INFO_NC_100_DECIDE.values.run_notebook}}"
+            right: NB_PATRIF_MOV_TRANS_TA_01
+        - task_key: NB_GMO_TRANS_INFO_NC_100_DECIDE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_0800_GMO_TRANS_INFO_NC_100_DECIDE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_0800_GMO_CLEANER
+          depends_on:
+            - task_key: NB_PATRIF_MOV_TRANS_INFO_02
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_0800_GMO_CLEANER"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_TRANS_INFO_01
+          depends_on:
+            - task_key: MOV_TRANS_INFO_01
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_MOV_TRANS_INFO_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_TRANS_INFO_02
+          depends_on:
+            - task_key: NB_PATRIF_MOV_TRANS_INFO_01
+            - task_key: NB_PATRIF_MOV_TRANS_TA_01
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_MOV_TRANS_INFO_02"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_MOV_TRANS_TA_01
+          depends_on:
+            - task_key: MOV_TRANS_TA_01
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/08_GEN_MOVIMIENTOS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_MOV_TRANS_TA_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      tags:
+        PRE_MOVS: TRANSFERENCIAS_INFONAVIT
+      queue:
+        enabled: true

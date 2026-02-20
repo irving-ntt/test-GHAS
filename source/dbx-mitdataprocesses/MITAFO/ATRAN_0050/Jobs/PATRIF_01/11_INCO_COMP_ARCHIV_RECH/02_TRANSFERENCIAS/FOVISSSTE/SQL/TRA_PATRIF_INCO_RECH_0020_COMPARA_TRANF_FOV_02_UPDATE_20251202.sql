@@ -1,0 +1,11 @@
+UPDATE PROCESOS.TTAFOTRAS_TRANS_FOVISSSTE SET
+	  FTC_CODIGO_RES_OPER = NULL
+      ,FTC_DIAG_PROCESAR = NULL
+      ,FTC_TIPO_ARCH = '01'   
+      ,FTC_ESTATUS = '1'  -----  aqui viene seteado a 1
+      ,FTN_MOTIVO_RECHAZO = NULL
+WHERE FTC_FOLIO ='#sr_folio#'
+   AND FTC_TIPO_ARCH='#sr_tipo_archivo#'
+
+
+

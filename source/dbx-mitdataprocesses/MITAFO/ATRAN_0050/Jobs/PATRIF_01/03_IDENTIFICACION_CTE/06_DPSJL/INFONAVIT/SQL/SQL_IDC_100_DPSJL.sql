@@ -1,0 +1,15 @@
+SELECT 
+FTC_FOLIO                    ,
+FTN_ID_ARCHIVO               ,
+FTC_NSS                      ,
+FTC_CURP                     ,
+FTC_RFC_TRABA                ,
+' ' FTC_APELLIDO_PATE_INFO   ,
+' ' FTC_APELLIDO_MATE_INFO   ,
+FTC_NOMBRE                   ,
+FTC_TIPO_ARCH
+FROM CIERREN_ETL.TTAFOTRAS_ETL_DEV_PAG_SJL
+WHERE FTN_ID_ARCHIVO= '#SR_ID_ARCHIVO#'
+  AND FTC_FOLIO = '#SR_FOLIO#'
+  AND FTC_TIPO_REG = '02'
+ORDER BY FTC_NSS

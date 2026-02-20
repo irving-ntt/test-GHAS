@@ -1,0 +1,111 @@
+resources:
+  jobs:
+    WF_OPER_AGRLS_ARCH_RESPUESTA_DITISSSTE:
+      name: WF_OPER_AGRLS_ARCH_RESPUESTA_DITISSSTE
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: TSK_NB_0010_ACL_ESP_200
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_JOIN_100
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_ARGLS_0020_ACL_ESP_200_ISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_300
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_JOIN_100
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_300_ISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_400
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_JOIN_100
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_400_ISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_500
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_JOIN_100
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_500_ISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_CAMPOS_LINEA_09_001
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_200
+            - task_key: TSK_NB_0010_ACL_ESP_400
+            - task_key: TSK_NB_0010_ACL_ESP_JOIN_300_LEE_ARCH
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0070_ACL_ESP_CAMPOS_LINEA_09_001"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_CAMPOS_LINEA_09_002
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_CAMPOS_LINEA_09_001
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0070_ACL_ESP_CAMPOS_LINEA_09_002"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_CAMPOS_LINEA_09_003
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_CAMPOS_LINEA_09_002
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0070_ACL_ESP_CAMPOS_LINEA_09_003"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_FINAL
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_CAMPOS_LINEA_09_003
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_FINAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_JOIN_100
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_UNION_47_DISPERSION
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_JOIN_100_SALIDA"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_JOIN_300_LEE_ARCH
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_300
+            - task_key: TSK_NB_0010_ACL_ESP_LEE_ARCH
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_JOIN_300_LEE_ARCH"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_LEE_ARCH
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_CARGA_LEE_ARCH"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_UNION_47_DISPERSION
+          depends_on:
+            - task_key: TSK_NB_0010_ACL_ESP_VAL_ST_REG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_UNION_47_DISPERSION"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_0010_ACL_ESP_VAL_ST_REG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/01_GEN_ARCH_RESP/01_DISPERSIONES/Notebooks/NB_OPER_AGRLS_0020_ACL_ESP_CARGA_INICIAL_ISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

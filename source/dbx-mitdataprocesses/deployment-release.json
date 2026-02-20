@@ -1,0 +1,60 @@
+{
+  "version_tag": "2.1.1",
+  "clusteres": {
+    "qa": [
+      {
+        "name": "Expanded Cluster - QA",
+        "id": "ID_EXPANDED_CLUSTER_DEV"
+      },
+      {
+        "name": "Expanded Cluster - QA",
+        "id": "ID_CLUSTER"
+      }
+    ],
+    "prod": [
+      {
+        "name": "Expanded Cluster - PROD",
+        "id": "ID_EXPANDED_CLUSTER_DEV"
+      },
+      {
+        "name": "Expanded Cluster - PROD",
+        "id": "ID_CLUSTER"
+      }
+    ]
+  },
+  "workflows_hijos":[
+        {
+            "name_wf": "WF_GEN_MOV_ABONO"
+        },
+        {
+            "name_wf": "WF_GEN_MOV_ABONO_RECALCULO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_ABONO_RECHAZO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_CARGO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_CARGO_RECALCULO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_CARGO_RECHAZO" 
+        }
+    ],
+    "workflows_padres":[
+        {
+            "name_wf": "WF_OPER_ANCIN_GEN_MOV",
+            "children": [
+                "GEN_MOV_ABONO",
+                "GEN_MOV_ABONO_RECALCULO",
+                "GEN_MOV_ABONO_RECHAZO",
+                "GEN_MOV_CARGO",
+                "GEN_MOV_CARGO_RECALCULO",
+                "GEN_MOV_CARGO_RECHAZO",
+                "GEN_MOV_ABONO_AEIM",
+                "GEN_MOV_ABONO_RECALCULO_AEIM"
+            ]
+        }
+    ]
+}

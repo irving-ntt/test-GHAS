@@ -1,0 +1,46 @@
+SELECT
+  SIEFORE ||
+  NUMCUE ||
+  (CASE WHEN DVCUE IS NULL THEN '0' ELSE DVCUE END) ||
+  RIGHT('00000000' || ROW_NUMBER() OVER (ORDER BY (SELECT NULL)), 8) ||
+  CODMOV ||
+  NSSTRA ||
+  FECPRO ||
+  '0000000' ||
+  FEHCCON ||
+  VALCUO ||
+   date_format(to_timestamp(from_utc_timestamp(CURRENT_TIMESTAMP, 'GMT-6')),'yyyyMMdd') ||
+  --TO_CHAR(CURRENT_DATE, 'YYYYMMDD') ||
+  SECLOT ||
+  CORREL ||
+  FECPAG ||
+  PERPAG ||
+  '000000' ||
+  '00000000' ||
+  '00000000000' ||
+  MONPES1 ||
+  MONCUO1 ||
+  MONPES2 ||
+  MONCUO2 ||
+  MONPES3 ||
+  MONCUO3 ||
+  MONPES4 ||
+  MONCUO4 ||
+  MONPES5 ||
+  MONCUO5 ||
+  MONPES6 ||
+  MONCUO6 ||
+  MONPES7 ||
+  MONCUO7 ||
+  MONPES8 ||
+  MONCUO8 ||
+  MONPES9 ||
+  MONCUO9 ||
+  '00000000' ||
+  '00000000' ||
+  '00000000' ||
+  '00000000' ||
+  '00000000' ||
+  CVESERV ||
+  '00000' AS ARCHIVO_SUBSEC_43_BIS
+FROM #DELTA_TABLA_NAME1# T

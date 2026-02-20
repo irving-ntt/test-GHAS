@@ -1,0 +1,229 @@
+/*#DS_500_NSS_AG#
+#DS_500_NSS_AG#
+#DS_400_REJINSSALDOS#
+#sr_folio#
+#DS_400_NNS_UNICO#*/
+
+
+WITH
+ds_500_nss_ag AS (
+  SELECT
+    FTN_NUM_CTA_INVDUAL,
+    FTN_ID_SUBP,
+    FTN_CONTA_SERV,
+    FTC_NSS_TRABA_AFORE,
+    FTN_NUM_APLI_INTE_VIVI92_SOL,
+    FTN_NUM_APLI_INTE_VIVI97_SOL,
+    CONTEO,
+    FCN_VALOR_ACCION,
+    FCN_ID_VALOR_ACCION,
+    FTC_FOLIO_BITACORA,
+    FCN_ID_TIPO_SUBCTA_97,
+    ValorSaldosSolPesos_VIV97,
+    ValorSaldosSolPesos_VIV92,
+    ValorSaldosDisPesos_VIV97,
+    ValorSaldosDisPesos_VIV92
+  FROM #DS_500_NSS_AG#
+  where FTN_CONTA_SERV in ('22','70')
+),
+
+-- ensure deterministic order per group (use CONTEO then account)
+ordered AS (
+  SELECT
+    a.*,
+    ROW_NUMBER() OVER (
+      PARTITION BY FTC_NSS_TRABA_AFORE
+      ORDER BY COALESCE(CONTEO,0), FTN_NUM_CTA_INVDUAL
+    ) AS rn
+  FROM ds_500_nss_ag a
+),
+
+-- compute sum of prior requested allocations in the group (rows before current)
+prior_sums AS (
+  SELECT
+    o.*,
+    COALESCE(
+      SUM(COALESCE(ValorSaldosSolPesos_VIV97,0)) OVER (
+        PARTITION BY FTC_NSS_TRABA_AFORE
+        ORDER BY rn
+        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+      ), 0
+    ) AS sum_prior_sol_97,
+    COALESCE(
+      SUM(COALESCE(ValorSaldosSolPesos_VIV92,0)) OVER (
+        PARTITION BY FTC_NSS_TRABA_AFORE
+        ORDER BY rn
+        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+      ), 0
+    ) AS sum_prior_sol_92
+  FROM ordered o
+),
+
+-- TF_501 reproduced: remaining before each row and derived SaldosVIV/BanderaVIV
+tf_501_resta_saldos AS (
+  SELECT
+    FTN_NUM_CTA_INVDUAL,
+    FTN_ID_SUBP,
+    FTN_CONTA_SERV,
+    FTC_NSS_TRABA_AFORE,
+    FTN_NUM_APLI_INTE_VIVI92_SOL,
+    FTN_NUM_APLI_INTE_VIVI97_SOL,
+    FCN_VALOR_ACCION,
+    FCN_ID_VALOR_ACCION,
+    FTC_FOLIO_BITACORA,
+    ValorSaldosSolPesos_VIV97,
+    ValorSaldosSolPesos_VIV92,
+    ValorSaldosDisPesos_VIV97,
+    ValorSaldosDisPesos_VIV92,
+    -- remaining available BEFORE applying this row's requested amount:
+    (COALESCE(ValorSaldosDisPesos_VIV97,0) - COALESCE(sum_prior_sol_97,0)) AS rem_before_97,
+    (COALESCE(ValorSaldosDisPesos_VIV92,0) - COALESCE(sum_prior_sol_92,0)) AS rem_before_92,
+    -- SaldosVIV: if ValorSaldosSolPesos_X = 0 then 0 else remaining before this row
+    CASE WHEN COALESCE(ValorSaldosSolPesos_VIV97,0) = 0
+         THEN 0
+         ELSE (COALESCE(ValorSaldosDisPesos_VIV97,0) - COALESCE(sum_prior_sol_97,0))
+    END AS SaldosVIV97,
+    CASE WHEN COALESCE(ValorSaldosSolPesos_VIV92,0) = 0
+         THEN 0
+         ELSE (COALESCE(ValorSaldosDisPesos_VIV92,0) - COALESCE(sum_prior_sol_92,0))
+    END AS SaldosVIV92,
+    -- Bandera flags based on remaining before
+    CASE WHEN COALESCE(ValorSaldosSolPesos_VIV97,0) = 0
+              OR (COALESCE(ValorSaldosDisPesos_VIV97,0) - COALESCE(sum_prior_sol_97,0)) <= 0
+         THEN 0 ELSE 1 END AS BanderaVIV97,
+    CASE WHEN COALESCE(ValorSaldosSolPesos_VIV92,0) = 0
+              OR (COALESCE(ValorSaldosDisPesos_VIV92,0) - COALESCE(sum_prior_sol_92,0)) <= 0
+         THEN 0 ELSE 1 END AS BanderaVIV92
+  FROM prior_sums
+),
+
+fi_502_rej_available AS (
+  SELECT * FROM tf_501_resta_saldos
+  WHERE BanderaVIV97 > 0 OR BanderaVIV92 > 0
+),
+fi_502_rej_rejected AS (
+  SELECT
+    FTN_NUM_CTA_INVDUAL,
+    FTN_ID_SUBP,
+    FTN_NUM_APLI_INTE_VIVI92_SOL,
+    FTN_NUM_APLI_INTE_VIVI97_SOL,
+    FTN_CONTA_SERV
+  FROM tf_501_resta_saldos
+  WHERE BanderaVIV97 = 0 AND BanderaVIV92 = 0
+),
+
+ds_400_rejinsaldos AS (
+  SELECT
+    FTN_NUM_CTA_INVDUAL,
+    FTN_ID_SUBP,
+    FTN_NUM_APLI_INTE_VIVI92_SOL,
+    FTN_NUM_APLI_INTE_VIVI97_SOL,
+    FTN_CONTA_SERV
+  FROM #DS_400_REJINSSALDOS#
+),
+
+fu_401_union_rej AS (
+  SELECT * FROM ds_400_rejinsaldos
+  UNION ALL
+  SELECT * FROM fi_502_rej_rejected
+),
+
+cg_402_gen_col_faltantes AS (
+  SELECT
+        FTN_NUM_CTA_INVDUAL,
+        0 AS FTN_IND_SDO_DISP_VIV97,
+        0 AS FTN_IND_SDO_DISP_92,
+        CAST(0 AS NUMERIC(18,14)) AS FCN_VALOR_ACCION,
+        CAST(0 AS NUMERIC(18,6)) AS FTN_MONTO_PESOS,
+        CAST(0 AS NUMERIC(18,6)) AS FTN_MONTO_PESOS_92,
+        CAST('#sr_folio#' AS VARCHAR(30)) AS FTC_FOLIO_BITACORA,
+        CAST(15 AS NUMERIC(4,0)) AS FCN_ID_TIPO_SUBCTA_97,
+        CAST(16 AS NUMERIC(10,0)) AS FCN_ID_TIPO_SUBCTA_92,
+        FTN_ID_SUBP,
+        NULL AS FCN_ID_VALOR_ACCION,
+        FTN_CONTA_SERV,
+        FTN_NUM_APLI_INTE_VIVI92_SOL,
+        FTN_NUM_APLI_INTE_VIVI97_SOL,
+        NULL AS DIAG92,
+        NULL AS DIAG97
+  FROM fu_401_union_rej
+),
+
+ds_400_nns_unico AS (
+  SELECT
+    FTN_NUM_CTA_INVDUAL,
+    FTN_IND_SDO_DISP_VIV97,
+    FTN_IND_SDO_DISP_92,
+    FCN_VALOR_ACCION,
+    FTN_MONTO_PESOS,
+    FTN_MONTO_PESOS_92,
+    FTC_FOLIO_BITACORA,
+    FCN_ID_TIPO_SUBCTA_97,
+    FCN_ID_TIPO_SUBCTA_92,
+    FTN_ID_SUBP,
+    FCN_ID_VALOR_ACCION,
+    FTN_CONTA_SERV,
+    FTN_NUM_APLI_INTE_VIVI92_SOL,
+    FTN_NUM_APLI_INTE_VIVI97_SOL,
+    DIAG92,
+    DIAG97
+  FROM #DS_400_NNS_UNICO#
+),
+
+tf_503_resta_saldo AS (
+  SELECT
+    FTN_NUM_CTA_INVDUAL,
+    CASE WHEN vSaldo97_calc > 0 THEN 1 ELSE 0 END AS FTN_IND_SDO_DISP_VIV97,
+    CASE WHEN vSaldo92_calc > 0 THEN 1 ELSE 0 END AS FTN_IND_SDO_DISP_92,
+    FCN_VALOR_ACCION,
+    vSaldo97_calc AS FTN_MONTO_PESOS,
+    vSaldo92_calc AS FTN_MONTO_PESOS_92,
+    FTC_FOLIO_BITACORA,
+    CAST(15 AS NUMERIC(4,0)) AS FCN_ID_TIPO_SUBCTA_97,
+    CAST(16 AS NUMERIC(10,0)) AS FCN_ID_TIPO_SUBCTA_92,
+    FTN_ID_SUBP,
+    FCN_ID_VALOR_ACCION,
+    FTN_CONTA_SERV,
+    FTN_NUM_APLI_INTE_VIVI92_SOL,
+    FTN_NUM_APLI_INTE_VIVI97_SOL,
+    CASE WHEN COALESCE(ValorSaldosSolPesos_VIV92,0) = 0 AND vSaldoSol92 >= COALESCE(ValorSaldosSolPesos_VIV92,0) THEN NULL ELSE '01' END AS DIAG92,
+    CASE WHEN COALESCE(ValorSaldosSolPesos_VIV97,0) = 0 AND vSaldoSol97 >= COALESCE(ValorSaldosSolPesos_VIV97,0) THEN NULL ELSE '01' END AS DIAG97
+  FROM (
+    SELECT
+      a.*,
+      GREATEST(COALESCE(SaldosVIV97,0),0) AS vSaldoSol97,
+      GREATEST(COALESCE(SaldosVIV92,0),0) AS vSaldoSol92,
+      LEAST(COALESCE(ValorSaldosSolPesos_VIV97,0), GREATEST(COALESCE(SaldosVIV97,0),0)) AS vSaldo97_calc,
+      LEAST(COALESCE(ValorSaldosSolPesos_VIV92,0), GREATEST(COALESCE(SaldosVIV92,0),0)) AS vSaldo92_calc
+    FROM fi_502_rej_available a
+  )
+)
+
+-- Final union: explicit identical column lists
+SELECT
+  FTN_NUM_CTA_INVDUAL, FTN_IND_SDO_DISP_VIV97, FTN_IND_SDO_DISP_92,
+  FCN_VALOR_ACCION, FTN_MONTO_PESOS, FTN_MONTO_PESOS_92, FTC_FOLIO_BITACORA,
+  FCN_ID_TIPO_SUBCTA_97, FCN_ID_TIPO_SUBCTA_92, FTN_ID_SUBP, FCN_ID_VALOR_ACCION,
+  FTN_CONTA_SERV, FTN_NUM_APLI_INTE_VIVI92_SOL, FTN_NUM_APLI_INTE_VIVI97_SOL,
+  DIAG92, DIAG97
+FROM cg_402_gen_col_faltantes
+
+UNION ALL
+
+SELECT
+  FTN_NUM_CTA_INVDUAL, FTN_IND_SDO_DISP_VIV97, FTN_IND_SDO_DISP_92,
+  FCN_VALOR_ACCION, FTN_MONTO_PESOS, FTN_MONTO_PESOS_92, FTC_FOLIO_BITACORA,
+  FCN_ID_TIPO_SUBCTA_97, FCN_ID_TIPO_SUBCTA_92, FTN_ID_SUBP, FCN_ID_VALOR_ACCION,
+  FTN_CONTA_SERV, FTN_NUM_APLI_INTE_VIVI92_SOL, FTN_NUM_APLI_INTE_VIVI97_SOL,
+  DIAG92, DIAG97
+FROM tf_503_resta_saldo
+
+UNION ALL
+
+SELECT
+  FTN_NUM_CTA_INVDUAL, FTN_IND_SDO_DISP_VIV97, FTN_IND_SDO_DISP_92,
+  FCN_VALOR_ACCION, FTN_MONTO_PESOS, FTN_MONTO_PESOS_92, FTC_FOLIO_BITACORA,
+  FCN_ID_TIPO_SUBCTA_97, FCN_ID_TIPO_SUBCTA_92, FTN_ID_SUBP, FCN_ID_VALOR_ACCION,
+  FTN_CONTA_SERV, FTN_NUM_APLI_INTE_VIVI92_SOL, FTN_NUM_APLI_INTE_VIVI97_SOL,
+  DIAG92, DIAG97
+FROM ds_400_nns_unico

@@ -1,0 +1,167 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR:
+      name: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_CARGA"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBETAPA_23
+          depends_on:
+            - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR.values.sr_subetapa}}"
+            right: '23'
+        - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_01
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_INFONAVIT_SOL_USO_GAR_01"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_02
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_INFONAVIT_SOL_USO_GAR_02"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_09
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_INFONAVIT_SOL_USO_GAR_09"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBETAPA_3356
+          depends_on:
+            - task_key: WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.WF_OPER_ANCIN_VALID_CONT_INFONAVIT_USO_GAR.values.sr_subetapa}}"
+            right: '3356'
+        - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_01_RECHAZO
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_INFONAVIT_SOL_USO_GAR_01_RECHAZO"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_02_RECHAZO
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_INFONAVIT_SOL_USO_GAR_02_RECHAZO"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_09_RECHAZO
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_INFONAVIT_SOL_USO_GAR_09_RECHAZO"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_OPER_ANCIN_VAL_CONT_CIFRAS_CONTROL
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_09
+            - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_01
+            - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_02
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_CIFRAS_CONTROL"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_OPER_ANCIN_VAL_CONT_CIFRAS_CONTROL_RECHAZO
+          depends_on:
+            - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_02_RECHAZO
+            - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_09_RECHAZO
+            - task_key: TSK_NB_OPER_ANCIN_INFONAVIT_USO_GAR_01_RECHAZO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/13_VALIDACION_CONTENIDO/Notebooks/NB_OPER_ANCIN_0010_VAL_CONT_CIFRAS_CONTROL"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_origen_arc: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

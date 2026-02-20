@@ -1,0 +1,82 @@
+# Databricks notebook source
+'''
+Descripcion:
+    Analiza el parámetro subproceso y, según su evaluación, determina automáticamente el workflow al que debe dirigirse.
+Subetapa:
+    20 - ARCHIVO RESPUESTA
+Trámite:
+    118 - DAEIMSS
+    120 - DOISSSTE
+    122 - DITISSSTE
+Tablas INPUT:
+    N/A
+Tablas OUTPUT:
+    N/A
+Tablas INPUT DELTA:
+    N/A
+Tablas OUTPUT DELTA:
+    N/A
+Archivos SQL:
+    N/A
+'''
+
+# COMMAND ----------
+
+# MAGIC %run "./startup"
+
+# COMMAND ----------
+
+# 📌 Definir y validar parámetros de entrada
+# Se definen los parámetros requeridos para el proceso
+# Crear la instancia con los parámetros esperados
+params = WidgetParams({
+    "sr_proceso":str,
+    "sr_subproceso": str,
+    "sr_subetapa": str,
+    "sr_folio": str,
+    "sr_etapa":str,
+    "sr_id_archivo": str,
+    "sr_instancia_proceso":str,
+    "sr_usuario":str,
+    "sr_id_snapshot":str,
+    "sr_recalculo":str,
+    "sr_tipo_archivo":str,
+    "sr_tipo_layout":str,
+    })
+# Validar widgets
+# params.validate()
+
+# COMMAND ----------
+
+if params.sr_subproceso == '354' :
+    stage = "IMSS MC 43 BIS"
+elif params.sr_subproceso == ['364','365','368']:
+    stage = "IMSS INFONAVIT 43 BIS GARANTIZADA"
+elif params.sr_subproceso in ['348','349']:
+    stage = "IMSS"
+elif params.sr_subproceso == '347' :
+    stage = "IMSS CRED VIV"
+elif params.sr_subproceso == '363' :
+    stage = "FOVISSSTE"
+elif params.sr_subproceso == '350' :
+    stage = "FOVISSSTE TA"
+elif params.sr_subproceso == '3286' :
+    stage = "MIXTA"
+elif params.sr_subproceso == '3283' :
+    stage = "FOVISSSTE"
+elif params.sr_subproceso == '3832' :
+    stage = "IMSS"
+
+dbutils.jobs.taskValues.set(key = "sr_proceso", value = params.sr_proceso)
+dbutils.jobs.taskValues.set(key = "sr_subproceso", value = params.sr_subproceso)
+dbutils.jobs.taskValues.set(key = "sr_subetapa", value = params.sr_subetapa)
+dbutils.jobs.taskValues.set(key = "sr_folio", value = params.sr_folio)
+dbutils.jobs.taskValues.set(key = "sr_id_archivo", value = params.sr_id_archivo)
+dbutils.jobs.taskValues.set(key = "sr_instancia_proceso", value = params.sr_instancia_proceso)
+dbutils.jobs.taskValues.set(key = "sr_usuario", value = params.sr_usuario)
+dbutils.jobs.taskValues.set(key = "sr_etapa", value = params.sr_etapa)
+dbutils.jobs.taskValues.set(key = "sr_id_snapshot", value = params.sr_id_snapshot)
+dbutils.jobs.taskValues.set(key = "sr_recalculo", value = params.sr_recalculo)
+dbutils.jobs.taskValues.set(key = "sr_tipo_archivo", value = params.sr_tipo_archivo)
+dbutils.jobs.taskValues.set(key = "sr_tipo_layout", value = params.sr_tipo_layout)
+

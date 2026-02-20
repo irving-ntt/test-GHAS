@@ -1,0 +1,365 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_PATRIF_VSS_0040:
+      name: WF_OPER_ATRAN_PATRIF_VSS_0040
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: 3286_0050_VSS_TRP
+          depends_on:
+            - task_key: TK_VSS_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '3286'
+        - task_key: 354_SOL_MARCA
+          depends_on:
+            - task_key: TK_VSS_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '354'
+        - task_key: 363_VSS_TRANSFERENCIAS_FOV
+          depends_on:
+            - task_key: TK_VSS_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '363'
+        - task_key: 364_ATRIF_VSS_0300_CONS_SALDO_TAG
+          depends_on:
+            - task_key: TSK_INF_VSS_TRANSFERENCIAS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '364'
+        - task_key: 364_ATRIF_VSS_0300_CONS_SALDO_TAG_REP
+          depends_on:
+            - task_key: TSK_INF_VSS_TRANSFERENCIAS_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '364'
+        - task_key: 365_ATRIF_VSS_0400_CONS_SALDO_AG
+          depends_on:
+            - task_key: TSK_INF_VSS_TRANSFERENCIAS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '365'
+        - task_key: 365_ATRIF_VSS_0400_CONS_SALDO_AG_REP
+          depends_on:
+            - task_key: TSK_INF_VSS_TRANSFERENCIAS_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '365'
+        - task_key: 368_364_365_VSS_TRANSFERENCIAS
+          depends_on:
+            - task_key: TK_VSS_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.stage}}"
+            right: INFONAVIT_TRANS
+        - task_key: 368_ATRIF_VSS_0200_CONS_SALDO_UG
+          depends_on:
+            - task_key: TSK_INF_VSS_TRANSFERENCIAS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '368'
+        - task_key: 368_ATRIF_VSS_0200_CONS_SALDO_UG_REP
+          depends_on:
+            - task_key: TSK_INF_VSS_TRANSFERENCIAS_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '368'
+        - task_key: 3832_VSS_DPSJL
+          depends_on:
+            - task_key: TK_VSS_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_subproceso}}"
+            right: '3832'
+        - task_key: NB_OPER_ATRAN_DPSJL
+          depends_on:
+            - task_key: TSK_INF_VSS_DPSJL
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/06_DPSJL/Notebooks/NB_OPER_ATRAN_DPSJL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_DPSJL_REP
+          depends_on:
+            - task_key: TSK_INF_VSS_DPSJL_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/06_DPSJL/Notebooks/NB_OPER_ATRAN_DPSJL_REP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_MCV_SOL_MCA_01
+          depends_on:
+            - task_key: TSK_INF_MARCA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_TRA_MCV_SOL_MCA_01"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_MCV_SOL_MCA_01_REP
+          depends_on:
+            - task_key: TSK_INF_MARCA_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_TRA_MCV_SOL_MCA_01_REP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_TRANS_363
+          depends_on:
+            - task_key: TSK_INF_VSS_TRANSFERENCIAS_FOV
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_OPER_ATRAN_TRA_TRANS_363"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_TRANS_363_REP
+          depends_on:
+            - task_key: TSK_INF_VSS_TRANSFERENCIAS_FOV_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_OPER_ATRAN_TRA_TRANS_363_REP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_TRANS_364
+          depends_on:
+            - task_key: 364_ATRIF_VSS_0300_CONS_SALDO_TAG
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_TRA_TRANS_INFONAVIT_364_CONS_SALDO_TAG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_TRANS_364_REP
+          depends_on:
+            - task_key: 364_ATRIF_VSS_0300_CONS_SALDO_TAG_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_TRA_TRANS_INFONAVIT_364_CONS_SALDO_TAG_REP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_TRANS_365
+          depends_on:
+            - task_key: 365_ATRIF_VSS_0400_CONS_SALDO_AG
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_TRA_TRANS_INFONAVIT_365_CONS_SALDO_AG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_TRANS_365_REP
+          depends_on:
+            - task_key: 365_ATRIF_VSS_0400_CONS_SALDO_AG_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_TRA_TRANS_INFONAVIT_365_CONS_SALDO_AG_REP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_TRANS_368
+          depends_on:
+            - task_key: 368_ATRIF_VSS_0200_CONS_SALDO_UG
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_TRA_TRANS_INFONAVIT_368_CONS_SALDO_UG"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRA_TRANS_368_REP
+          depends_on:
+            - task_key: 368_ATRIF_VSS_0200_CONS_SALDO_UG_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_OPER_ATRAN_TRA_TRANS_INFONAVIT_368_CONS_SALDO_UG_REP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRP
+          depends_on:
+            - task_key: TSK_INF_VSS_TRP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/05_TRP/Notebooks/NB_OPER_ATRAN_TRP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ATRAN_TRP_REP
+          depends_on:
+            - task_key: TSK_INF_VSS_TRP_REP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/05_TRP/Notebooks/NB_OPER_ATRAN_TRP_REP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TK_VSS_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/00_ATRIF_0040_VSS/Notebooks/NB_OPER_ATRIF_VSS_0040"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_reproceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_Conclusion
+          depends_on:
+            - task_key: NB_OPER_ATRAN_TRA_TRANS_368
+            - task_key: NB_OPER_ATRAN_TRA_MCV_SOL_MCA_01_REP
+            - task_key: NB_OPER_ATRAN_TRA_TRANS_363
+            - task_key: NB_OPER_ATRAN_DPSJL_REP
+            - task_key: NB_OPER_ATRAN_TRA_TRANS_365_REP
+            - task_key: NB_OPER_ATRAN_DPSJL
+            - task_key: NB_OPER_ATRAN_TRA_TRANS_363_REP
+            - task_key: NB_OPER_ATRAN_TRA_TRANS_368_REP
+            - task_key: NB_OPER_ATRAN_TRA_TRANS_364
+            - task_key: NB_OPER_ATRAN_TRP_REP
+            - task_key: NB_OPER_ATRAN_TRA_MCV_SOL_MCA_01
+            - task_key: NB_OPER_ATRAN_TRA_TRANS_365
+            - task_key: NB_OPER_ATRAN_TRA_TRANS_364_REP
+            - task_key: NB_OPER_ATRAN_TRP
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/04_VAL_SUFIC_SALDO/GRAL/Notebooks/NB_OPER_ANCIN_VAL_CONT_CONCLUSION"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_reproceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INF_MARCA
+          depends_on:
+            - task_key: 354_SOL_MARCA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '0'
+        - task_key: TSK_INF_MARCA_REP
+          depends_on:
+            - task_key: 354_SOL_MARCA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '1'
+        - task_key: TSK_INF_VSS_DPSJL
+          depends_on:
+            - task_key: 3832_VSS_DPSJL
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '0'
+        - task_key: TSK_INF_VSS_DPSJL_REP
+          depends_on:
+            - task_key: 3832_VSS_DPSJL
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '1'
+        - task_key: TSK_INF_VSS_TRANSFERENCIAS
+          depends_on:
+            - task_key: 368_364_365_VSS_TRANSFERENCIAS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '0'
+        - task_key: TSK_INF_VSS_TRANSFERENCIAS_FOV
+          depends_on:
+            - task_key: 363_VSS_TRANSFERENCIAS_FOV
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '0'
+        - task_key: TSK_INF_VSS_TRANSFERENCIAS_FOV_REP
+          depends_on:
+            - task_key: 363_VSS_TRANSFERENCIAS_FOV
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '1'
+        - task_key: TSK_INF_VSS_TRANSFERENCIAS_REP
+          depends_on:
+            - task_key: 368_364_365_VSS_TRANSFERENCIAS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '1'
+        - task_key: TSK_INF_VSS_TRP
+          depends_on:
+            - task_key: 3286_0050_VSS_TRP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '0'
+        - task_key: TSK_INF_VSS_TRP_REP
+          depends_on:
+            - task_key: 3286_0050_VSS_TRP
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TK_VSS_COND.values.sr_reproceso}}"
+            right: '1'
+      queue:
+        enabled: true

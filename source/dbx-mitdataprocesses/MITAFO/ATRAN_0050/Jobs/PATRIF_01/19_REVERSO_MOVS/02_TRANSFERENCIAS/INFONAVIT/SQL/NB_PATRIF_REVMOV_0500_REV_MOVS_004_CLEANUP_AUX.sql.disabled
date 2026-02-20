@@ -1,0 +1,12 @@
+-- NB_PATRIF_REVMOV_0500_REV_MOVS_004_CLEANUP_AUX.sql
+-- ========================================================================
+-- Propósito: Limpiar tabla auxiliar después del MERGE (APPROACH ALTERNATIVO)
+-- ========================================================================
+-- NOTA: Este archivo está deshabilitado (.disabled)
+--       Para usarlo, renombrar a .sql y seguir instrucciones en
+--       NB_PATRIF_REVMOV_0500_REV_MOVS_003_MERGE.sql.disabled
+-- ========================================================================
+
+DELETE FROM #CX_DATAUX_ESQUEMA#.TTSISGRAL_ETL_PRE_MOVIMIENTOS_AUX
+WHERE FTC_FOLIO = '#SR_FOLIO#'
+

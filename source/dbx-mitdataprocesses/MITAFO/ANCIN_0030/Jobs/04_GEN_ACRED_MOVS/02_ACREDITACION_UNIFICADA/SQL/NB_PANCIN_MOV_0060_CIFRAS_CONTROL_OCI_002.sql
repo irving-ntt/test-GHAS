@@ -1,0 +1,7 @@
+-- NB_PANCIN_IDC_0900_CIFRAS_CLIENTE_007_OCI_DELETE_CIERREN.sql
+-- Propósito: Eliminar registros existentes en tabla principal CIERREN
+-- Tipo: OCI (Oracle)
+
+DELETE /*+ PARALLEL(8) */ FROM #CX_CRN_ESQUEMA#.#TL_CRN_VAL_CIFRAS_CONTROL#
+WHERE FTC_FOLIO = '#SR_FOLIO#'
+  AND FTC_ID_SUBETAPA = #SR_SUBETAPA#

@@ -1,0 +1,191 @@
+{
+  "flow" : "DOIMSS",
+  "id" : "4",
+  "steps" :
+    [
+        {
+          "step_id" : "001",
+          "subprocess" : "Actualizacion de indicadores",
+          "description" : [
+          "Descripcion - La actualización de indicadores para las solicitudes DOIMSS consiste en la ",
+          "actualización de: la fecha de primera aportación de ahorro voluntario CP 2 meses (corto plazo),",
+          "la fecha de primera aportación de ahorro voluntario LP 12 meses (largo plazo) y el indicador cuenta activa. ",
+          "JP_PANCIN_0020_ACT_INDICADOR_DP - Parte 1",
+
+           "#PARAM@1# = CIERREN.TTAFOGRAL_IND_CTA_INDV Original, se cambio por movimientos en el distinct",
+           "#PARAM@2# = CIERREN_ETL.TTSISGRAL_ETL_MOVIMIENTOS",
+           "#PARAM@3# = Folio del proceso"       
+          ],
+          "value": [   
+           "SELECT "
+          ,"q1.FTN_NUM_CTA_INVDUAL,"
+          ,"q2.FCN_ID_IND_6,"
+          ,"q2.INDI_6,"
+          ,"q2.FTC_VIG_6,"
+          ,"q3.FCN_ID_IND_13,"
+          ,"q3.INDI_13,"
+          ,"q3.FTC_VIG_13,"
+          ,"q4.FCN_ID_IND_16,"
+          ,"q4.INDI_16,"
+          ,"q4.FTC_VIG_16"
+          ,"FROM"
+          ,"("
+          ," SELECT DISTINCT FTN_NUM_CTA_INVDUAL"
+          ," FROM #PARAM@2# WHERE FTC_FOLIO = '#PARAM@3#'"
+          ," ) q1"
+          ,"LEFT JOIN"
+          ,"( "
+          ,"SELECT"
+          ,"FTN_NUM_CTA_INVDUAL,"
+          ,"DECODE(FFN_ID_CONFIG_INDI,6,FCN_ID_IND_CTA_INDV,0) FCN_ID_IND_6,"
+          ,"DECODE(FFN_ID_CONFIG_INDI,6,FFN_ID_CONFIG_INDI,0) INDI_6,"
+          ,"DECODE(FFN_ID_CONFIG_INDI,6,FTC_VIGENCIA,0) FTC_VIG_6"
+          ,"FROM #PARAM@1#"
+          ,"WHERE FFN_ID_CONFIG_INDI = 6 "
+          ,") q2 ON q1.FTN_NUM_CTA_INVDUAL = q2.FTN_NUM_CTA_INVDUAL"
+          ,"LEFT JOIN"
+          ,"("
+          ,"SELECT"
+          ,"FTN_NUM_CTA_INVDUAL,"
+          ,"DECODE(FFN_ID_CONFIG_INDI,13,FCN_ID_IND_CTA_INDV,0) FCN_ID_IND_13,"
+          ,"DECODE(FFN_ID_CONFIG_INDI,13,FFN_ID_CONFIG_INDI,0) INDI_13,"
+          ," DECODE(FFN_ID_CONFIG_INDI,13,SUBSTR(FCC_VALOR_IND,1,1),0) FTC_VIG_13"
+          ,"FROM #PARAM@1#"
+          ," WHERE FFN_ID_CONFIG_INDI = 13    "
+          ,") q3 ON q1.FTN_NUM_CTA_INVDUAL = q3.FTN_NUM_CTA_INVDUAL"
+          ,"LEFT JOIN"
+          ,"("
+          ,"SELECT"
+          ,"FTN_NUM_CTA_INVDUAL,"
+          ,"DECODE(FFN_ID_CONFIG_INDI,16,FCN_ID_IND_CTA_INDV,0) FCN_ID_IND_16,"
+          ,"DECODE(FFN_ID_CONFIG_INDI,16,FFN_ID_CONFIG_INDI,0) INDI_16,"
+          ,"DECODE(FFN_ID_CONFIG_INDI,16,FTC_VIGENCIA,0) FTC_VIG_16"
+          ,"FROM #PARAM@1#"
+          ,"WHERE FFN_ID_CONFIG_INDI = 16 "
+          ,") q4 ON q1.FTN_NUM_CTA_INVDUAL = q4.FTN_NUM_CTA_INVDUAL"   
+          ]
+        },
+        {
+          "step_id" : "002",
+          "subprocess" : "Actualizacion de indicadores",
+          "description" : [
+                "#PARAM@1# dbx_mit_dev_1udbvf_workspace.default.temp_dispersion_mov",
+                "#PARAM@2# temp_view_001"
+          ],
+          "value": [
+              "SELECT"
+             ,"    C1.FTN_NUM_CTA_INVDUAL,"
+             ,"    C1.FCN_ID_TIPO_SUBCTA,"
+             ,"    C1.FTD_FEH_LIQUIDACION,"
+             ,"    C2.FCN_ID_IND_6,"
+             ,"    C2.INDI_6,"
+             ,"    C2.FTC_VIG_6,"
+             ,"    C2.FCN_ID_IND_13,"
+             ,"    C2.INDI_13,"
+             ,"    C2.FTC_VIG_13,"
+             ,"    C2.FCN_ID_IND_16,"
+             ,"    C2.INDI_16,"
+             ,"    C2.FTC_VIG_16"
+             ,"FROM ("
+             ,"        SELECT DISTINCT"
+             ,"            FTC_NUM_CTA_INVDUAL FTN_NUM_CTA_INVDUAL,"
+             ,"            FCN_ID_TIPO_SUBCTA,"
+             ,"            FTD_FEH_LIQUIDACION"
+             ,"        FROM #PARAM@1#"
+             ,"        WHERE FCN_ID_TIPO_MOV = 181 "
+             ,""
+             ,") C1"
+             ,"LEFT JOIN #PARAM@2# C2"
+             ,"ON C1.FTN_NUM_CTA_INVDUAL = C2.FTN_NUM_CTA_INVDUAL"
+
+          ]
+        },
+        {
+          "step_id" : "003",
+          "subprocess" : "Actualizacion de indicadores",
+          "description" : [
+                "#PARAM@1# TEMP_DOIMSS_IND_01"
+                ],
+          "value": [
+           "    SELECT"
+           ,"        NULL AS FCN_ID_IND_CTA_INDV,"
+           ,"        FTN_NUM_CTA_INVDUAL,"
+           ,"        6 AS FFN_ID_CONFIG_INDI,"
+           ,"        TO_CHAR(FTD_FEH_LIQUIDACION, 'dd/MM/yyyy') AS FCC_VALOR_IND,"
+           ,"        '1' AS FTC_VIGENCIA,"
+           ,"         from_utc_timestamp(current_timestamp(), 'GMT-6')  FTD_FEH_REG,"
+           ,"        'DATABRICKS' AS FTC_USU_REG,"
+           ,"         from_utc_timestamp(current_timestamp(), 'GMT-6') FTD_FEH_ACT,"
+           ,"        'DATABRICKS' AS FCC_USU_ACT"
+           ,"    FROM #PARAM@1#"
+           ,"    WHERE (8 = 8 OR 8 = 120 OR 8 = 118)"
+           ,"        AND FCN_ID_TIPO_SUBCTA = 19"
+           ,"        AND FCN_ID_IND_6 IS NULL"
+           ,"    UNION ALL"
+           ,"    SELECT"
+           ,"        NULL AS FCN_ID_IND_CTA_INDV,"
+           ,"        FTN_NUM_CTA_INVDUAL,"
+           ,"        16 AS FFN_ID_CONFIG_INDI,"
+           ,"        TO_CHAR(FTD_FEH_LIQUIDACION, 'dd/MM/yyyy') AS FCC_VALOR_IND,"
+           ,"        '1' AS FTC_VIGENCIA,"
+           ,"        from_utc_timestamp(current_timestamp(), 'GMT-6')  FTD_FEH_REG,"
+           ,"        'DATABRICKS' AS FTC_USU_REG,"
+           ,"         from_utc_timestamp(current_timestamp(), 'GMT-6')  FTD_FEH_ACT,"
+           ,"        'DATABRICKS' AS FCC_USU_ACT"
+           ,"    FROM #PARAM@1#"
+           ,"    WHERE (8 = 8 OR 8 = 120 OR 8 = 118)"
+           ,"        AND FCN_ID_TIPO_SUBCTA = 23"
+           ,"        AND FCN_ID_IND_16 IS NULL"
+           ,"    UNION ALL"
+           ,"    SELECT"
+           ,"        CASE"
+           ,"            WHEN FCN_ID_IND_13 IS NOT NULL THEN FCN_ID_IND_13"
+           ,"            ELSE NULL"
+           ,"        END AS FCN_ID_IND_CTA_INDV,"
+           ,"        FTN_NUM_CTA_INVDUAL,"
+           ,"        CASE"
+           ,"            WHEN INDI_13 IS NULL THEN 13"
+           ,"            ELSE INDI_13"
+           ,"        END AS FFN_ID_CONFIG_INDI,"
+           ,"        '1' AS FCC_VALOR_IND,"
+           ,"        '1' AS FTC_VIGENCIA,"
+           ,"         from_utc_timestamp(current_timestamp(), 'GMT-6') FTD_FEH_REG,"
+           ,"        'DATABRICKS'  AS FTC_USU_REG,"
+           ,"         from_utc_timestamp(current_timestamp(), 'GMT-6') FTD_FEH_ACT,"
+           ,"        'DATABRICKS' AS FCC_USU_ACT"
+           ,"    FROM #PARAM@1#"
+           ,"    WHERE FTC_VIG_13 = 0 OR FCN_ID_IND_13 IS NULL "
+          ]
+        },
+        {
+          "step_id" : "004",
+          "subprocess" : "Actualizacion de indicadores",
+          "description" : [
+                "#PARAM@1# CIERREN.TTAFOGRAL_IND_CTA_INDV",
+                "#PARAM@2# CIERREN_DATAUX.TTAFOGRAL_ETL_IND_CTA_INDV_AUX"
+                ],
+          "value": [
+          "MERGE INTO #PARAM@1# ori"
+              ,"USING ("
+              ,"SELECT"
+              ,"FTC_FOLIO,"
+              ,"FTN_NUM_CTA_INVDUAL,"
+              ,"FCN_ID_IND_CTA_INDV,"
+              ,"FCC_VALOR_IND,"
+              ,"FTC_VIGENCIA,"
+              ,"FTD_FEH_ACT,"
+              ,"FCC_USU_ACT"
+              ,"FROM #PARAM@2#"
+              ,"WHERE FTC_FOLIO = #PARAM@3#"
+              ,") aux"
+              ,"ON (ori.FCN_ID_IND_CTA_INDV = aux.FCN_ID_IND_CTA_INDV)"
+              ,"WHEN MATCHED THEN"
+              ,"UPDATE SET"
+              ,"ori.FCC_VALOR_IND = aux.FCC_VALOR_IND,"
+              ,"ori.FTC_VIGENCIA  = aux.FTC_VIGENCIA ,"
+              ,"ori.FTD_FEH_ACT   = aux.FTD_FEH_ACT  ,"
+              ,"ori.FCC_USU_ACT   = aux.FCC_USU_ACT"
+          ]
+        }
+    ]
+}
