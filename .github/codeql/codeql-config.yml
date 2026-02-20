@@ -1,0 +1,9 @@
+name: "CodeQL config "
+paths:
+  - .
+paths-ignore:
+  - "**/.venv/**"
+  - "**/venv/**"
+  - "**/__pycache__/**"
+  - "**/.git/**"
+  - "**/.github/**"
