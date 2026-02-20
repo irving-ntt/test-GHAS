@@ -9,11 +9,12 @@ include:
 targets:
   qa:
     mode: production
-    permissions:
-      - group_name : developers-mit
-        level: CAN_MANAGE
+    # permissions:
+    #   - group_name : developers-mit
+    #     level: CAN_MANAGE
     workspace:
-      host: https://adb-3925217763478917.17.azuredatabricks.net/
+      # host: https://adb-3925217763478917.17.azuredatabricks.net/
+      host: https://adb-2693506096277586.6.azuredatabricks.net/
       root_path: /Users/${workspace.current_user.userName}/Workflows_padres
       file_path: /Users/${workspace.current_user.userName}/Workflows_padres
       artifact_path: /Users/${workspace.current_user.userName}/deploy/workflows_padres${bundle.name}/${bundle.target}
@@ -23,11 +24,12 @@ targets:
 
   prod:
     mode: production
-    permissions:
-      - group_name : prod-operaciones5.0-soporte
-        level: CAN_MANAGE
+    # permissions:
+    #   - group_name : prod-operaciones5.0-soporte
+    #     level: CAN_MANAGE
     workspace:
-      host: https://adb-1051909841828239.19.azuredatabricks.net/
+      # host: https://adb-1051909841828239.19.azuredatabricks.net/
+      host: https://adb-2693506096277586.6.azuredatabricks.net/
       root_path: /Users/${workspace.current_user.userName}/deploy/workflows_padres/${bundle.name}/${bundle.target}
     run_as:
       service_principal_name: ${workspace.current_user.userName}

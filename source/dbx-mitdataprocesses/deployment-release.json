@@ -22,50 +22,40 @@
       }
     ]
   },
-  "pool": {
-    "qa": [
-      {
-        "type": "Driver Pool",
-        "poolNameToAssing": "Operaciones5.0_NCI_DriversPool",
-        "poolIdToReplace": "ID_DRIVER_POOL"
-      },
-      {
-        "type": "instance Pool",
-        "poolNameToAssing": "Operaciones5.0_NCI_WorkersPool",
-        "poolIdToReplace": "ID_INSTANCE_POOL"
-      }
+  "workflows_hijos":[
+        {
+            "name_wf": "WF_GEN_MOV_ABONO"
+        },
+        {
+            "name_wf": "WF_GEN_MOV_ABONO_RECALCULO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_ABONO_RECHAZO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_CARGO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_CARGO_RECALCULO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_CARGO_RECHAZO" 
+        },
+        {
+            "name_wf": "WF_GEN_MOV_ABONO_CARGO" 
+        }
     ],
-    "prod": [
-      {
-        "type": "Driver Pool",
-        "poolNameToAssing": "Operaciones5.0_NCI_DriversPool",
-        "poolIdToReplace": "ID_DRIVER_POOL"
-      },
-      {
-        "type": "instance Pool",
-        "poolNameToAssing": "Operaciones5.0_NCI_WorkersPool",
-        "poolIdToReplace": "ID_INSTANCE_POOL"
-      }
-    ]
-  },
-  "policy": {
-    "qa": [
-      {
-        "policyNameToAssing": "OP5.0_NCI_JOB_CLUSTER_POLICY",
-        "policyIdToReplace": "ID_JOB_CLUSTER_POLICY"
-      }
+    "workflows_padres":[
+        {
+            "name_wf": "WF_DEMO_OPER_ANCIN_GEN_MOV",
+            "children": [
+                "GEN_MOV_ABONO",
+                "GEN_MOV_ABONO_RECALCULO",
+                "GEN_MOV_ABONO_RECHAZO",
+                "GEN_MOV_CARGO",
+                "GEN_MOV_CARGO_RECALCULO",
+                "GEN_MOV_CARGO_RECHAZO"
+            ]
+        }
     ],
-    "prod": [
-      {
-        "policyNameToAssing": "OP5.0_NCI_JOB_CLUSTER_POLICY",
-        "policyIdToReplace": "ID_JOB_CLUSTER_POLICY"
-      }
-    ]
-  },
-  "workflows_hijos": [
-
-  ],
-  "workflows_padres": [
-    
-  ]
 }
