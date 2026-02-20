@@ -44,7 +44,7 @@
     ],
     "workflows_padres":[
         {
-            "name_wf": "WF_DEMO_OPER_ANCIN_GEN_MOV",
+            "name_wf": "WF_OPER_ANCIN_GEN_MOV",
             "children": [
                 "GEN_MOV_ABONO",
                 "GEN_MOV_ABONO_RECALCULO",
