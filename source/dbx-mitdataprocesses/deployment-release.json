@@ -51,7 +51,9 @@
                 "GEN_MOV_ABONO_RECHAZO",
                 "GEN_MOV_CARGO",
                 "GEN_MOV_CARGO_RECALCULO",
-                "GEN_MOV_CARGO_RECHAZO"
+                "GEN_MOV_CARGO_RECHAZO",
+                "GEN_MOV_ABONO_AEIM",
+                "GEN_MOV_ABONO_RECALCULO_AEIM"
             ]
         }
     ]
