@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [ release-qa ]
+    branches: [ release-qa, main ]
   pull_request:
-    branches: [ release-qa ]
+    branches: [ release-qa, main ]
   schedule:
     - cron: "0 3 * * 6"
 
