@@ -1,0 +1,107 @@
+SELECT
+   FTC_FOLIO                 ,
+   FTN_NUM_CTA_INVDUAL       ,
+   FTN_ID_ARCHIVO            ,
+   FTC_FOLIO_PROCESAR        ,
+   FTC_NSS_IMSS              ,
+   FTC_APELLIDO_PATERNO      ,
+   FTC_APELLIDO_MATERNO      ,
+   FTC_NOMBRE                ,
+   FTC_CURP                  ,
+   FTC_TIPO_OPERACION        ,
+   FTC_INSTITUTO_ORIGEN      ,
+   FTC_CREDITO               ,
+   FTN_MONTO_PESOS           ,
+   FTN_AIVS                  ,
+   FTD_FEH_VAL_AIVS          ,
+   FTN_TOTAL_AIVS            ,
+   FTD_FEH_CREDITO           ,
+   FTD_FEH_VAL_TRANSFERENCIA ,
+   FTC_ESTATUS_OPE           ,
+   FTC_MOTIVO_REC            ,
+   FCN_ID_TIPO_SUBCTA        ,
+   FCN_ID_SIEFORE            ,
+   FTN_SUBPROCESO            ,
+   FTC_CELULAR               ,
+   FTC_CORREO_ELEC           ,
+   FTC_MASCARA_RECEP         ,
+   FTD_FEH_CRE               ,
+   FTC_USU_CRE               ,
+   FTC_RFC                   ,
+   FTN_NO_LINEA              ,
+   FTN_MONTO_PESOS_92        ,
+   FTN_AIVS_92               ,
+   FTD_FEH_VAL_AIVS_92       ,
+   FTN_TOTAL_AIVS_92         ,
+   FCN_ID_TIPO_SUBCTA_92     ,
+   FTC_ID_DIAGNOSTICO        ,
+   ESTATUS_DIAG              ,
+   FTC_NOMBRE_CTE            ,
+   FTC_ID_SUBP_NO_VIG        ,
+   FTD_FECHA_CERTIFICACION   ,
+   FTN_CTE_PENSIONADO        ,
+   FTC_CLAVE_ENT_RECEP       ,
+   FTC_CLAVE_TMP             ,
+   BNDDUP   
+FROM (
+    SELECT 
+      FTC_FOLIO                 ,
+      FTN_NUM_CTA_INVDUAL       ,
+      FTN_ID_ARCHIVO            ,
+      FTC_FOLIO_PROCESAR        ,
+      FTN_NSS AS FTC_NSS_IMSS   ,
+      FTC_APELLIDO_PATERNO		,
+      FTC_APELLIDO_MATERNO		,
+      FTC_NOMBRE				,
+      FTC_CURP					,
+      FTC_TIPO_OPERACION		,
+      FTC_INSTITUTO_ORIGEN		,
+      FTC_CREDITO				,
+      FTN_MONTO_PESOS			,
+      FTN_AIVS					,
+      FTD_FEH_VAL_AIVS			,
+      FTN_TOTAL_AIVS			,
+      FTD_FEH_CREDITO			,
+      FTD_FEH_VAL_TRANSFERENCIA	,
+      CASE 
+        WHEN FTN_ESTATUS_DIAG = 0 THEN '02'
+    	WHEN FTN_ESTATUS_DIAG <> 0 AND BNDDUP = 1 THEN '01'
+        ELSE '02' END AS FTC_ESTATUS_OPE  ,
+      CASE 
+        WHEN FTN_ESTATUS_DIAG = 0 THEN REPLACE(FTC_ID_DIAGNOSTICO,0,'')
+    	WHEN FTN_ESTATUS_DIAG <> 0 AND BNDDUP = 1 THEN NULL
+        ELSE '4437' END AS FTC_MOTIVO_REC	  ,
+      FCN_ID_TIPO_SUBCTA		,
+      FCN_ID_SIEFORE			,
+      FTN_SUBPROCESO			,
+      FTN_CELULAR AS FTC_CELULAR               ,
+      FTC_CORREO_ELEC           ,
+      FTC_MASCARA_RECEP			,
+      to_timestamp(from_utc_timestamp(CURRENT_TIMESTAMP, 'GMT-6'))  AS FTD_FEH_CRE ,
+      'DATABRICKS' AS FTC_USU_CRE        ,
+      FTC_RFC               	,
+      FTN_NO_LINEA				,
+      FTN_MONTO_PESOS_92		,
+      FTN_AIVS_92				,
+      FTD_FEH_VAL_AIVS_92		,
+      FTN_TOTAL_AIVS_92			,
+      FCN_ID_TIPO_SUBCTA_92     ,
+      CASE 
+        WHEN FTN_ESTATUS_DIAG = 0 THEN FTC_ID_DIAGNOSTICO
+    	WHEN FTN_ESTATUS_DIAG <> 0 AND BNDDUP = 1 THEN NULL
+        ELSE '4437' END AS FTC_ID_DIAGNOSTICO    	,
+      CASE
+        WHEN FTN_ESTATUS_DIAG = 0 THEN 0
+    	WHEN FTN_ESTATUS_DIAG <> 0 AND BNDDUP = 1 THEN '01'
+    	ELSE '0' END AS ESTATUS_DIAG              ,
+      FTC_NOMBRE_CTE            ,
+      FTC_ID_SUBP_NO_VIG        ,
+      FTD_FECHA_CERTIFICACION   ,
+      FTN_CTE_PENSIONADO        ,
+      FTC_CLAVE_ENT_RECEP       ,
+      FTC_CLAVE_TMP             ,
+      BNDDUP                    ,
+      ROW_NUMBER() OVER (PARTITION BY FTN_NSS, FTN_NO_LINEA ORDER BY FTN_NSS ASC, FTN_NO_LINEA ASC) AS rn
+    FROM #DELTA_701# 
+) --WHERE rn = 1
+

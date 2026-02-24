@@ -1,0 +1,32 @@
+name: Develop Lint
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  develop-lint:
+    name: Develop-lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v4
+        with: { python-version: "3.10" }
+
+      - name: Lint (flake8 annotations in PR)
+        uses: reviewdog/action-flake8@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          fail_on_error: true

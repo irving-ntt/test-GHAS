@@ -1,0 +1,697 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_VALID_STRC:
+      name: WF_OPER_ANCIN_VALID_STRC
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: TSK_OPER_ANCIN_VALID_STRUCT_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_VALID_STRUCT_COND"
+            base_parameters:
+              sr_proceso: ""
+              sr_path_arch: ""
+              sr_subproceso: ""
+              sr_id_archivo: ""
+              sr_subetapa: ""
+              sr_folio: ""
+              sr_instancia_proceso: ""
+              sr_usuario: ""
+              sr_etapa: ""
+              sr_id_snapshot: ""
+              sr_paso: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBETAPA_23
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_VALID_STRUCT_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_subetapa}}"
+            right: '23'
+        - task_key: DESMARCA_DE_CREDITO_DE_VIVIENDA_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DESMARCA DE CREDITO DE VIVIENDA POR 43 BIS
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_DESMARCA_CREDITO_VIVIENDA_IMSS
+          depends_on:
+            - task_key: DESMARCA_DE_CREDITO_DE_VIVIENDA_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DESMARCA_FOVISSSTE
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DESMARCA FOVISSSTE
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_DESMARCA_FOVISSSTE
+          depends_on:
+            - task_key: DESMARCA_FOVISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DEVOLUCION_DE_EXCEDENTES_FOVISSSTE
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DEVOLUCION DE EXCEDENTES POR T. A. FOVISSSTE
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_DEVOLUCION_EXCEDENTES_FOVISSSTE
+          depends_on:
+            - task_key: DEVOLUCION_DE_EXCEDENTES_FOVISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DEVOLUCION_DE_EXCEDENTES_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DEVOLUCION DE EXCEDENTES POR 43 BIS
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_DEVOLUCION_EXCEDENTES_IMSS
+          depends_on:
+            - task_key: DEVOLUCION_DE_EXCEDENTES_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DEVOLUCION_DE_PAGO_SIN_JUSTIFICACION_LEGAL_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DEVOLUCION DE PAGO SIN JUSTIFICACION LEGAL IMSS
+        - task_key: TSK_NB_OPER_ANCIN_0900_STRL_TRAS_DEVOL_PAGO_IMSS
+          depends_on:
+            - task_key: DEVOLUCION_DE_PAGO_SIN_JUSTIFICACION_LEGAL_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0900_STRL_TRAS_DEVOL_PAGO"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DEVOLUCION_DE_SALDOS_EXCEDENTES_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DEVOLUCION DE SALDOS EXCEDENTES POR T. A. A. G.
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_DEVOLUCION_DE_SALDOS_EXCEDENTES_IMSS
+          depends_on:
+            - task_key: DEVOLUCION_DE_SALDOS_EXCEDENTES_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DISPERSION_DE_ACLARACIONES_ESPECIALES_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DISPERSION DE ACLARACIONES ESPECIALES IMSS
+        - task_key: TSK_NB_OPER_ANCIN_0700_STRL_ACESP
+          depends_on:
+            - task_key: DISPERSION_DE_ACLARACIONES_ESPECIALES_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0700_STRL_ACESP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DISPERSION_GUBERNAMENTAL_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DISPERSION GUBERNAMENTAL IMSS
+        - task_key: TSK_NB_OPER_ANCIN_0100_STRL_DGIMSS
+          depends_on:
+            - task_key: DISPERSION_GUBERNAMENTAL_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0100_STRL_DGIMSS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DISPERSION_GUBERNAMENTAL_ISSSTE
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DISPERSION GUBERNAMENTAL ISSSTE
+        - task_key: TSK_NB_OPER_ANCIN_0200_STRL_DGISSSTE
+          depends_on:
+            - task_key: DISPERSION_GUBERNAMENTAL_ISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0200_STRL_DGISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DISPERSION_INTERESES_EN_TRANSITO
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DISPERSION INTERESES EN TRANSITO
+        - task_key: TSK_NB_OPER_ANCIN_0500_STRL_ITIMSS
+          depends_on:
+            - task_key: DISPERSION_INTERESES_EN_TRANSITO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0500_STRL_ITIMSS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DISPERSION_INTERESES_EN_TRANSITO_ISSSTE
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DISPERSION INTERESES EN TRANSITO ISSSTE
+        - task_key: TSK_NB_OPER_ANCIN_0600_STRL_ITISSSTE
+          depends_on:
+            - task_key: DISPERSION_INTERESES_EN_TRANSITO_ISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0600_STRL_ITISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DISPERSION_ORDINARIA_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DISPERSION ORDINARIA IMSS
+        - task_key: TSK_NB_OPER_ANCIN_0300_STRL_DOIMSS
+          depends_on:
+            - task_key: DISPERSION_ORDINARIA_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0300_STRL_DOIMSS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DISPERSION_ORDINARIA_ISSSTE
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DISPERSION ORDINARIA ISSSTE
+        - task_key: TSK_NB_OPER_ANCIN_0400_STRL_DOISSSTE
+          depends_on:
+            - task_key: DISPERSION_ORDINARIA_ISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0400_STRL_DOISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SOLICITUD_DE_MARCA_DE_CUENTAS_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: SOLICITUD DE MARCA DE CUENTAS POR 43 BIS
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_SOLICITUD_MARCA_IMSS
+          depends_on:
+            - task_key: SOLICITUD_DE_MARCA_DE_CUENTAS_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TRANSFERENCIAS_DE_ACREDITADOS_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIAS DE ACREDITADOS INFONAVIT
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_TRANSFERANCIA_ACREDITADOS_IMSS
+          depends_on:
+            - task_key: TRANSFERENCIAS_DE_ACREDITADOS_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TRANSFERENCIA_DE_ACREDITADOS_FOVISSSTE
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIA DE ACREDITADOS FOVISSSTE
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_TRANSFERENCIA_DE_ACREDITADOS_FOVISSSTE
+          depends_on:
+            - task_key: TRANSFERENCIA_DE_ACREDITADOS_FOVISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TRANSFERENCIA_DE_RECURSOS_POR_PORTABILIDAD
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIA DE RECURSOS POR PORTABILIDAD
+        - task_key: TSK_NB_OPER_ANCIN_1000_STRL_TRAS_TRANS_REC_PORTA
+          depends_on:
+            - task_key: TRANSFERENCIA_DE_RECURSOS_POR_PORTABILIDAD
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_1000_STRL_TRAS_TRANS_REC_PORTA"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TRANSFERENCIA_POR_ANUALIDAD_GARANTIZADA_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIA POR ANUALIDAD GARANTIZADA
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_TRANSFERENCIA_ANUALIDAD_GARANTIZADA_IMSS
+          depends_on:
+            - task_key: TRANSFERENCIA_POR_ANUALIDAD_GARANTIZADA_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: USO_DE_GARANTIA_IMSS
+          depends_on:
+            - task_key: SUBETAPA_23
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: USO DE GARANTIA POR 43 BIS
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_USO_GARANTIA_IMSS
+          depends_on:
+            - task_key: USO_DE_GARANTIA_IMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBETAPA_25
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_VALID_STRUCT_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_subetapa}}"
+            right: '25'
+        - task_key: SUBETAPA_3356
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_VALID_STRUCT_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_subetapa}}"
+            right: '3356'
+        - task_key: SOLICITUD_DE_MARCA_DE_CUENTAS_POR_43_BIS
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: SOLICITUD DE MARCA DE CUENTAS POR 43 BIS
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_SOLICITUD_MARCA_IMSS_RECHAZO
+          depends_on:
+            - task_key: SOLICITUD_DE_MARCA_DE_CUENTAS_POR_43_BIS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TRANSFERENCIAS_DE_ACREDITADOS_INFONAVIT
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIAS DE ACREDITADOS INFONAVIT
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_TRANSFERANCIA_ACREDITADOS_IMSS_RECHAZOS
+          depends_on:
+            - task_key: TRANSFERENCIAS_DE_ACREDITADOS_INFONAVIT
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TRANSFERENCIA_DE_ACREDITADOS_FOVISS
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIA DE ACREDITADOS FOVISSSTE
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_TRANSFERENCIA_DE_ACREDITADOS_FOVISSSTE_RECHAZOS
+          depends_on:
+            - task_key: TRANSFERENCIA_DE_ACREDITADOS_FOVISS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TRANSFERENCIA_POR_ANUALIDAD_GARANTIZADA
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIA POR ANUALIDAD GARANTIZADA
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_TRANSFERENCIA_ANUALIDAD_GARANTIZADA_IMSS_RECHAZOS
+          depends_on:
+            - task_key: TRANSFERENCIA_POR_ANUALIDAD_GARANTIZADA
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: USO_DE_GARANTIA_POR_43_BIS
+          depends_on:
+            - task_key: SUBETAPA_3356
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: USO DE GARANTIA POR 43 BIS
+        - task_key: TSK_NB_OPER_ANCIN_0800_STRL_USO_GARANTIA_IMSS_RECHAZOS
+          depends_on:
+            - task_key: USO_DE_GARANTIA_POR_43_BIS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBETAPA_4030
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_VALID_STRUCT_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_subetapa}}"
+            right: '4030'
+        - task_key: DESMARCA_DE_CREDITO_DE_VIVIENDA_POR_43_BIS_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DESMARCA DE CREDITO DE VIVIENDA POR 43 BIS
+        - task_key: DESMARCA_FOVISSSTE_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DESMARCA FOVISSSTE
+        - task_key: DEVOLUCION_DE_EXCEDENTES_POR_43_BIS_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DEVOLUCION DE EXCEDENTES POR 43 BIS
+        - task_key: DEVOLUCION_DE_EXCEDENTES_POR_T_A_FOVISSSTE_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DEVOLUCION DE EXCEDENTES POR T. A. FOVISSSTE
+        - task_key: DEVOLUCION_DE_PAGO_SIN_JUSTIFICACION_LEGAL_IMSS_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DEVOLUCION DE PAGO SIN JUSTIFICACION LEGAL IMSS
+        - task_key: TSK_NB_OPER_ANCIN_0900_STRL_TRAS_DEVOL_PAGO_INTGRTY
+          depends_on:
+            - task_key: DEVOLUCION_DE_PAGO_SIN_JUSTIFICACION_LEGAL_IMSS_INTGRTY
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0900_STRL_TRAS_DEVOL_PAGO_INTGRTY"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: DEVOLUCION_DE_SALDOS_EXCEDENTES_POR_T_A_A_G_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: DEVOLUCION DE SALDOS EXCEDENTES POR T. A. A. G.
+        - task_key: SOLICITUD_DE_MARCA_DE_CUENTAS_POR_43_BIS_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: SOLICITUD DE MARCA DE CUENTAS POR 43 BIS
+        - task_key: TRANSFERENCIAS_DE_ACREDITADOS_INFONAVIT_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIAS DE ACREDITADOS INFONAVIT
+        - task_key: TRANSFERENCIA_DE_ACREDITADOS_FOVISSSTE_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIA DE ACREDITADOS FOVISSSTE
+        - task_key: TRANSFERENCIA_DE_RECURSOS_POR_PORTABILIDAD_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIA DE RECURSOS POR PORTABILIDAD
+        - task_key: TSK_NB_OPER_ANCIN_1000_TRAS_TRANS_REC_PORTA_INTGRTY
+          depends_on:
+            - task_key: TRANSFERENCIA_DE_RECURSOS_POR_PORTABILIDAD_INTGRTY
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_1000_STRL_TRAS_TRANS_REC_PORTA_INTGRTY"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TRANSFERENCIA_POR_ANUALIDAD_GARANTIZADA_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: TRANSFERENCIA POR ANUALIDAD GARANTIZADA
+        - task_key: USO_DE_GARANTIA_POR_43_BIS_INTGRTY
+          depends_on:
+            - task_key: SUBETAPA_25
+              outcome: 'true'
+            - task_key: SUBETAPA_4030
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_stage}}"
+            right: USO DE GARANTIA POR 43 BIS
+        - task_key: TSK_NB_OPER_ANCIN_0800_TRASP_INTGRTY
+          depends_on:
+            - task_key: TRANSFERENCIA_DE_ACREDITADOS_FOVISSSTE_INTGRTY
+              outcome: 'true'
+            - task_key: DESMARCA_DE_CREDITO_DE_VIVIENDA_POR_43_BIS_INTGRTY
+              outcome: 'true'
+            - task_key: DEVOLUCION_DE_EXCEDENTES_POR_43_BIS_INTGRTY
+              outcome: 'true'
+            - task_key: TRANSFERENCIA_POR_ANUALIDAD_GARANTIZADA_INTGRTY
+              outcome: 'true'
+            - task_key: DESMARCA_FOVISSSTE_INTGRTY
+              outcome: 'true'
+            - task_key: SOLICITUD_DE_MARCA_DE_CUENTAS_POR_43_BIS_INTGRTY
+              outcome: 'true'
+            - task_key: DEVOLUCION_DE_EXCEDENTES_POR_T_A_FOVISSSTE_INTGRTY
+              outcome: 'true'
+            - task_key: USO_DE_GARANTIA_POR_43_BIS_INTGRTY
+              outcome: 'true'
+            - task_key: DEVOLUCION_DE_SALDOS_EXCEDENTES_POR_T_A_A_G_INTGRTY
+              outcome: 'true'
+            - task_key: TRANSFERENCIAS_DE_ACREDITADOS_INFONAVIT_INTGRTY
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0800_STRL_TRASPASOS_INTGRTY"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBETAPA_832
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_VALID_STRUCT_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_subetapa}}"
+            right: '832'
+        - task_key: WF_VALID_STRC_GEN_ARCH_RESP
+          depends_on:
+            - task_key: SUBETAPA_832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_VALID_STRC_GEN_ARCH_RESP_JOB_ID
+            job_parameters:
+              sr_id_archivo_siguiente: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_id_archivo_siguiente}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_proceso}}"
+              sr_path_arch: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_path_arch}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_instancia_proceso}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_origen_arc}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_etapa}}"
+              sr_fec_arc: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_fec_arc}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_id_archivo}}"
+              sr_paso: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_paso}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_VALID_STRUCT_COND.values.sr_subetapa}}"
+      queue:
+        enabled: true

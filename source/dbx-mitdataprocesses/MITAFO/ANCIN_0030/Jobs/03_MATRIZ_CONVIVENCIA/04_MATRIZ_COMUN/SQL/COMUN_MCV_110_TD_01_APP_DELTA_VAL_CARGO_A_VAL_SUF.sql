@@ -1,0 +1,56 @@
+-- Query para generar el dataset 03  (400) VAL CARGO 
+--  
+SELECT 
+         B.FTN_NUM_CTA_INVDUAL
+        ,B.FTN_ID_PROCESO     
+        ,B.FTN_ID_SUBPROCESO  
+        ,B.FTN_ID_SIEFORE     
+        ,B.FTN_ID_TIPO_SUBCTA 
+        ,B.FTN_ID_TIPO_MONTO  
+        ,B.FTN_ID_SALDO_OPERA 
+        ,B.FTN_ID_TIPO_MOV    
+        ,B.FTN_MONTO_ACCIONES 
+        ,B.FTN_MONTO_PESOS  
+        ,B.FCN_ID_PROCESO_CON    
+        ,B.FCN_ID_SUBPROCESO_CON 
+        ,B.FCN_ID_TIPO_SUBCTA_CON
+        ,B.FCN_ID_TIPO_MONTO_CON  
+        ,B.FTD_FECHA_BLOQ        
+        ,B.B_MATRIZ      
+        ,B.FFB_CONVIVENCIA       
+        ,B.B_CONVIV   
+FROM 
+(
+SELECT 
+   -- D.* 
+         D.FTN_NUM_CTA_INVDUAL
+        ,D.FTN_ID_PROCESO     
+        ,D.FTN_ID_SUBPROCESO  
+        ,D.FTN_ID_SIEFORE     
+        ,D.FTN_ID_TIPO_SUBCTA 
+        ,D.FTN_ID_TIPO_MONTO  -- AQUI
+        ,D.FTN_ID_SALDO_OPERA 
+        ,D.FTN_ID_TIPO_MOV    
+        ,D.FTN_MONTO_ACCIONES 
+        ,D.FTN_MONTO_PESOS  
+        ,D.FCN_ID_PROCESO_CON    
+        ,D.FCN_ID_SUBPROCESO_CON 
+        ,D.FCN_ID_TIPO_SUBCTA_CON
+        ,D.FCN_ID_TIPO_MONTO_CON -- AQUI 
+        ,D.FTD_FECHA_BLOQ        
+        ,D.B_MATRIZ      
+        ,D.FFB_CONVIVENCIA       
+        ,D.B_CONVIV        
+        ,CASE WHEN D.FTN_ID_TIPO_SUBCTA = FCN_ID_TIPO_SUBCTA_CON THEN 1 ELSE 0 END AS B_IGUALES  
+        ,CASE WHEN (D.FCN_ID_TIPO_MONTO_CON = 185  AND  D.FTN_ID_TIPO_MONTO = 185) 
+                OR (D.FCN_ID_TIPO_MONTO_CON = 199  AND  D.FTN_ID_TIPO_MONTO = 199) 
+                OR (D.FCN_ID_TIPO_MONTO_CON = 200  AND  D.FTN_ID_TIPO_MONTO = 200)   THEN 1 ELSE 0 END AS B_MONTOS
+FROM  #DELTA_TABLA_NAME1# D
+) AS B
+WHERE 
+      B.B_IGUALES = 0  -- CON DISTINTAS  SUBCTAS
+      OR 
+      (B.B_IGUALES = 1 AND B.B_MONTOS = 1)  -- CON MISMAS SUB CTAS Y CUMPLE LA CONDICION DE LOS MONTOS
+
+
+

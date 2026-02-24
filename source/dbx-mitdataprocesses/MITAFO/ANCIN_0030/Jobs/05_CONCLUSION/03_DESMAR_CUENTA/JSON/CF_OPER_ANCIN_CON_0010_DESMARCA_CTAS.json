@@ -1,0 +1,87 @@
+{
+  "flow" : "DOIMSS",
+  "id" : "001",
+  "steps" :
+    [
+        {
+          "step_id" : "001",
+          "subprocess" : "DESMARCA FOLIO",
+          "description":
+        [
+          "#PARAM@1# = #SR_ACCION# =",
+          "#PARAM@2# = #FOLIO# ="
+        ],
+    "value": [
+    "SELECT"
+       ,"FTC_FOLIO,"
+       ,"FTN_ID_MARCA,"
+       ,"'#PARAM@1#' AS FTB_ESTATUS_MARCA,"
+       ,"CURRENT_TIMESTAMP AS FTD_FEH_ACT,"
+       ,"'DATABRICKS' AS FCC_USU_ACT"
+       ,"FROM CIERREN.TTAFOGRAL_MATRIZ_CONVIVENCIA"
+    ,"WHERE FTC_FOLIO='#PARAM@2#'"
+          ]
+         },
+		    {
+          "step_id" : "002",
+          "subprocess" : "DESMARCA INSTANCIA",
+          "description":["#PARAM@1# = #FOLIO INSTANCIA#"],
+     "value":[
+    "SELECT"
+      ,"'#PARAM@1#' AS FTC_FOLIO,"  
+      ,"MAT.FTN_ID_MARCA,"
+       ,"MAT.FTB_ESTATUS_MARCA,"
+       ,"CURRENT_TIMESTAMP AS FTD_FEH_ACT,"
+       ,"'DATABRICKS' AS FCC_USU_ACT"
+       ,"FROM CIERREN.TTAFOGRAL_MATRIZ_CONVIVENCIA MAT,"
+       ,"(SELECT DISTINCT" 
+       ,"    FTC_FOLIO,"
+       ,"    FTN_NUM_CTA_INVDUAL,"
+       ,"    FTC_ID_INSTANCIA"
+       ,"FROM PROFAPOVOL.TTAFOAVOL_PRINCIPAL"
+       ,"WHERE FTC_ID_INSTANCIA =#PARAM@1#"
+       ,"AND FTN_REG_ACREDITADO=1) PRI "
+       ,"WHERE MAT.FTC_FOLIO=PRI.FTC_FOLIO"
+       ,"AND MAT.FTN_NUM_CTA_INVDUAL=PRI.FTN_NUM_CTA_INVDUAL"
+    ]
+    },
+		    {
+          "step_id" : "003",
+          "subprocess" : "DESMARCA ACTUALIZACIÓN",
+          "description":[],
+     "value":[
+      "MERGE INTO CIERREN.TTAFOGRAL_MATRIZ_CONVIVENCIA ORIG"
+        ,"USING ("
+        ,"SELECT"
+        ,"FTN_ID_MARCA FTN_ID_MARCA,"
+        ,"FTC_ESTATUS_MARCA FTB_ESTATUS_MARCA,"
+        ,"FTD_FEH_ACT FTD_FEH_ACT,"
+        ,"FCC_USU_ACT FCC_USU_ACT"
+        ,"FROM CIERREN_DATAUX.TTAFOGRAL_ETL_MATRIZ_CONVIVENCIA_AUX"
+        ,") AUX"
+        ,"ON (ORIG.FTN_ID_MARCA = AUX.FTN_ID_MARCA)"
+        ,"WHEN MATCHED THEN"
+        ,"UPDATE SET"
+        ,"ORIG.FTB_ESTATUS_MARCA = AUX.FTB_ESTATUS_MARCA,"
+        ,"ORIG.FTD_FEH_ACT = AUX.FTD_FEH_ACT,"
+        ,"ORIG.FCC_USU_ACT = AUX.FCC_USU_ACT"
+    ]
+    },
+		    {
+          "step_id" : "004",
+          "subprocess" : "CANCELA FOLIO",
+          "description":["VALIDACIÓN DE EXISTENCIA DE FOLIO"],
+      "value": [
+      "SELECT COUNT(FTC_FOLIO) AS TOTAL"
+        ,"FROM PROFAPOVOL.TTAFOAVOL_CONCILIACION"
+        ,"WHERE FTC_FOLIO='#PARAM@1#'"
+        ,"AND FTN_ORIGEN_APORTACION IN (--287, --SOLO DE PRUEBA, NO DEBE QUEDARSE EL VALOR 287"
+        ,"845,--Domiciliación Traspasos"
+        ,"291,--Domiciliación"
+        ,"433,--Domiciliación"
+        ,"937 --Domiciliación Traspaso"
+        ,")AND ROWNUM <= 1"
+        ]
+        }
+    ]
+}

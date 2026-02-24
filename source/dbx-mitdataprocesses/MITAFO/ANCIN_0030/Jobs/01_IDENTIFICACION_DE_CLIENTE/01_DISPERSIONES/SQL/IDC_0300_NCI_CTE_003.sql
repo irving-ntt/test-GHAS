@@ -1,0 +1,23 @@
+SELECT 
+    tra.FTN_NSS_CURP,
+    tra.FTN_NUM_CTA_INVDUAL,
+    ind.FCN_ID_IND_CTA_INDV,
+    ind.FFN_ID_CONFIG_INDI,
+    ind.FCC_VALOR_IND,
+    ind.FTC_VIGENCIA,
+    ind.FTN_DETALLE,
+    tra.FTC_NOMBRE_BUC,
+    tra.FTC_AP_PATERNO_BUC,
+    tra.FTC_AP_MATERNO_BUC,
+    tra.FTC_RFC_BUC,
+    tra.FTC_FOLIO,
+    tra.FTN_ID_ARCHIVO,
+    tra.FTN_NSS,
+    tra.FTC_CURP,
+    tra.FTC_RFC,
+    tra.FTC_NOMBRE_CTE,
+    tra.FTC_CLAVE_ENT_RECEP,
+    tra.FCN_ID_TIPO_SUBCTA
+FROM temp_view_tramite_no_null_#SR_ID_ARCHIVO# tra
+LEFT JOIN #CATALOG_NAME#.#SCHEMA_NAME#.TEMP_IND_CTA_VIG_02_#SR_ID_ARCHIVO# ind
+ON tra.FTN_NUM_CTA_INVDUAL = ind.FTN_NUM_CTA_INVDUAL

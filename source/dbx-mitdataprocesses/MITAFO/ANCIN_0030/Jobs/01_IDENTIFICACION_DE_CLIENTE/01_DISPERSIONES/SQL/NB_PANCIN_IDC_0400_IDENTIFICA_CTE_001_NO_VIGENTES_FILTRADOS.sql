@@ -1,0 +1,25 @@
+-- Leer tabla Delta temp_novigentes con filtro y ordenamiento (equivalente a DS_200_NO_VIGENTES_0 + SO_210_IZQ + FI_300_FILTRO)
+-- En DataStage: 
+-- - DS_200_NO_VIGENTES_0 lee archivo
+-- - SO_210_IZQ ordena por FTN_NSS_CURP
+-- - FI_300_FILTRO filtra FTN_DETALLE <> 372 AND FTN_DETALLE <> 212
+SELECT 
+    FTN_NSS_CURP,
+    FTN_NUM_CTA_INVDUAL,
+    FTN_ID_ARCHIVO,
+    FTN_NSS,
+    FTC_CURP,
+    FTC_RFC,
+    FTC_NOMBRE_CTE,
+    FTC_FOLIO,
+    FTC_NOMBRE_BUC,
+    FTC_AP_PATERNO_BUC,
+    FTC_AP_MATERNO_BUC,
+    FTC_RFC_BUC,
+    FTC_CLAVE_ENT_RECEP,
+    FCC_VALOR_IND,
+    FCN_ID_TIPO_SUBCTA
+FROM #CATALOG_SCHEMA#.temp_novigentes_#SR_ID_ARCHIVO#
+WHERE FTN_DETALLE <> 372 
+  AND FTN_DETALLE <> 212
+ORDER BY FTN_NSS_CURP

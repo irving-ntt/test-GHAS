@@ -1,0 +1,213 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_INCO_COMP_ARCHIV_RECH:
+      name: WF_OPER_ANCIN_INCO_COMP_ARCHIV_RECH
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: COND_SUBPROCESO_354
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: NB_PATRIF_INCO_0010_SDM_COMPARA_ARCH
+        - task_key: COND_SUBPROCESO_363
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: NB_PATRIF_INCO_RECH_0030_TI_FOV
+        - task_key: COND_SUBPROCESO_364
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: NB_PATRIF_INCO_RECH_0020_TI_364
+        - task_key: COND_SUBPROCESO_365
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: NB_PATRIF_INCO_RECH_0020_TI_365
+        - task_key: COND_SUBPROCESO_368
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_COND.values.sr_stage}}"
+            right: NB_PATRIF_INCO_RECH_0020_TI_368
+        - task_key: TSK_CONCLUSION
+          depends_on:
+            - task_key: TSK_NB_PATRIF_INCO_0020_SDM_COMPARATIVO
+            - task_key: TSK_NB_PATRIF_INCO_RECH_0030_TI_FOV
+            - task_key: TSK_NB_PATRIF_INCO_RECH_0040_COMPARATIVO_TAUG
+            - task_key: TSK_NB_PATRIF_INCO_RECH_0040_COMPARATIVO_UG
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/NOTEBOOKS/NB_PATRIF_INCO_COMP_ARCH_CONCLUSION"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_folio_original: ""
+              sr_folio_rechazado: ""
+              sr_id_archivo: ""
+              sr_id_archivo_rechazado: ""
+              sr_id_est_reg: ""
+              sr_mot_rechazo: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+              sr_tipo_arch_original: ""
+              sr_tipo_arch_rechazado: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_PATRIF_INCO_0010_SDM_ARCH_RECH
+          depends_on:
+            - task_key: COND_SUBPROCESO_354
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/01_SOL_MARCA/INFONAVIT/Notebooks/NB_PATRIF_INCO_0010_SDM_ARCH_RECH"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_nombrearch: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_PATRIF_INCO_0020_SDM_COMPARATIVO
+          depends_on:
+            - task_key: TSK_NB_PATRIF_INCO_0010_SDM_ARCH_RECH
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/01_SOL_MARCA/INFONAVIT/Notebooks/NB_PATRIF_INCO_0020_SDM_COMPARATIVO"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_PATRIF_INCO_RECH_0010_TRANF_SUG
+          depends_on:
+            - task_key: COND_SUBPROCESO_368
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_INCO_RECH_0010_TRANF_SUG"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_nombrearch: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_PATRIF_INCO_RECH_0020_TRANF_STA
+          depends_on:
+            - task_key: COND_SUBPROCESO_364
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_INCO_RECH_0020_TRANF_STA"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_PATRIF_INCO_RECH_0030_TI_FOV
+          depends_on:
+            - task_key: COND_SUBPROCESO_363
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/02_TRANSFERENCIAS/FOVISSSTE/Notebooks/NB_PATRIF_INCO_RECH_0030_TI_FOV"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_PATRIF_INCO_RECH_0030_TRANF_SAG
+          depends_on:
+            - task_key: COND_SUBPROCESO_365
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_INCO_RECH_0030_TRANF_SAG"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_PATRIF_INCO_RECH_0040_COMPARATIVO_TAUG
+          depends_on:
+            - task_key: TSK_NB_PATRIF_INCO_RECH_0020_TRANF_STA
+            - task_key: TSK_NB_PATRIF_INCO_RECH_0030_TRANF_SAG
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_INCO_RECH_0040_COMPARATIVO_TAUG"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_PATRIF_INCO_RECH_0040_COMPARATIVO_UG
+          depends_on:
+            - task_key: TSK_NB_PATRIF_INCO_RECH_0010_TRANF_SUG
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_INCO_RECH_0040_COMPARATIVO_UG"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_OPER_ANCIN_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/11_INCO_COMP_ARCHIV_RECH/NOTEBOOKS/NB_PATRIF_INCO_COMP_ARCH_COND"
+            base_parameters:
+              sr_codigo_error: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_mot_rechazo: ""
+              sr_subproceso: ""
+              sr_tipo_arch: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

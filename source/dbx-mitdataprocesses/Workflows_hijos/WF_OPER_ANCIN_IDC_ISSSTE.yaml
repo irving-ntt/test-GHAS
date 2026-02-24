@@ -1,0 +1,372 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_IDC_ISSSTE:
+      name: WF_OPER_ANCIN_IDC_ISSSTE
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_JS_CLEANER
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0900_ARCH_CLI_004
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_JS_GARBAGE_CLEANER"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0000_EXTRA_NSS_CURP
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0250_BUC_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0000_EXTRA_NSS_CURP"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0050_EXT_IMSS_ISSSTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0050_EXT_IMSS_ISSSTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0050_EXT_VAL_IDENT_CTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0050_EXT_IMSS_ISSSTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0050_EXT_VAL_IDENT_CTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0100_MAP_IMSS_ISSSTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0050_EXT_VAL_IDENT_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0100_MAP_IMSS_ISSSTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0250_BUC_CTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0100_MAP_IMSS_ISSSTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0250_BUC_CTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0300_NCI_CTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0000_EXTRA_NSS_CURP
+            - task_key: NP_OPER_ANCIN_IDC_0200_BUC_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0300_NCI_CTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0400_IDENT_CTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0300_NCI_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0400_IDENTIFICA_CTE​"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0500_CARGA_IDEN_CTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0400_IDENT_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0500_CARGA_IDEN_CTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0600_UPD_CTE_PRE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0500_CARGA_IDEN_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0600_UPD_CTE_PRE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0600_UPD_IMSSSTE_CTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0600_UPD_CTE_PRE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0600_UPD_IMSSSTE_CTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0700_UPD_DISPERSIONES
+          depends_on:
+            - task_key: TSK_VAL_NO_ENCONTRADOS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0700_UPD_DISPERSIONES"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0800_SCD_IDC
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0600_UPD_IMSSSTE_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0800_SCD_IDC"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0900_ARCH_CLI_004
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_900_CIFRAS_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0900_ARCH_CLI"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_900_CIFRAS_CTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0700_UPD_DISPERSIONES
+            - task_key: TSK_VAL_NO_ENCONTRADOS
+              outcome: 'false'
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0900_CIFRAS_CTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NP_OPER_ANCIN_IDC_0200_BUC_CTE
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0250_BUC_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NP_OPER_ANCIN_IDC_0200_BUC_CTE"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_layout: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_VAL_NO_ENCONTRADOS
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0800_SCD_IDC
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_OPER_ANCIN_IDC_0800_SCD_IDC.values.validacion}}"
+            right: '1'
+      tags:
+        IDC: ""
+      queue:
+        enabled: true

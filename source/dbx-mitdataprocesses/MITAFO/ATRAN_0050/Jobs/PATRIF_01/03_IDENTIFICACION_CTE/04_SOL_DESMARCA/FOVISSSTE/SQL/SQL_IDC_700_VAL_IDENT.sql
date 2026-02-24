@@ -1,0 +1,41 @@
+SELECT
+   DF.FTC_ID_SERVICIO      ,
+   DF.FTC_ID_OPERACION     ,
+   DF.FTD_FEH_PRESEN       ,
+   DF.FTC_ID_TIPO_REGIST   ,
+   DF.FTN_LINEA_CREDIT     ,
+   DF.FTN_TIPTRA           ,
+   DF.FTC_CURP             ,
+   DF.FTC_ID_PROCESAR      ,
+   DF.FTC_NSS              ,
+   DF.FTN_ID_ARCHIVO       ,
+   DF.FTC_RFC              ,
+   DF.FTC_TIPO_MAR_CRE_FOV ,
+   VAL.FTC_RFC_BUC         ,
+   VAL.FTN_NUM_CTA_INVDUAL ,
+   VAL.FTN_ESTATUS_DIAG    ,
+   VAL.FTC_ID_DIAGNOSTICO
+FROM CIERREN_ETL.TTAFOTRAS_ETL_DESMARCA_FOVST DF
+LEFT JOIN (
+    SELECT 
+       FTC_RFC_BUC         ,
+       FTC_CURP            ,
+       FTN_NUM_CTA_INVDUAL ,
+       FTN_ESTATUS_DIAG    ,
+       FTC_ID_DIAGNOSTICO
+    FROM ( 
+         SELECT 
+            FTC_RFC AS FTC_RFC_BUC ,
+            FTC_CURP               ,
+            FTN_NUM_CTA_INVDUAL    ,
+            FTN_ESTATUS_DIAG       ,
+            FTC_ID_DIAGNOSTICO     ,
+            ROW_NUMBER() OVER (PARTITION BY FTC_CURP, FTN_NUM_CTA_INVDUAL ORDER BY FTC_CURP ASC, FTN_NUM_CTA_INVDUAL ASC) AS rn
+          FROM CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE
+          WHERE FTC_FOLIO = '#SR_FOLIO#'
+         )
+         WHERE rn = 1
+     ) VAL
+  ON DF.FTC_CURP = VAL.FTC_CURP
+WHERE DF.FTC_FOLIO= '#SR_FOLIO#'
+  AND DF.FTN_ID_ARCHIVO = #SR_ID_ARCHIVO#

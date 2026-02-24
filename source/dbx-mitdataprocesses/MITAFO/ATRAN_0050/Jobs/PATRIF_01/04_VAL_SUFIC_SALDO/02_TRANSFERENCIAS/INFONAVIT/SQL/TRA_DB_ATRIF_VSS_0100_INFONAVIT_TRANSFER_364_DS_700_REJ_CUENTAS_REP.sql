@@ -1,0 +1,124 @@
+WITH RankedData AS (
+    SELECT 
+        a.FTN_NUM_CTA_AFORE AS FTN_NUM_CTA_INVDUAL, -- Ensuring aliasing for consistency
+        a.FTN_ID_SUBP,
+        ADD_MONTHS(TRUNC(a.FTD_FEH_PRESEN, 'MONTH'), 1) AS FECHA_VALOR_AIVS,
+        a.FTN_CONTA_SERV,
+        a.FTC_NSS_TRABA_AFORE,
+        NVL(b.SALDO_DISPONIBLE_AIVS, 0) AS SALDO_DISPONIBLE_AIVS_VIV97,
+        NVL(c.SALDO_DISPONIBLE_AIVS, 0) AS SALDO_DISPONIBLE_AIVS_VIV92,
+        ROW_NUMBER() OVER (
+            PARTITION BY a.FTN_NUM_CTA_AFORE, a.FTC_NSS_TRABA_AFORE
+            ORDER BY a.FTC_NSS_TRABA_AFORE ASC
+        ) AS Row_Number
+    FROM 
+        PROCESOS.TTCRXGRAL_TRANS_INFONA a
+    LEFT JOIN 
+        (SELECT 
+            FTC_NUM_CTA_INVDUAL,
+            SUM(NVL(FTN_DISP_ACCIONES, 0)) AS SALDO_DISPONIBLE_AIVS,
+            FCN_ID_TIPO_SUBCTA 
+         FROM 
+            CIERREN.TTAFOGRAL_BALANCE_MOVS
+         WHERE 
+            FCN_ID_SIEFORE = 81
+            AND FCN_ID_TIPO_SUBCTA = 15 
+            AND FTC_NUM_CTA_INVDUAL IN 
+                (SELECT FTN_NUM_CTA_AFORE 
+                 FROM PROCESOS.TTCRXGRAL_TRANS_INFONA 
+                 WHERE FTC_FOLIO_BITACORA = '#sr_folio#')
+         GROUP BY 
+            FTC_NUM_CTA_INVDUAL, FCN_ID_TIPO_SUBCTA) b
+    ON 
+        a.FTN_NUM_CTA_AFORE = b.FTC_NUM_CTA_INVDUAL
+    LEFT JOIN 
+        (SELECT 
+            FTC_NUM_CTA_INVDUAL,
+            SUM(NVL(FTN_DISP_ACCIONES, 0)) AS SALDO_DISPONIBLE_AIVS,
+            FCN_ID_TIPO_SUBCTA 
+         FROM 
+            CIERREN.TTAFOGRAL_BALANCE_MOVS
+         WHERE 
+            FCN_ID_SIEFORE = 81
+            AND FCN_ID_TIPO_SUBCTA = 16
+            AND FTC_NUM_CTA_INVDUAL IN 
+                (SELECT FTN_NUM_CTA_AFORE 
+                 FROM PROCESOS.TTCRXGRAL_TRANS_INFONA 
+                 WHERE FTC_FOLIO_BITACORA = '#sr_folio#')
+         GROUP BY 
+            FTC_NUM_CTA_INVDUAL, FCN_ID_TIPO_SUBCTA) c
+    ON 
+        a.FTN_NUM_CTA_AFORE = c.FTC_NUM_CTA_INVDUAL
+    WHERE 
+        a.FTC_FOLIO_BITACORA = '#sr_folio#'
+        AND ((FTN_MOTIVO_RECHAZO <> 93)
+AND   (FTN_MOTIVO_RECHAZO <> 254)
+AND  (FTN_MOTIVO_RECHAZO <> 375) 
+AND  (FTN_MOTIVO_RECHAZO <> 1178)
+OR (FTN_MOTIVO_RECHAZO IS NULL))
+        AND (NVL(c.SALDO_DISPONIBLE_AIVS, 0) > 0 OR NVL(b.SALDO_DISPONIBLE_AIVS, 0) > 0)
+),
+GeneratedColumns AS (
+    SELECT 
+        r.FTN_NUM_CTA_INVDUAL,
+        r.FTN_ID_SUBP,
+        r.FECHA_VALOR_AIVS,
+        r.FTN_CONTA_SERV,
+        r.FTC_NSS_TRABA_AFORE,
+        r.SALDO_DISPONIBLE_AIVS_VIV97,
+        r.SALDO_DISPONIBLE_AIVS_VIV92,
+        -- Simulating the generated columns
+        NULL AS Bandera,
+        0 AS FTN_SDO_AIVS,
+        0 AS FTN_MONTO_PESOS,
+        0 AS FTN_IND_SDO_DISP_VIV97,
+        0 AS FCN_ID_TIPO_SUBCTA_97,
+        0 AS FTN_SDO_AIVS_92,
+        0 AS FTN_MONTO_PESOS_92,
+        0 AS FTN_IND_SDO_DISP_92,
+        0 AS FCN_ID_TIPO_SUBCTA_92,
+        0 AS FCN_VALOR_ACCION,
+        0 AS FCN_ID_VALOR_ACCION
+    FROM 
+        RankedData r
+    WHERE 
+        r.Row_Number = 1
+),
+RejectedData AS (
+    SELECT 
+        FTN_NUM_CTA_INVDUAL,
+        FTN_ID_SUBP,
+        FTN_CONTA_SERV,
+        FTC_NSS_TRABA_AFORE,
+        FTN_SDO_AIVS,
+        FTN_MONTO_PESOS,
+        FTN_IND_SDO_DISP_VIV97,
+        FCN_ID_TIPO_SUBCTA_97,
+        FTN_SDO_AIVS_92,
+        FTN_MONTO_PESOS_92,
+        FTN_IND_SDO_DISP_92,
+        FCN_ID_TIPO_SUBCTA_92,
+        FCN_VALOR_ACCION,
+        FCN_ID_VALOR_ACCION
+    FROM 
+        GeneratedColumns
+    WHERE 
+        Bandera IS NULL -- Reject condition
+)
+SELECT 
+    FTN_NUM_CTA_INVDUAL,
+    FTN_ID_SUBP,
+    FTN_CONTA_SERV,
+    FTC_NSS_TRABA_AFORE,
+    FTN_SDO_AIVS,
+    FTN_MONTO_PESOS,
+    FTN_IND_SDO_DISP_VIV97,
+    FCN_ID_TIPO_SUBCTA_97,
+    FTN_SDO_AIVS_92,
+    FTN_MONTO_PESOS_92,
+    FTN_IND_SDO_DISP_92,
+    FCN_ID_TIPO_SUBCTA_92,
+    FCN_VALOR_ACCION,
+    FCN_ID_VALOR_ACCION
+FROM 
+    RejectedData

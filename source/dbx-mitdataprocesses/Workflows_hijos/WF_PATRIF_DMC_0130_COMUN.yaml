@@ -1,0 +1,102 @@
+resources:
+  jobs:
+    WF_PATRIF_DMC_0130_COMUN:
+      name: WF_PATRIF_DMC_0130_COMUN
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: BORRADO_DE_DELTAS
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN_2
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN_2.values.sr_stage}}"
+            right: BORRADO DE DELTAS
+        - task_key: DESMARCA_COMUN
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN.values.sr_stage}}"
+            right: DESMARCA COMUN
+        - task_key: GENERACION_ARCHIVO_69
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN_2
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN_2.values.sr_stage}}"
+            right: GENERACION DE ARCHIVO 69
+        - task_key: INTEGRITY
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN.values.sr_stage}}"
+            right: INTEGRITY
+        - task_key: TSK_NB_ANCIN_COMUN_MCV_DESM_050_RESPUESTA_DE_ITGY_ARCHIVO_70
+          depends_on:
+            - task_key: INTEGRITY
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_ANCIN_COMUN_MCV_DESM_050_RESPUESTA_DE_ITGY_ARCHIVO_70"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0020_DESMARCA_MC_COMUN
+          depends_on:
+            - task_key: DESMARCA_COMUN
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0020_DESMARCA_MC_COMUN"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_0030_DESMARCA_ARC_COMUN
+          depends_on:
+            - task_key: GENERACION_ARCHIVO_69
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_0030_DESMARCA_ARC_COMUN"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_DESMARCA_COND_COMUN"
+            base_parameters:
+              sr_conv_ingty: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_path_arch: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_ejecucion: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_DESMARCA_COND_COMUN_2
+          depends_on:
+            - task_key: TSK_NB_OPER_ATRAN_0020_DESMARCA_MC_COMUN
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_DESMARCA_COND_COMUN_2"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_OPER_ATRAN_DESMARCA_FINAL
+          depends_on:
+            - task_key: BORRADO_DE_DELTAS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/14_DESM_MATRIZ_CONVIV/01_SOL_MARCA/INFONAVIT/Notebooks/NB_OPER_ATRAN_DESMARCA_FINAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

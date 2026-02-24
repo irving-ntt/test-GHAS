@@ -1,0 +1,169 @@
+resources:
+  jobs:
+    WF_OPER_AGRLS_INTERP_CONT:
+      name: WF_OPER_AGRLS_INTERP_CONT
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: AEIM
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: AEIM
+        - task_key: DGG
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: DGG
+        - task_key: DITIMSS
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: DITIMSS
+        - task_key: DOIMSS
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: DOIMSS
+        - task_key: DOISSSTE
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: DOISSSTE
+        - task_key: INT_ISSSTE
+          depends_on:
+            - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_ICO_COND.values.sr_stage}}"
+            right: INT_ISSSTE
+        - task_key: TSK_ICO_COND
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_COND"
+            base_parameters:
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_CONCLUSION
+          depends_on:
+            - task_key: TSK_INTERP_CONT_CRG_CTE_SUA
+            - task_key: TSK_INTERP_CONT_CRG_PREDISP
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_CONCLUSION"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_CRG_CTE_SUA
+          depends_on:
+            - task_key: TSK_INTERP_INT_ISSSTE
+            - task_key: TSK_INTERP_DOIMSS
+            - task_key: TSK_INTERP_CONT_INT_IMSS
+            - task_key: TSK_INTERP_DOISSSTE
+            - task_key: TSK_INTERP_CONT_GUBER
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_CRG_CTE_SUA_03"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_CRG_PREDISP
+          depends_on:
+            - task_key: TSK_INTERP_INT_ISSSTE
+            - task_key: TSK_INTERP_DOIMSS
+            - task_key: TSK_INTERP_CONT_INT_IMSS
+            - task_key: TSK_INTERP_DOISSSTE
+            - task_key: TSK_INTERP_CONT_GUBER
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_CRG_PREDISP_03"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_GUBER
+          depends_on:
+            - task_key: DGG
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_GUBER_GLOBAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_CONT_INT_IMSS
+          depends_on:
+            - task_key: DITIMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_INT_IMSS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_DOIMSS
+          depends_on:
+            - task_key: DOIMSS
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_DOIMSS"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_DOISSSTE
+          depends_on:
+            - task_key: DOISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_ORD_ISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_INTERP_INT_ISSSTE
+          depends_on:
+            - task_key: INT_ISSSTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/02_INTERPR_CONTENIDO/01_DISPERSION/Notebooks/NB_OPER_AGRLS_ICO_INT_ISSSTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: WF_INCO_AEIM
+          depends_on:
+            - task_key: AEIM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_AGRLS_INTERP_CONT_AEIM_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.TSK_ICO_COND.values.sr_proceso}}"
+              sr_subproceso: "{{tasks.TSK_ICO_COND.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_ICO_COND.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_ICO_COND.values.sr_instancia_proceso}}"
+              sr_etapa: "{{tasks.TSK_ICO_COND.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_ICO_COND.values.sr_id_snapshot}}"
+              sr_id_archivo: "{{tasks.TSK_ICO_COND.values.sr_id_archivo}}"
+              sr_folio: "{{tasks.TSK_ICO_COND.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_ICO_COND.values.sr_subetapa}}"
+      tags:
+        INCO: ""
+      queue:
+        enabled: true

@@ -1,0 +1,5 @@
+-- Elimina registros del folio de TRANS FOVISSSTE antes de insertar
+DELETE 
+FROM CIERREN_DATAUX.TTAFOTRAS_TRANS_FOVISSSTE_AUX
+WHERE
+  FTC_FOLIO = '#SR_FOLIO#'

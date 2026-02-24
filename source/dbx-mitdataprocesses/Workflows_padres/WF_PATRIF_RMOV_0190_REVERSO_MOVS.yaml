@@ -1,0 +1,82 @@
+resources:
+  jobs:
+    WF_PATRIF_RMOV_0190_REVERSO_MOVS:
+      name: WF_PATRIF_RMOV_0190_REVERSO_MOVS
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: JQ_PATRIF_RMOV_0100_TRANSF
+          depends_on:
+            - task_key: NB_PATRIF_RMOV_0190_REVERSO_MOVS
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.job_target}}"
+            right: JQ_PATRIF_RMOV_0100_TRANSF
+        - task_key: JQ_PATRIF_RMOV_0100_TRNS_FOV
+          depends_on:
+            - task_key: NB_PATRIF_RMOV_0190_REVERSO_MOVS
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.job_target}}"
+            right: JQ_PATRIF_RMOV_0100_TRNS_FOV
+        - task_key: NB_PATRIF_RMOV_0190_REVERSO_MOVS
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/19_REVERSO_MOVS/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_PATRIF_RMOV_0190_REVERSO_MOVS"
+            base_parameters:
+              sr_etapa: ""
+              sr_fec_acc: ""
+              sr_fec_liq: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: WF_PATRIF_RMOV_0100_TRANSF
+          depends_on:
+            - task_key: JQ_PATRIF_RMOV_0100_TRANSF
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: PATRIF_RMOV_0100_TRANSF_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_proceso}}"
+              sr_fec_liq: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_fec_liq}}"
+              sr_subproceso: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_instancia_proceso}}"
+              sr_etapa: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_paso}}"
+              sr_fec_acc: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_fec_acc}}"
+              sr_folio: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_subetapa}}"
+        - task_key: WF_PATRIF_RMOV_0100_TRNS_FOV
+          depends_on:
+            - task_key: JQ_PATRIF_RMOV_0100_TRNS_FOV
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: PATRIF_RMOV_0100_TRNS_FOV_JOB_ID
+            job_parameters:
+              sr_proceso: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_proceso}}"
+              sr_fec_liq: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_fec_liq}}"
+              sr_subproceso: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_instancia_proceso}}"
+              sr_etapa: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_id_snapshot}}"
+              sr_paso: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_paso}}"
+              sr_fec_acc: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_fec_acc}}"
+              sr_folio: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_folio}}"
+              sr_subetapa: "{{tasks.NB_PATRIF_RMOV_0190_REVERSO_MOVS.values.sr_subetapa}}"
+      tags:
+        RMOV: ""
+      queue:
+        enabled: true

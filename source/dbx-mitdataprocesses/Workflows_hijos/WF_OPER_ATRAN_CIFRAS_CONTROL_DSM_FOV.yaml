@@ -1,0 +1,30 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_CIFRAS_CONTROL_DSM_FOV:
+      name: WF_OPER_ATRAN_CIFRAS_CONTROL_DSM_FOV
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: TASK_COND_RECALCULO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/04_SOL_DESM/FOVISSSTE/Notebooks/NB_OPER_ATRAN_CIFRASCONTROL_DSM_FOV_COND"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_DESM_FOV
+          depends_on:
+            - task_key: TASK_COND_RECALCULO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/04_SOL_DESM/FOVISSSTE/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_DSM_FOV"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_NB_DATRAN_SDM_FINAL
+          depends_on:
+            - task_key: TSK_NB_DATRAN_DESM_FOV
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/07_CIFRAS_CONTROL/04_SOL_DESM/FOVISSSTE/Notebooks/NB_OPER_ATRAN_PATRIF_CCTRL_DSM_FOV_FINAL"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

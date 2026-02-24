@@ -1,0 +1,253 @@
+name: Parametrización y sync de QA a release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - release
+
+jobs:
+  parametrizar:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - name: Checkout repositorio completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Configurar Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
+      - name: Crear rama temporal para parametrización
+        run: |
+          fecha=$(date +%Y%m%d%H%M%S)
+          export PARAM_BRANCH="parametrizacion-release-$fecha"
+          # Obtener el merge commit del PR
+          MERGE_SHA="${{ github.event.pull_request.merge_commit_sha }}"
+          git checkout release
+          git pull origin release
+          # Asegurarnos de estar en el merge commit del PR
+          if [ -n "$MERGE_SHA" ]; then
+            git checkout "$MERGE_SHA"
+          fi
+          # Crear rama temporal desde este punto
+          git checkout -b "$PARAM_BRANCH"
+          echo "PARAM_BRANCH=$PARAM_BRANCH" >> $GITHUB_ENV
+
+      - name: Listar todos los archivos a parametrizar
+        run: |
+          find . -type f \( -name "*.env" -o -name "*.properties" -o -name "*.yaml" -o -name "*.yml" \) > all_relevant_files.txt
+
+      - name: Crear scripts de parametrización
+        run: |
+          cat > update_envs.py << 'EOF'
+          import os
+          import re
+
+          replacements = {
+              "WEBHOOK_URL_VAL_STR": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/validation-completion-notification-event",
+              "WEBHOOK_URL_CARG_ARCH": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/loading-completion-notification-event",
+              "WEBHOOK_URL_INTR_CONT": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/substages-orchestration/substages/notify",
+              "WEBHOOK_URL_DEFAULT": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/substages-orchestration/substages/notify",
+              "WEBHOOK_URL_VAL_CONT": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/content-validation-notification-event",
+              "SCOPE_NOTIFICATIONS": "https://api.profuturo.mx/oauth2/token",
+              "CONN_OPTIONS": '{"url":"jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=on)(FAILOVER=on)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.105)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.95)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.49)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.76)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.177)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=MITAFOPR.snashpdbsy01.vcnashgrnvcn.oraclevcn.com)(SERVER=DEDICATED))(FAILOVER_MODE=(TYPE=session)(METHOD=basic)(RETRIES=10)(DELAY=5)))","driver":"oracle.jdbc.driver.OracleDriver", "fetchSize": "20000", "numPartitions": "100", "queryTimeout": "0", "connectRetryCount": "10", "connectRetryInterval": "10"}',
+              "CONN_ADITIONAL_OPTIONS": '{"batchsize": "20000", "sessionInitStatement": "BEGIN execute immediate \\"ALTER SESSION ENABLE PARALLEL DML\\"; END;"}',
+              "CATALOG": "dbx_mit_mmeytw_mainprod_eastus_001_1051909841828239",
+              "SCHEMA": "default",
+              "SCOPE": "Scope_prod_kv",
+              "CONN_USER": "usuario",
+              "CONN_KEY": "password",
+              "EXTERNAL_LOCATION": "abfss://nci-repository@dlsmitfilesprodeastus1.dfs.core.windows.net/",
+              "debug": "False",
+              "external_location": "abfss://nci-repository@dlsmitfilesprodeastus1.dfs.core.windows.net/",
+              "conn_options": '{"url":"jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=on)(FAILOVER=on)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.105)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.95)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.49)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.76)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.177)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=MITAFOPR.snashpdbsy01.vcnashgrnvcn.oraclevcn.com)(SERVER=DEDICATED))(FAILOVER_MODE=(TYPE=session)(METHOD=basic)(RETRIES=10)(DELAY=5)))","driver":"oracle.jdbc.driver.OracleDriver", "fetchSize": "20000", "numPartitions": "100", "queryTimeout": "0", "connectRetryCount": "10", "connectRetryInterval": "10"}',
+              "conn_url": "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=on)(FAILOVER=on)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.105)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.95)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.49)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.76)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.11.90.177)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=MITAFOPR.snashpdbsy01.vcnashgrnvcn.oraclevcn.com)(SERVER=DEDICATED))(FAILOVER_MODE=(TYPE=session)(METHOD=basic)(RETRIES=10)(DELAY=5)))",
+              "catalog_name": "dbx_mit_mmeytw_mainprod_eastus_001_1051909841828239",
+              "schema_name": "default",
+              "conn_aditional_options": '{"batchsize": "20000", "sessionInitStatement": "BEGIN execute immediate \\"ALTER SESSION ENABLE PARALLEL DML\\"; END;"}',
+              "webhook_url": "https://hooks.slack.com/services/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",
+              "webhook_url_val_str": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/validation-completion-notification-event",
+              "webhook_url_carg_arch": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/loading-completion-notification-event",
+              "webhook_url_intr_cont": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/substages-orchestration/substages/notify",
+              "webhook_url_default": "https://api.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/substages-orchestration/substages/notify",
+              "scope": "Scope_prod_kv",
+              "conn_user": "usuario",
+              "conn_key": "password",
+              "delta_workspace": "dbx_mit_mmeytw_mainprod_eastus_001_1051909841828239",
+              "DATABRICKS_INSTANCE": "https://adb-1051909841828239.19.azuredatabricks.net",
+              "DATABRICKS_CLUSTER_ID": "1127-224355-86ft9qrl",
+              "WEBHOOK_URL_VAL_STR_TRAS": "https://api.profuturo.mx/afore/1/nci-integrationprocessintegrity/file-loading/validation-completion-notification-event",
+              "WEBHOOK_URL_VAL_CONT_TRAS": "https://api.profuturo.mx/afore/1/nci-integrationprocessintegrity/file-loading/content-validation-notification-event",
+              "catalog_001": "dbx_mit_mmeytw_mainprod_eastus_001_1051909841828239"
+
+          }
+
+          with open("all_relevant_files.txt") as f:
+              changed_files = [line.strip() for line in f if line.strip().endswith((".env", ".properties"))]
+
+          def replace_in_file(filepath, replacements):
+              with open(filepath, 'r', encoding='utf-8') as f:
+                  content = f.read()
+              for key, value in replacements.items():
+                  content = re.sub(rf'^{key}\s*[:=]\s*.*$', f'{key}={value}', content, flags=re.MULTILINE)
+              with open(filepath, 'w', encoding='utf-8') as f:
+                  f.write(content)
+
+          for filepath in changed_files:
+              if os.path.exists(filepath):
+                  print(f'Actualizando {filepath}')
+                  replace_in_file(filepath, replacements)
+          EOF
+
+          # COMENTADO: Script para parametrizar workflows hijos
+          # cat > replace_cluster_ids.py << 'EOF'
+          # import os
+          # import re
+          #
+          # replacements = {
+          #     "ID_EXPANDED_CLUSTER_DEV": "ID_EXPANDED_CLUSTER_PROD",
+          #     "ID_EXPANDED_CLUSTER_QA": "ID_EXPANDED_CLUSTER_PROD",
+          # }
+          #
+          # with open("all_relevant_files.txt") as f:
+          #     changed_yaml = [line.strip() for line in f if line.strip().endswith(".yaml") and "Workflows_hijos" in line]
+          #
+          # for path in changed_yaml:
+          #     if not os.path.exists(path):
+          #         continue
+          #     print(f'Procesando workflow hijo: {path}')
+          #     with open(path, "r", encoding="utf-8") as f:
+          #         lines = f.readlines()
+          #
+          #     new_lines = []
+          #     changed = False
+          #     for line in lines:
+          #         match = re.match(r"^(\s*)existing_cluster_id:\s*(\S+)", line)
+          #         if match:
+          #             indent, current_value = match.groups()
+          #             new_value = replacements.get(current_value, current_value)
+          #             if current_value != new_value:
+          #                 changed = True
+          #                 print(f'  Reemplazando {current_value} por {new_value}')
+          #             new_line = f"{indent}existing_cluster_id: {new_value}\n"
+          #             new_lines.append(new_line)
+          #         else:
+          #             new_lines.append(line)
+          #
+          #     with open(path, "w", encoding="utf-8") as f:
+          #         f.writelines(new_lines)
+          #     if not changed:
+          #         print(f'  Sin cambios necesarios en {path}')
+          # EOF
+
+          # COMENTADO: Script para parametrizar workflows padres
+          # cat > replace_cluster_ids_padres.py << 'EOF'
+          # import os
+          # import re
+          #
+          # replacements = {
+          #     "ID_EXPANDED_CLUSTER_DEV": "ID_EXPANDED_CLUSTER_PROD",
+          #     "ID_EXPANDED_CLUSTER_QA": "ID_EXPANDED_CLUSTER_PROD",
+          # }
+          #
+          # with open("all_relevant_files.txt") as f:
+          #     changed_yaml = [line.strip() for line in f if line.strip().endswith(".yaml") and "Workflows_padres" in line]
+          #
+          # for path in changed_yaml:
+          #     if not os.path.exists(path):
+          #         continue
+          #     print(f'Procesando workflow padre: {path}')
+          #     with open(path, "r", encoding="utf-8") as f:
+          #         lines = f.readlines()
+          #
+          #     new_lines = []
+          #     changed = False
+          #     for line in lines:
+          #         match = re.match(r"^(\s*)existing_cluster_id:\s*(\S+)", line)
+          #         if match:
+          #             indent, current_value = match.groups()
+          #             new_value = replacements.get(current_value, current_value)
+          #             if current_value != new_value:
+          #                 changed = True
+          #                 print(f'  Reemplazando {current_value} por {new_value}')
+          #             new_line = f"{indent}existing_cluster_id: {new_value}\n"
+          #             new_lines.append(new_line)
+          #         else:
+          #             new_lines.append(line)
+          #
+          #     with open(path, "w", encoding="utf-8") as f:
+          #         f.writelines(new_lines)
+          #     if not changed:
+          #         print(f'  Sin cambios necesarios en {path}')
+          # EOF
+
+      - name: Ejecutar parametrización y hacer commit en rama temporal
+        run: |
+          # Guardar el estado inicial
+          git status --porcelain > /tmp/before_status.txt || true
+          
+          # Ejecutar scripts de parametrización
+          python3 update_envs.py || true
+          # COMENTADO: Ejecución de scripts de parametrización de workflows
+          # python3 replace_cluster_ids.py || true
+          # python3 replace_cluster_ids_padres.py || true
+          
+          # Eliminar archivos temporales del staging si existen
+          for file in update_envs.py replace_cluster_ids.py replace_cluster_ids_padres.py all_relevant_files.txt changed_files.txt; do
+            if git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
+              git rm --cached "$file" || true
+            fi
+          done
+          
+          # Agregar todos los cambios (incluyendo modificaciones y eliminaciones)
+          git add -A || true
+          
+          # Verificar si hay cambios comparando con el estado inicial
+          git status --porcelain > /tmp/after_status.txt || true
+          
+          # Verificar cambios de manera robusta
+          HAS_CHANGES=false
+          if ! diff -q /tmp/before_status.txt /tmp/after_status.txt >/dev/null 2>&1; then
+            HAS_CHANGES=true
+          elif ! git diff --cached --quiet; then
+            HAS_CHANGES=true
+          elif ! git diff --quiet; then
+            HAS_CHANGES=true
+          fi
+          
+          if [ "$HAS_CHANGES" = true ]; then
+            echo "Cambios detectados, haciendo commit..."
+            git commit -m "Parametrización automática de archivos para release"
+            git push origin HEAD
+            echo "Haciendo merge automático a release con prioridad a la rama temporal..."
+            git checkout release
+            git pull origin release
+            git merge --no-ff -X theirs "$PARAM_BRANCH" -m "Merge parametrización automática desde rama temporal"
+            git push origin release
+            echo "Borrando la rama temporal $PARAM_BRANCH..."
+            if [[ "$PARAM_BRANCH" == parametrizacion-release-* ]]; then
+              git push origin --delete "$PARAM_BRANCH" || true
+            else
+              echo "Nombre de rama temporal no válido, no se borra nada."
+            fi
+          else
+            echo "Sin cambios detectados después de la parametrización, borrando rama temporal..."
+            if [[ "$PARAM_BRANCH" == parametrizacion-release-* ]]; then
+              git push origin --delete "$PARAM_BRANCH" || true
+            fi
+          fi
+
+      - name: Limpiar archivos temporales
+        run: |
+          rm -f update_envs.py replace_cluster_ids.py replace_cluster_ids_padres.py all_relevant_files.txt changed_files.txt || true

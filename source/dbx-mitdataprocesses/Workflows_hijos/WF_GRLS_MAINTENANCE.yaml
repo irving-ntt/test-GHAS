@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    WF_GRLS_MAINTENANCE:
+      name: WF_GRLS_MAINTENANCE
+      schedule:
+        quartz_cron_expression: 42 0 9 * * ?
+        timezone_id: America/Mexico_City
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: TSK_DROP_OLD_DELTA_TABLES
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/CGRLS_0010/Notebooks/NB_GRLS_MANTEINANCE_DROP_OLD_DELTA.py
+            base_parameters:
+              dias_retencion: "7"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

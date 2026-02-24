@@ -1,0 +1,164 @@
+resources:
+  jobs:
+    WF_PATRIF_VALIDA_INDICADORES:
+      name: WF_PATRIF_VALIDA_INDICADORES
+      tasks:
+        - task_key: TSK_VALIDA_INDICADORES_COND
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/NOTEBOOKS/NB_PATRIF_VALIDA_INDICADORES_COND
+            base_parameters:
+              sr_folio: ""
+              sr_subproceso: ""
+              ind_vigencia: ""
+              config_indi: ""
+              sr_reproceso: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0100_DESM_FOV_3283
+          depends_on:
+            - task_key: TSK_VALIDA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_stage}}"
+            right: JQ_PATRIF_0010_VSS_DESM_FOV
+        - task_key: COND_0100_DESM_FOV_REPRO
+          depends_on:
+            - task_key: COND_0100_DESM_FOV_3283
+              outcome: "true"
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_reproceso}}"
+            right: "0"
+        - task_key: TSK_0100_DESM_FOV
+          depends_on:
+            - task_key: COND_0100_DESM_FOV_REPRO
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/04_SOL_DESMARCA/FOVISSTE/Notebooks/NB_
+              PATRIF_IND_VIV_0100_DESM_FOV_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_0200_DESM_FOV_REPRO
+          depends_on:
+            - task_key: COND_0100_DESM_FOV_REPRO
+              outcome: "false"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/04_SOL_DESMARCA/FOVISSTE/Notebooks/NB_
+              PATRIF_IND_VIV_0200_DESM_FOV_REP_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0100_MARCA_354
+          depends_on:
+            - task_key: TSK_VALIDA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_stage}}"
+            right: NB_PATRIF_IND_VIV_0100_MARCA
+        - task_key: TSK_0100_MARCA
+          depends_on:
+            - task_key: COND_0100_MARCA_354
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/01_SOL_MARCA/INFONAVIT/Notebooks/NB_
+              PATRIF_IND_VIV_0100_MARCA_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0100_SOL_DESM_347
+          depends_on:
+            - task_key: TSK_VALIDA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_stage}}"
+            right: JQ_PATRIF_0010_VSS_SOL_DESM
+        - task_key: COND_0100_SOL_DESM_347_repro
+          depends_on:
+            - task_key: COND_0100_SOL_DESM_347
+              outcome: "true"
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_reproceso}}"
+            right: "0"
+        - task_key: TSK_0100_SOL_DESM
+          depends_on:
+            - task_key: COND_0100_SOL_DESM_347_repro
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/04_SOL_DESMARCA/INFONAVIT/Notebooks/NB_
+              PATRIF_IND_VIV_0100_SOL_DESM_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_0100_SOL_DESM_REP
+          depends_on:
+            - task_key: COND_0100_SOL_DESM_347_repro
+              outcome: "false"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/04_SOL_DESMARCA/INFONAVIT/Notebooks/NB_
+              PATRIF_IND_VIV_0200_SOL_DESM_REP_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0100_TRANF_INFO_364
+          depends_on:
+            - task_key: TSK_VALIDA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_stage}}"
+            right: NB_PATRIF_IND_VIV_0100_TRANF_INFO_TRANS_ACRE
+        - task_key: COND_0100_TRANF_INFO_365
+          depends_on:
+            - task_key: TSK_VALIDA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_stage}}"
+            right: NB_PATRIF_IND_VIV_0100_TRANF_INFO_TRANS_AG
+        - task_key: COND_0100_TRANF_INFO_368
+          depends_on:
+            - task_key: TSK_VALIDA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_stage}}"
+            right: NB_PATRIF_IND_VIV_0100_TRANF_INFO_USO_GAR
+        - task_key: TSK_0100_TRANF_INFO
+          depends_on:
+            - task_key: COND_0100_TRANF_INFO_368
+              outcome: "true"
+            - task_key: COND_0100_TRANF_INFO_365
+              outcome: "true"
+            - task_key: COND_0100_TRANF_INFO_364
+              outcome: "true"
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/02_TRANSFERENCIAS/INFONAVIT/Notebooks/NB_
+              PATRIF_IND_VIV_0100_TRANF_INFO_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: COND_0100_TRP_3286
+          depends_on:
+            - task_key: TSK_VALIDA_INDICADORES_COND
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_VALIDA_INDICADORES_COND.values.sr_stage}}"
+            right: JP_IND_VIV_0100_TRP
+        - task_key: TSK_0100_TRP
+          depends_on:
+            - task_key: COND_0100_TRP_3286
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/05_TRP/Notebooks/NB_PATRIF_IND_VIV_0100_TRP_01
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_VALIDA_INDICADORES_CONCLUSION
+          depends_on:
+            - task_key: TSK_0100_SOL_DESM_REP
+            - task_key: TSK_0100_SOL_DESM
+            - task_key: TSK_0100_TRP
+            - task_key: TSK_0100_MARCA
+            - task_key: TSK_0100_DESM_FOV
+            - task_key: TSK_0200_DESM_FOV_REPRO
+            - task_key: TSK_0100_TRANF_INFO
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: /Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/05_VAL_INDIC_CRED_VIVIENDA/NOTEBOOKS/NB_PATRIF_VALIDA_INDICADORES_CONCLUSION
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

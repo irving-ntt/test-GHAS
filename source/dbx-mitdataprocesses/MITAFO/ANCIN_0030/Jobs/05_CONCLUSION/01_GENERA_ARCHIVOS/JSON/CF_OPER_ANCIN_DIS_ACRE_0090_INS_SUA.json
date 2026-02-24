@@ -1,0 +1,131 @@
+{
+  "flow" : "DOIMSS",
+  "id" : "4",
+  "steps" :
+    [
+        {
+          "step_id" : "001",
+          "subprocess" : "Generacion de archivos SUA",
+          "description" : [
+           "#PARAM@1# = folio",
+           "#PARAM@2# = CIERREN_ETL.TLSISGRAL_ETL_CLIENTE_SUA",
+           "#PARAM@3# = CIERREN.TNAFORECA_SUA"
+          ],
+          "value": [
+          "INSERT INTO CIERREN.TNAFORECA_SUA"
+          ,"SELECT DISTINCT"
+          ,"     MOVIMIENTOS.FNN_ID_REFERENCIA"
+          ,"    ,SUA.FTC_FOLIO"
+          ,"    ,SUA.FCN_ID_PROCESO"
+          ,"    ,SUA.FCN_ID_SUBPROCESO"
+          ,"    ,MOVIMIENTOS.FTN_NUM_CTA_INVDUAL"
+          ,"    ,0 FNN_NUMREG"
+          ,"    ,SUA.FNC_TIPREG"
+          ,"    ,SUA.FTN_NSS"
+          ,"    ,SUA.FTN_CONS_REG_LOTE"
+          ,"    ,SUA.FTC_RFC"
+          ,"    ,SUA.FTC_CURP"
+          ,"    ,SUA.FTC_NOMBRE"
+          ,"    ,SUA.FNC_PERIODO_PAGO_PATRON"
+          ,"    ,SUA.FND_FECHA_PAGO"
+          ,"    ,SUA.FND_FECHA_VALOR_IMSS_ACV_VIV"
+          ,"    ,SUA.FNN_ULTIMO_SALARIO_INT_PER"
+          ,"    ,SUA.FNC_FOLIO_PAGO_SUA"
+          ,"    ,SUA.FNC_REG_PATRONAL_IMSS"
+          ,"    ,SUA.FNC_RFC_PATRON"
+          ,"    ,SUA.FNN_DIAS_COTZDOS_BIMESTRE"
+          ,"    ,SUA.FNN_DIAS_INCAP_BIMESTRE"
+          ,"    ,SUA.FNN_DIAS_AUSENT_BIMESTRE"
+          ,"    ,SUA.FNN_ID_VIV_GARANTIA"
+          ,"    ,SUA.FNN_APLIC_INT_VIVIENDA"
+          ,"    ,SUA.FNC_MOTIVO_LIBCION_APORT"
+          ,"    ,SUA.FND_FECHA_PAGO_CUOTA_GUB"
+          ,"    ,SUA.FND_FECHA_VALOR_RCV"
+          ,"    ,SUA.FND_FECTRA"
+          ,"    ,SUA.FNN_SECLOT"
+          ,"     ,0 FNN_AFORE"
+          ,"     ,0 FNN_DEVPAG"
+          ,"    ,SUA.FNN_CVE_ENT_RECEP_PAGO"
+          ,"    ,SUA.FNN_NSS_ISSSTE"
+          ,"    ,SUA.FNC_DEPEND_CTRO_PAGO"
+          ,"    ,SUA.FNN_CTRO_PAGO_SAR"
+          ,"    ,SUA.FNN_CVE_RAMO"
+          ,"    ,SUA.FNC_CVE_PAGADURIA"
+          ,"    ,SUA.FNN_SUELDO_BASICO_COTIZ_RCV"
+          ,"    ,SUA.FNC_ID_TRABAJADOR_BONO"
+          ,"    ,systimestamp FND_FEH_CRE"
+          ,"    ,'DATABRICKS' FNC_USU_CRE"
+          ,"    ,SUA.FTN_INTERESES_VIV92"
+          ,"    ,SUA.FTN_INTERESES_VIV08"
+          ,"    ,SUA.FCN_ID_TIPO_APO"
+          ,"FROM #PARAM@2# SUA"
+          ,"INNER JOIN" 
+          ,"                  (SELECT  DISTINCT" 
+          ,"                           FTC_FOLIO"
+          ,"                          ,FTN_NUM_CTA_INVDUAL"
+          ,"                          ,FNN_ID_REFERENCIA"
+          ,"                  FROM #PARAM@3#"
+          ,"            WHERE FTN_REG_ACREDITADO = 0"
+          ,"            AND FTC_FOLIO = '#PARAM@1#'"
+          ,"                  )  MOVIMIENTOS"
+          ,"ON SUA.FNN_ID_REFERENCIA = MOVIMIENTOS.FNN_ID_REFERENCIA AND SUA.FTC_FOLIO=MOVIMIENTOS.FTC_FOLIO"
+          ]
+        },
+         {
+          "step_id" : "002",
+          "subprocess" : "Generacion de archivos SUA",
+          "description" : [
+            "#PARAM@1# TEMP_INS_SUA"
+          ],
+          "value": [
+              "select "
+             ,"FNN_ID_REFERENCIA           "
+             ,",FTC_FOLIO                   "
+             ,",FCN_ID_PROCESO              "
+             ,",FCN_ID_SUBPROCESO           "
+             ,",FTN_NUM_CTA_INVDUAL         "
+             ,",FNN_NUMREG                  "
+             ,",FNC_TIPREG                  "
+             ,",FTN_NSS                     "
+             ,",FTN_CONS_REG_LOTE           "
+             ,",FTC_RFC                     "
+             ,",FTC_CURP                    "
+             ,",FTC_NOMBRE                  "
+             ,",FNC_PERIODO_PAGO_PATRON     "
+             ,",CURRENT_TIMESTAMP AS FND_FECHA_PAGO              "
+             ,",CURRENT_TIMESTAMP AS FND_FECHA_VALOR_IMSS_ACV_VIV "
+             ,",FNN_ULTIMO_SALARIO_INT_PER  "
+             ,",FNC_FOLIO_PAGO_SUA          "
+             ,",FNC_REG_PATRONAL_IMSS       "
+             ,",FNC_RFC_PATRON              "
+             ,",FNN_DIAS_COTZDOS_BIMESTRE   "
+             ,",FNN_DIAS_INCAP_BIMESTRE     "
+             ,",FNN_DIAS_AUSENT_BIMESTRE    "
+             ,",FNN_ID_VIV_GARANTIA         "
+             ,",FNN_APLIC_INT_VIVIENDA      "
+             ,",FNC_MOTIVO_LIBCION_APORT    "
+             ,",CURRENT_TIMESTAMP AS FND_FECHA_PAGO_CUOTA_GUB    "
+             ,",CURRENT_TIMESTAMP AS FND_FECHA_VALOR_RCV         "
+             ,",CURRENT_TIMESTAMP AS FND_FECTRA                   "
+             ,",FNN_SECLOT                  "
+             ,",FNN_AFORE                   "
+             ,",FNN_DEVPAG                  "
+             ,",FNN_CVE_ENT_RECEP_PAGO      "
+             ,",FNN_NSS_ISSSTE              "
+             ,",FNC_DEPEND_CTRO_PAGO        "
+             ,",FNN_CTRO_PAGO_SAR           "
+             ,",FNN_CVE_RAMO                "
+             ,",FNC_CVE_PAGADURIA           "
+             ,",FNN_SUELDO_BASICO_COTIZ_RCV "
+             ,",FNC_ID_TRABAJADOR_BONO      "
+             ,",CURRENT_TIMESTAMP AS FND_FEH_CRE                 "
+             ,",FNC_USU_CRE                 "
+             ,",FTN_INTERESES_VIV92         "
+             ,",FTN_INTERESES_VIV08         "
+             ,",FCN_ID_TIPO_APO             "             
+             ,"FROM #PARAM@1#"
+          ]
+        }
+
+    ]
+}

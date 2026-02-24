@@ -1,0 +1,47 @@
+{
+    "flow" : "DOIMSS",
+    "id" : "06",
+    "steps" :
+      [
+          {
+            "step_id" : "001",
+            "subprocess" : "Envío de Transferencias Extemporáneas",
+            "description" : [
+              "descripcion - El objetivo es validar si es necesario una nueva ejecución de transferencia de IMSS o continuar con el proceso de otorgamiento de pensión. ",
+              "#PARAM@1# = FTC_FOLIO ",              
+              "#PARAM@2# CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE"
+              
+            ],
+            "value": [
+                 "        SELECT"
+                ,"        FTN_NUM_CTA_INVDUAL,"
+                ,"        FTN_CTE_PENSIONADO,"
+                ,"        FTC_NOMBRE_CTE,"
+                ,"        FTC_RFC,"
+                ,"        FTC_CURP"
+                ,"    FROM #PARAM@2#"
+                ,"    WHERE FTC_FOLIO = '#PARAM@1#' "
+                ,"    AND FTN_CTE_PENSIONADO = 1"                
+                
+                
+            ]
+        },      
+
+          {
+            "step_id" : "002",
+            "subprocess" : "Envío de Transferencias Extemporáneas",
+            "description" : [
+                "#PARAM@1# = ORACLE_DISPERSIONES"
+            ],
+              "value": [
+                "  SELECT DISTINCT"
+                ,"    FTC_FOLIO,"
+                ,"    FTC_NUM_CTA_INVDUAL AS FTN_NUM_CTA_INVDUAL," 
+                ,"    FTD_FEH_LIQUIDACION,"
+                ,"    FCN_ID_TIPO_MOV"
+                ,"  FROM #PARAM@1#"
+                ,"  WHERE FCN_ID_TIPO_MOV = 181"
+            ]
+          }
+      ]
+}

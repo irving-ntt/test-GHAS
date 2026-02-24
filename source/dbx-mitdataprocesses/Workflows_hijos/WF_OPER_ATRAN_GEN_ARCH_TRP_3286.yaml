@@ -1,0 +1,38 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_GEN_ARCH_TRP_3286:
+      name: WF_OPER_ATRAN_GEN_ARCH_TRP_3286
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: NB_PATRIF_GAR_0100_ENCABEZADO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/05_TRP/INFONAV_FOVISSS/Notebooks/NB_PATRIF_GAR_0100_ENCABEZADO"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0200_DETALLE
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0100_ENCABEZADO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/05_TRP/INFONAV_FOVISSS/Notebooks/NB_PATRIF_GAR_0200_DETALLE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0300_SUMARIO
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0200_DETALLE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/05_TRP/INFONAV_FOVISSS/Notebooks/NB_PATRIF_GAR_0300_SUMARIO"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_PATRIF_GAR_0400_UPD_PROC_TRP
+          depends_on:
+            - task_key: NB_PATRIF_GAR_0300_SUMARIO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/09_GEN_ARCHIVOS_RESP/05_TRP/INFONAV_FOVISSS/Notebooks/NB_PATRIF_GAR_0400_UPD_PROC_TRP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

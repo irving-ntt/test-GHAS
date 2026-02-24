@@ -1,0 +1,21 @@
+-- Query para PROCESOS.TTAFOGRAL_RESPUESTA_ITGY
+-- If p_SR_PROCESO_DESM =347 Then p_SR_PROCESO_DESM Else  p_SR_SUBPROCESO
+WITH ED AS 
+( 
+SELECT 
+  #sr_folio# AS FTC_FOLIO,
+  #sr_proceso# as FTN_ID_PROCESO,
+  CASE  WHEN #sr_proceso_desm# = '347' THEN #sr_proceso_desm#  ELSE #sr_subproceso# END as FTN_ID_SUBPROCESO,
+  D.TOTAL AS FTN_REGISTROS_ENVIADOS,
+  0 as FTN_REGISTROS_RECIBIDOS,
+  3879 as FTN_ID_ESTATUS,
+  '#sr_usuario#' as FTC_USU_CRE,
+  from_utc_timestamp(current_timestamp(), 'America/Mexico_City') as FTD_FEH_CRE
+ -- current_timestamp() as FTD_FEH_CRE
+ -- '#sr_fecha_creacion#' as FTD_FEH_CRE
+FROM #DELTA_TABLA_NAME1# D
+  LIMIT 1
+  )
+SELECT 
+  ED.* 
+FROM ED

@@ -1,0 +1,93 @@
+-- ==========================================
+-- QUERY: NB_PANCIN_MOV_0016_SUF_SALDO_001.sql
+-- DESCRIPCIÓN: Extraer datos de premovimientos desde OCI (DB_100_ETL_PRE_MOVIMIENTOS en DataStage)
+-- AUTOR: Sistema
+-- FECHA: 2024-01-15
+-- VERSIÓN: 1.0.0
+-- ==========================================
+-- PARÁMETROS:
+--   @CX_CRE_ESQUEMA: Esquema de CIERREN_ETL
+--   @CX_CRN_ESQUEMA: Esquema de CIERREN
+--   @CX_BNF_ESQUEMA: Esquema de BENEFICIOS
+--   @TL_CRE_PRE_MOVIMIENTOS: Tabla de premovimientos
+--   @TL_CRN_TIPO_SUBCTA: Tabla de tipo de subcuenta
+--   @TL_CRN_MOV_SUBCTA: Tabla de movimientos de subcuenta
+--   @TL_CRN_CONFIG_CONCEP_MOV: Tabla de configuración de conceptos de movimiento
+--   @TL_BNF_TRAMITE: Tabla de trámites
+--   @TL_BNF_TRAMITE_SUBSECUENTE: Tabla de trámites subsecuentes
+--   @SR_FOLIO: Folio del proceso
+--   @SR_TIPO_MOV: Tipo de movimiento
+-- ==========================================
+-- TIPO: OCI
+-- USO: db.sql_oci()
+-- ==========================================
+
+WITH PRE AS (
+    SELECT 
+        FCN_ID_CAT_SUBCTA,
+        FTC_FOLIO,
+        FTN_NUM_CTA_INVDUAL,
+        FCN_ID_SUBPROCESO,
+        FCN_ID_TIPO_MOV,
+        FCN_ID_CONCEPTO_MOV,
+        FCN_ID_SIEFORE,
+        FTF_MONTO_PESOS,
+        FTF_MONTO_ACCIONES,
+        FTF_MONTO_PESOS_SOL,
+        FTF_MONTO_ACCIONES_SOL
+    FROM #CX_CRE_ESQUEMA#.#TL_CRE_PRE_MOVIMIENTOS# PRE
+    WHERE PRE.FTC_FOLIO = '#SR_FOLIO#'
+        AND PRE.FTN_PRE_MOV_GENERADO IN (0,1)
+        AND PRE.FCN_ID_TIPO_MOV = #SR_TIPO_MOV#
+    
+    UNION
+    
+    SELECT 
+        FCN_ID_CAT_SUBCTA,
+        FTC_FOLIO,
+        FTN_NUM_CTA_INVDUAL,
+        FCN_ID_SUBPROCESO,
+        FCN_ID_TIPO_MOV,
+        FCN_ID_CONCEPTO_MOV,
+        FCN_ID_SIEFORE,
+        FTF_MONTO_PESOS,
+        FTF_MONTO_ACCIONES,
+        FTF_MONTO_PESOS_SOL,
+        FTF_MONTO_ACCIONES_SOL
+    FROM #CX_CRE_ESQUEMA#.#TL_CRE_PRE_MOVIMIENTOS# PRE
+    WHERE PRE.FTC_FOLIO_REL = '#SR_FOLIO#'
+        AND PRE.FTN_PRE_MOV_GENERADO IN (0,1)
+        AND PRE.FCN_ID_TIPO_MOV = #SR_TIPO_MOV#
+)
+SELECT /*+ PARALLEL (8) */
+    PRE.FTC_FOLIO,
+    PRE.FTN_NUM_CTA_INVDUAL,
+    TSUB.FCN_ID_TIPO_SUBCTA,
+    PRE.FCN_ID_SIEFORE,
+    CMOV.FTN_DEDUCIBLE,
+    TSUB.FCN_ID_PLAZO,
+    MOV.FRN_ID_MOV_SUBCTA,
+    PRE.FTF_MONTO_PESOS,
+    PRE.FTF_MONTO_ACCIONES,
+    PRE.FTF_MONTO_PESOS_SOL,
+    PRE.FTF_MONTO_ACCIONES_SOL,
+    S.FOLIO
+FROM PRE
+INNER JOIN #CX_CRN_ESQUEMA#.#TL_CRN_TIPO_SUBCTA# TSUB 
+    ON (PRE.FCN_ID_CAT_SUBCTA = TSUB.FCN_ID_CAT_SUBCTA)
+INNER JOIN #CX_CRN_ESQUEMA#.#TL_CRN_MOV_SUBCTA# MOV 
+    ON (TSUB.FCN_ID_TIPO_SUBCTA = MOV.FCN_ID_TIPO_SUBCTA 
+        AND PRE.FCN_ID_SUBPROCESO = MOV.FCN_ID_SUBPROCESO 
+        AND PRE.FCN_ID_TIPO_MOV = MOV.FCN_ID_TIPO_MOV)
+INNER JOIN #CX_CRN_ESQUEMA#.#TL_CRN_CONFIG_CONCEP_MOV# CMOV 
+    ON (MOV.FRN_ID_MOV_SUBCTA = CMOV.FRN_ID_MOV_SUBCTA 
+        AND PRE.FCN_ID_CONCEPTO_MOV = CMOV.FFN_ID_CONCEPTO_MOV)
+LEFT JOIN (
+    SELECT 
+        T.FTC_FOLIO FOLIO, 
+        TS.FTC_FOLIO FOLIO_SUB 
+    FROM #CX_BNF_ESQUEMA#.#TL_BNF_TRAMITE# T, 
+         #CX_BNF_ESQUEMA#.#TL_BNF_TRAMITE_SUBSECUENTE# TS
+    WHERE T.FTN_FOLIO_TRAMITE = TS.FTN_FOLIO_TRAMITE_REL
+        AND TS.FTN_NUM_MENSUALIDAD > 1
+) S ON PRE.FTC_FOLIO = S.FOLIO_SUB

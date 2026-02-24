@@ -1,0 +1,120 @@
+SELECT
+    T.FTN_NUM_CTA_INVDUAL,
+    T.FTN_SUBPROCESO,
+    T.FTC_INSTITUTO_ORIGEN,
+    ADD_MONTHS(TRUNC(SYSDATE, 'MONTH'), 1) AS FECHA_VALOR_AIVS,
+    T.FTC_NSS_IMSS,
+    T.FTN_MONTO_PESOS,
+    T.FTN_TOTAL_AIVS,
+    T.FTN_AIVS,
+    CASE
+        WHEN T.FTC_INSTITUTO_ORIGEN = '001'
+            THEN NVL(B15.SALDO_DISPONIBLE_AIVS, 0)
+        ELSE
+            NVL(B18.SALDO_DISPONIBLE_AIVS, 0)
+    END AS SALDO_DISPONIBLE_AIVS_VIV97,
+    CASE
+        WHEN T.FTC_INSTITUTO_ORIGEN = '001'
+            THEN NVL(B16.SALDO_DISPONIBLE_AIVS, 0)
+        ELSE
+            NVL(B17.SALDO_DISPONIBLE_AIVS, 0)
+    END AS SALDO_DISPONIBLE_AIVS_VIV92,
+    T.FTN_NO_LINEA,
+    CASE WHEN T.FTC_INSTITUTO_ORIGEN = '001'
+         THEN 138
+         ELSE 139
+    END AS FCN_ID_REGIMEN,
+    T.FCN_ID_TIPO_SUBCTA_92,
+    T.FTN_MONTO_PESOS_92,
+    T.FTN_TOTAL_AIVS_92
+
+FROM
+    PROCESOS.TTAFOTRAS_TRANS_REC_PORTA T
+
+    -- Join for VIV97 (subaccount 15)
+    LEFT JOIN (
+        SELECT
+            FTC_NUM_CTA_INVDUAL,
+            SUM(FTN_DISP_ACCIONES) AS SALDO_DISPONIBLE_AIVS
+        FROM
+            CIERREN.TTAFOGRAL_BALANCE_MOVS
+        WHERE
+            FCN_ID_SIEFORE = 81
+            AND FCN_ID_TIPO_SUBCTA = 15
+            AND FTC_NUM_CTA_INVDUAL IN (
+                SELECT FTN_NUM_CTA_INVDUAL
+                FROM PROCESOS.TTAFOTRAS_TRANS_REC_PORTA
+                WHERE FTC_FOLIO = '#sr_folio#'
+            )
+        GROUP BY
+            FTC_NUM_CTA_INVDUAL
+    ) B15
+        ON B15.FTC_NUM_CTA_INVDUAL = T.FTN_NUM_CTA_INVDUAL
+
+    -- Join for VIV92 (subaccount 16)
+    LEFT JOIN (
+        SELECT
+            FTC_NUM_CTA_INVDUAL,
+            SUM(FTN_DISP_ACCIONES) AS SALDO_DISPONIBLE_AIVS
+        FROM
+            CIERREN.TTAFOGRAL_BALANCE_MOVS
+        WHERE
+            FCN_ID_SIEFORE = 81
+            AND FCN_ID_TIPO_SUBCTA = 16
+            AND FTC_NUM_CTA_INVDUAL IN (
+                SELECT FTN_NUM_CTA_INVDUAL
+                FROM PROCESOS.TTAFOTRAS_TRANS_REC_PORTA
+                WHERE FTC_FOLIO = '#sr_folio#'
+            )
+        GROUP BY
+            FTC_NUM_CTA_INVDUAL
+    ) B16
+        ON B16.FTC_NUM_CTA_INVDUAL = T.FTN_NUM_CTA_INVDUAL
+
+    -- Join for FOV92 (subaccount 17)
+    LEFT JOIN (
+        SELECT
+            FTC_NUM_CTA_INVDUAL,
+            SUM(FTN_DISP_ACCIONES) AS SALDO_DISPONIBLE_AIVS
+        FROM
+            CIERREN.TTAFOGRAL_BALANCE_MOVS
+        WHERE
+            FCN_ID_SIEFORE = 81
+            AND FCN_ID_TIPO_SUBCTA = 17
+            AND FTC_NUM_CTA_INVDUAL IN (
+                SELECT FTN_NUM_CTA_INVDUAL
+                FROM PROCESOS.TTAFOTRAS_TRANS_REC_PORTA
+                WHERE FTC_FOLIO = '#sr_folio#'
+            )
+        GROUP BY
+            FTC_NUM_CTA_INVDUAL
+    ) B17
+        ON B17.FTC_NUM_CTA_INVDUAL = T.FTN_NUM_CTA_INVDUAL
+
+    -- Join for FOV08 (subaccount 18)
+    LEFT JOIN (
+        SELECT
+            FTC_NUM_CTA_INVDUAL,
+            SUM(FTN_DISP_ACCIONES) AS SALDO_DISPONIBLE_AIVS
+        FROM
+            CIERREN.TTAFOGRAL_BALANCE_MOVS
+        WHERE
+            FCN_ID_SIEFORE = 81
+            AND FCN_ID_TIPO_SUBCTA = 18
+            AND FTC_NUM_CTA_INVDUAL IN (
+                SELECT FTN_NUM_CTA_INVDUAL
+                FROM PROCESOS.TTAFOTRAS_TRANS_REC_PORTA
+                WHERE FTC_FOLIO = '#sr_folio#'
+            )
+        GROUP BY
+            FTC_NUM_CTA_INVDUAL
+    ) B18
+        ON B18.FTC_NUM_CTA_INVDUAL = T.FTN_NUM_CTA_INVDUAL
+
+WHERE
+    T.FTC_FOLIO = '#sr_folio#'
+    AND ((FTC_MOTIVO_REC <> 93)
+AND   (FTC_MOTIVO_REC <> 254)
+AND  (FTC_MOTIVO_REC <> 375) 
+AND  (FTC_MOTIVO_REC <> 1178)
+OR (FTC_MOTIVO_REC IS NULL))

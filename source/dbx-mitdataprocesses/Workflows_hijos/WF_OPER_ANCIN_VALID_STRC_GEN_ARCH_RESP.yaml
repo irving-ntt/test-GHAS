@@ -1,0 +1,156 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_VALID_STRC_GEN_ARCH_RESP:
+      name: WF_OPER_ANCIN_VALID_STRC_GEN_ARCH_RESP
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_VALID_STRUCT_COND_GEN_ARCH_RESP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBPROCESO_118
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '118'
+        - task_key: TSK_NB_OPER_ANCIN_0700_STRL_ACESP_832
+          depends_on:
+            - task_key: SUBPROCESO_118
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0700_STRL_ACESP_832"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBPROCESO_120
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '120'
+        - task_key: TSK_NB_OPER_ANCIN_0400_STRL_DOISSSTE_832
+          depends_on:
+            - task_key: SUBPROCESO_120
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0400_STRL_DOISSSTE_832"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBPROCESO_122
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '122'
+        - task_key: TSK_NB_OPER_ANCIN_0600_STRL_ITISSSTE_832
+          depends_on:
+            - task_key: SUBPROCESO_122
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_0600_STRL_ITISSSTE_832"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBPROCESO_3286
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '3286'
+        - task_key: TSK_NB_OPER_ANCIN_STRL_GENERAL_ARCH_RESP_3286
+          depends_on:
+            - task_key: SUBPROCESO_3286
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_STRL_GENERAL_ARCH_RESP_3286"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBPROCESO_354
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '354'
+        - task_key: SUBPROCESO_363
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '363'
+        - task_key: SUBPROCESO_364
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '364'
+        - task_key: SUBPROCESO_365
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '365'
+        - task_key: SUBPROCESO_368
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '368'
+        - task_key: TSK_NB_OPER_ANCIN_STRL_GENERAL_ARCH_RESP
+          depends_on:
+            - task_key: SUBPROCESO_368
+              outcome: 'true'
+            - task_key: SUBPROCESO_354
+              outcome: 'true'
+            - task_key: SUBPROCESO_364
+              outcome: 'true'
+            - task_key: SUBPROCESO_363
+              outcome: 'true'
+            - task_key: SUBPROCESO_365
+              outcome: 'true'
+          run_if: AT_LEAST_ONE_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_STRL_GENERAL_ARCH_RESP"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: SUBPROCESO_3832
+          depends_on:
+            - task_key: TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_NB_VALID_STRUCT_COND_GEN_ARCH_RESP.values.sr_subproceso}}"
+            right: '3832'
+        - task_key: TSK_NB_OPER_ANCIN_STRL_GENERAL_ARCH_RESP_3832
+          depends_on:
+            - task_key: SUBPROCESO_3832
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/12_VALIDACION_ESTRUCTURA/Notebooks/NB_OPER_ANCIN_STRL_GENERAL_ARCH_RESP_3832"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

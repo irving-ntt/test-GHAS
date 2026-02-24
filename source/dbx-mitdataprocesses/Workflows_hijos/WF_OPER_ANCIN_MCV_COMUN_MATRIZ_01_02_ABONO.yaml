@@ -1,0 +1,53 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_MCV_COMUN_MATRIZ_01_02_ABONO:
+      name: WF_OPER_ANCIN_MCV_COMUN_MATRIZ_01_02_ABONO
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_ANCIN_COMUN_MCV_0120_CARGA_MATRIZ_ABONO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/04_MATRIZ_COMUN/Notebooks/NB_ANCIN_COMUN_MCV_0120_CARGA_VAL_MATRIZ_ABONO"
+            base_parameters:
+              sr_conv_ingty: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_paso: ""
+              sr_path_arch: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_ejecucion: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_ANCIN_COMUN_MCV_0130_CARGA_MATRIZ_ABONO
+          depends_on:
+            - task_key: NB_ANCIN_COMUN_MCV_0120_CARGA_MATRIZ_ABONO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/04_MATRIZ_COMUN/Notebooks/NB_ANCIN_COMUN_MCV_0130_CARGA_MATRIZ_ABONO"
+            base_parameters:
+              sr_conv_ingty: ""
+              sr_etapa: ""
+              sr_folio: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_paso: ""
+              sr_path_arch: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_ejecucion: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      tags:
+        COMUN: ""
+        MCV: Matriz de Convivencia
+      queue:
+        enabled: true

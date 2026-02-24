@@ -1,0 +1,26 @@
+SELECT
+   FTC_FOLIO                  ,
+   FTN_ID_ARCHIVO             ,
+   FTC_FOLIO_PROCESAR         ,
+   FTC_NSS_IMSS               ,
+   FTC_APELLIDO_PATERNO       ,
+   FTC_APELLIDO_MATERNO       ,
+   FTC_NOMBRE                 ,
+   FTC_CURP                   ,
+   FTC_TIPO_OPERACION         ,
+   FTC_INSTITUTO_ORIGEN       ,
+   FTC_CREDITO                ,
+   FTN_MONTO_PESOS            ,
+   FTN_AIVS                   ,
+   FTD_FEH_VAL_AIVS           ,
+   FTN_TOTAL_AIVS             ,
+   FTD_FEH_CREDITO            ,
+   FTD_FEH_VAL_TRANSFERENCIA  ,
+   FTC_DIAGNOSTICO            ,
+   FCN_ID_TIPO_SUBCTA         ,
+   FCN_ID_SIEFORE             ,
+   FTN_SUBPROCESO             ,
+   FTC_MASCARA_RECEP
+FROM CIERREN_ETL.TTAFOTRAS_ETL_TRANS_REC_PORTA
+WHERE FTC_FOLIO = '#SR_FOLIO#'
+

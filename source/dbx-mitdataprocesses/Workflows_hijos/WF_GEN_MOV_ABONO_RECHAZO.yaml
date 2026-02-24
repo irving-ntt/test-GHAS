@@ -1,0 +1,108 @@
+resources:
+  jobs:
+    WF_GEN_MOV_ABONO_RECHAZO:
+      name: WF_GEN_MOV_ABONO_RECHAZO
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: TSK_GEN_0022_INS_MOV_BAL_ETL_BALANCE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0022_INS_MOV_BAL_ETL_BALANCE"
+            base_parameters:
+              cx_cre_esquema: ""
+              sr_etapa: ""
+              sr_factor: ""
+              sr_fcc_usu_cre: ""
+              sr_fecha_acc: ""
+              sr_fecha_liq: ""
+              sr_flc_usu_reg: ""
+              sr_folio: ""
+              sr_folio_rel: ""
+              sr_id_snapshot: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_reproceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              tl_cre_dispersion: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_GEN_0022_INS_MOV_BAL_ETL_MOVS
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0022_INS_MOV_BAL_ETL_MOVS"
+            base_parameters:
+              cx_cre_esquema: ""
+              sr_etapa: ""
+              sr_factor: ""
+              sr_fcc_usu_cre: ""
+              sr_fecha_acc: ""
+              sr_fecha_liq: ""
+              sr_flc_usu_reg: ""
+              sr_folio: ""
+              sr_folio_rel: ""
+              sr_id_snapshot: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_reproceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              tl_cre_dispersion: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_GEN_0022_INS_MOV_BAL_ORACLE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_MOV_0022_INS_MOV_BAL_ORACLE"
+            base_parameters:
+              cx_cre_esquema: ""
+              sr_etapa: ""
+              sr_factor: ""
+              sr_fcc_usu_cre: ""
+              sr_fecha_acc: ""
+              sr_fecha_liq: ""
+              sr_flc_usu_reg: ""
+              sr_folio: ""
+              sr_folio_rel: ""
+              sr_id_snapshot: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_reproceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              tl_cre_dispersion: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_GEN_CONCLUSION
+          depends_on:
+            - task_key: TSK_GEN_0022_INS_MOV_BAL_ETL_BALANCE
+            - task_key: TSK_GEN_0022_INS_MOV_BAL_ETL_MOVS
+            - task_key: TSK_GEN_0022_INS_MOV_BAL_ORACLE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/04_GEN_ACRED_MOVS/DISPERSIONES/Notebooks/NB_OPER_PANCIN_GEN_MOV_CONCLUSION"
+            base_parameters:
+              cx_cre_esquema: ""
+              sr_etapa: ""
+              sr_factor: ""
+              sr_fcc_usu_cre: ""
+              sr_fecha_acc: ""
+              sr_fecha_liq: ""
+              sr_flc_usu_reg: ""
+              sr_folio: ""
+              sr_folio_rel: ""
+              sr_id_snapshot: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_reproceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              tl_cre_dispersion: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

@@ -1,0 +1,1237 @@
+{
+  "flow" : "DOIMSS",
+  "id" : "1",
+  "steps" :
+    [
+        {
+          "step_id" : "001",
+          "source" : "oracle",
+            "description" : [
+            "descripcion - Este query genera la tabla TEMP_DOIMSS_MCV_MONTOS_CLIENTE",
+            "#PARAM@1# = #p_SR_FOLIO# = Numero de folio"
+          ],
+          "value" : [
+              "SELECT A.FTN_ID_ARCHIVO",
+              "    ,A.FTN_NO_LINEA",
+              "    ,A.FTC_FOLIO",
+              "    ,A.FTN_NSS",
+              "    ,A.FTC_CURP",
+              "    ,A.FCN_ID_TIPO_SUBCTA",
+              "    ,A.FTN_NSS_CURP",
+              "FROM (",
+              "    SELECT A.FTN_ID_ARCHIVO",
+              "        ,A.FTN_NO_LINEA",
+              "        ,A.FTC_FOLIO",
+              "        ,A.FTN_NSS",
+              "        ,A.FTC_CURP",
+              "        ,A.FCN_ID_TIPO_SUBCTA",
+              "        ,CASE WHEN B.FCN_ID_SUBPROCESO IN (120, 122, 210, 105) THEN A.FTC_CURP ELSE A.FTN_NSS END FTN_NSS_CURP",
+              "        ,ROW_NUMBER() OVER (",
+              "            PARTITION BY (CASE WHEN B.FCN_ID_SUBPROCESO IN (120, 122, 210, 105) THEN A.FTC_CURP ELSE A.FTN_NSS END)",
+              "            ORDER BY (CASE WHEN B.FCN_ID_SUBPROCESO IN (120, 122, 210, 105) THEN A.FTC_CURP ELSE A.FTN_NSS END)",
+              "            ) AS rn",
+              "    FROM CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION A",
+              "    INNER JOIN CIERREN.TTCRXGRAL_FOLIO B",
+              "        ON A.FTC_FOLIO = B.FTC_FOLIO",
+              "    WHERE A.FTC_FOLIO = '#PARAM@1#') A",
+              "WHERE rn = 1"
+          ]
+        },
+        {
+          "step_id" : "002",
+          "source" : "oracle",
+            "description" : [
+            "descripcion ",
+            "#PARAM@1# = CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION",
+            "#PARAM@2# = CIERREN.TTCRXGRAL_FOLIO",
+            "#PARAM@3# = #SR_FOLIO# = Numero de folio"
+          ],
+          "value" : [
+          "SELECT"
+          ,"    CASE"
+          ,"        WHEN B.FCN_ID_SUBPROCESO IN (120,122,210,105)"
+          ,"        THEN A.FTC_CURP"
+          ,"        ELSE A.FTN_NSS"
+          ,"    END FTN_NSS_CURP,"
+          ,"    1 FLAG,"
+          ,"    A.FTN_ESTATUS_DIAG"
+          ,"FROM"
+          ,"    #PARAM@1# A"
+          ,"INNER JOIN"
+          ,"    #PARAM@2# B"
+          ,"ON A.FTC_FOLIO = B.FTC_FOLIO"
+          ,"WHERE"
+          ,"    A.FTC_FOLIO= '#PARAM@3#'"
+          ]
+        },
+        {
+          "step_id" : "003",
+          "source" : "oracle",
+            "description" : [
+            "descripcion - ",
+            "#PARAM@1# = TEMP_IDEN_CLIENTE",
+            "#PARAM@2# = TEMP_CLIENTE_NO_IDEN"
+          ],
+          "value" : [
+          "SELECT",
+          "    IDC.FTC_FOLIO,",
+          "    IDC.FTN_NSS_CURP,",
+          "    IDC.FTN_ID_ARCHIVO,",
+          "    IDC.FTN_NO_LINEA,",
+          "    IDC.FTN_NSS,",
+          "    IDC.FTC_CURP,",
+          "    NOIDEN.FLAG,",
+          "    NOIDEN.FTN_ESTATUS_DIAG",
+          "FROM #PARAM@1# IDC",
+          "LEFT JOIN #PARAM@2# NOIDEN ON IDC.FTN_NSS_CURP = NOIDEN.FTN_NSS_CURP",
+          "WHERE NOIDEN.FLAG IS NULL OR NOIDEN.FTN_ESTATUS_DIAG = 0"
+          ]
+        },
+        {
+          "step_id" : "004",
+          "source" : "oracle",
+		      "description" : "",
+          "value" : [
+          "SELECT"
+          ,"    A.FTN_ID_ARCHIVO,"
+          ,"    A.FTN_NO_LINEA,"
+          ,"    SUBSTR(A.FTC_LINEA, 172, 3) AS FTC_CLAVE_ENT_RECEP_IMSS,"
+          ,"    SUBSTR(A.FTC_LINEA, 13, 3) AS FTC_CLAVE_ENT_RECEP_ISSSTE,"
+          ,"    SUBSTR(A.FTC_LINEA, 24, 13) AS FTC_RFC_IMSS,"
+          ,"    SUBSTR(A.FTC_LINEA, 129, 13) AS FTC_RFC_ISSSTE,"
+          ,"    SUBSTR(A.FTC_LINEA, 55, 50) AS FTC_NOMBRE_CTE_IMSS,"
+          ,"    TRIM(SUBSTR(A.FTC_LINEA, 240, 40)) || ' ' ||"
+          ,"    TRIM(SUBSTR(A.FTC_LINEA, 160, 40)) || ' ' ||"
+          ,"    TRIM(SUBSTR(A.FTC_LINEA, 200, 40)) AS FTC_NOMBRE_CTE_ISSSTE"
+          ,"FROM"
+          ,"    #PARAM@1# A"
+          ,"WHERE"
+          ,"    A.FTN_ID_ARCHIVO = #PARAM@2#"
+          ]
+        },
+        {
+          "step_id" : "005",
+          "source" : "oracle",
+		      "description" : "",
+          "value" : [
+              "SELECT",
+              "A.FTN_ID_ARCHIVO",
+              ",CASE WHEN '#PARAM@1#' = 'IMSS' THEN FTC_CLAVE_ENT_RECEP_IMSS",
+              "ELSE FTC_CLAVE_ENT_RECEP_ISSSTE END FTC_CLAVE_ENT_RECEP",
+              ",CASE WHEN '#PARAM@1#' = 'IMSS' THEN FTN_NSS",
+              "ELSE FTC_CURP END FTC_NSS_CURP",
+              ",CASE WHEN '#PARAM@1#' = 'IMSS' THEN FTC_RFC_IMSS",
+              "ELSE FTC_RFC_ISSSTE END FTC_RFC",
+              ",CASE WHEN '#PARAM@1#' = 'IMSS' THEN FTC_NOMBRE_CTE_IMSS",
+              "ELSE FTC_NOMBRE_CTE_ISSSTE END FTC_NOMBRE_CTE",
+              ",B.FTC_FOLIO",
+              ",B.FTN_NSS",
+              ",B.FTC_CURP",
+              ",CASE WHEN '#PARAM@1#' = 'IMSS' THEN FTN_NSS",
+              "ELSE FTC_CURP END FTC_CLAVE_TMP",
+              ",to_timestamp(from_utc_timestamp(current_timestamp, 'GMT-6')) FTD_FEH_CRE",
+              ",'#PARAM@3#' FTC_USU_CRE",
+              "FROM #PARAM@4#.TEMP_MAP_IMSS_ISSSTE_#PARAM@2# A",
+              "INNER JOIN #PARAM@4#.TEMP_UNION_CLIENTE_#PARAM@2# B ",
+              "ON (A.FTN_ID_ARCHIVO = B.FTN_ID_ARCHIVO",
+              "AND A.FTN_NO_LINEA = B.FTN_NO_LINEA)"
+          ]
+        },
+       {
+          "step_id" : "006",
+          "source" : "oracle",
+		      "description" : "",
+          "value" : [
+              "DELETE /*+ PARALLEL(8) */ FROM CIERREN_ETL.TTSISGRAL_ETL_DISPERSION_CTAS TBL WHERE FTC_FOLIO = '#PARAM@1#'"
+          ]
+        },
+       {
+          "step_id" : "007",
+          "source" : "oracle",
+		      "description" : "",
+          "value" : [
+              "SELECT",
+              "    CTAS.FTC_FOLIO,",
+              "    MAX(BUC.#PARAM@2#) FTN_NSS_CURP,",
+              "    MAX(BUC.FTN_NUM_CTA_INVDUAL) FTN_NUM_CTA_INVDUAL,",
+              "    BUC.FTC_RFC FTC_RFC_BUC,",
+              "    BUC.FTC_NOMBRE FTC_NOMBRE_BUC,",
+              "    BUC.FTC_AP_PATERNO FTC_AP_PATERNO_BUC,",
+              "    BUC.FTC_AP_MATERNO FTC_AP_MATERNO_BUC,",
+              "    BUC.FTC_BANDERA",
+              "FROM",
+              "    CIERREN_ETL.TLSISGRAL_ETL_BUC BUC",
+              "INNER JOIN ",
+              "    CIERREN_ETL.TTSISGRAL_ETL_DISPERSION_CTAS CTAS ON BUC.#PARAM@2# = CTAS.FTC_NSS_CURP",
+              "WHERE",
+              "    CTAS.FTC_FOLIO = '#PARAM@1#'",
+              "and BUC.FTN_NUM_CTA_INVDUAL not like '972%'",
+              "GROUP BY",
+              "    CTAS.FTC_FOLIO,",
+              "    BUC.FTC_RFC,",
+              "    BUC.FTC_NOMBRE,",
+              "    BUC.FTC_AP_PATERNO,",
+              "    BUC.FTC_AP_MATERNO,",
+              "    BUC.FTC_BANDERA"     
+            ]
+        },
+        {
+          "step_id" : "008",
+          "source" : "oracle",
+		      "description" : "",
+          "value": [
+            "WITH BUC_DISP_01 AS ( "
+              ,"SELECT"
+              ,"    BUC.FTC_FOLIO,"
+              ,"    MAX(BUC.FTN_NSS_CURP) AS FTN_NSS_CURP,"
+              ,"    MAX(BUC. FTN_NUM_CTA_INVDUAL) AS FTN_NUM_CTA_INVDUAL,"
+              ,"    BUC. FTC_RFC_BUC,"
+              ,"    BUC. FTC_NOMBRE_BUC,"
+              ,"    BUC. FTC_AP_PATERNO_BUC,"
+              ,"    BUC. FTC_AP_MATERNO_BUC,"
+              ,"    BUC. FTC_BANDERA,"
+              ,"    DISP. FCN_ID_TIPO_SUBCTA"
+              ,"    FROM #PARAM@2#.TEMP_INDEN_BUC_#PARAM@1# BUC"
+              ,"    INNER JOIN #PARAM@2#.TEMP_CLIENTES_DISPERSION_#PARAM@1# DISP"
+              ,"    ON BUC. FTN_NSS_CURP = DISP. FTN_NSS_CURP AND BUC. FTC_FOLIO = DISP. FTC_FOLIO"
+              ,"GROUP BY BUC.FTC_FOLIO,"
+              ,"    BUC. FTC_RFC_BUC,"
+              ,"    BUC. FTC_NOMBRE_BUC,"
+              ,"    BUC. FTC_AP_PATERNO_BUC,"
+              ,"    BUC. FTC_AP_MATERNO_BUC,"
+              ,"    BUC. FTC_BANDERA,"
+              ,"    DISP. FCN_ID_TIPO_SUBCTA"
+              ,"),"
+              ,"IMSS_ISSSTE AS("
+              ,"    SELECT"
+              ,"        FTC_CLAVE_TMP AS FTN_NSS_CURP,"
+              ,"        FTC_FOLIO,"
+              ,"        FTN_ID_ARCHIVO,"
+              ,"        FTN_NSS,"
+              ,"        FTC_CURP,"
+              ,"        FTC_RFC,"
+              ,"        FTC_NOMBRE_CTE,"
+              ,"        FTC_CLAVE_ENT_RECEP"
+              ,"    FROM #PARAM@2#.TEMP_DISP_IMSS_ISSSTE_#PARAM@1#"
+              ,")"
+              ,"SELECT"
+              ,"    MAX(IMSS_ISSSTE.FTN_NSS_CURP) AS FTN_NSS_CURP,"
+              ,"    BUC_DISP_01.FTC_BANDERA,"
+              ,"    MAX(BUC_DISP_01.FTN_NUM_CTA_INVDUAL) AS FTN_NUM_CTA_INVDUAL,"
+              ,"    BUC_DISP_01.FTC_NOMBRE_BUC,"
+              ,"    BUC_DISP_01.FTC_AP_PATERNO_BUC,"
+              ,"    BUC_DISP_01.FTC_AP_MATERNO_BUC,"
+              ,"    BUC_DISP_01.FTC_RFC_BUC,"
+              ,"    IMSS_ISSSTE.FTC_FOLIO,"
+              ,"    IMSS_ISSSTE.FTN_ID_ARCHIVO,"
+              ,"    IMSS_ISSSTE.FTN_NSS,"
+              ,"    IMSS_ISSSTE.FTC_CURP,"
+              ,"    IMSS_ISSSTE.FTC_RFC,"
+              ,"    IMSS_ISSSTE.FTC_NOMBRE_CTE,"
+              ,"    IMSS_ISSSTE.FTC_CLAVE_ENT_RECEP,"
+              ,"    BUC_DISP_01.FCN_ID_TIPO_SUBCTA"
+              ,"FROM BUC_DISP_01"
+              ,"RIGHT JOIN IMSS_ISSSTE"
+              ,"ON BUC_DISP_01.FTN_NSS_CURP = IMSS_ISSSTE.FTN_NSS_CURP"
+              ,"GROUP BY "
+              ,"    BUC_DISP_01.FTC_BANDERA,"
+              ,"    BUC_DISP_01.FTC_NOMBRE_BUC,"
+              ,"    BUC_DISP_01.FTC_AP_PATERNO_BUC,"
+              ,"    BUC_DISP_01.FTC_AP_MATERNO_BUC,"
+              ,"    BUC_DISP_01.FTC_RFC_BUC,"
+              ,"    IMSS_ISSSTE.FTC_FOLIO,"
+              ,"    IMSS_ISSSTE.FTN_ID_ARCHIVO,"
+              ,"    IMSS_ISSSTE.FTN_NSS,"
+              ,"    IMSS_ISSSTE.FTC_CURP,"
+              ,"    IMSS_ISSSTE.FTC_RFC,"
+              ,"    IMSS_ISSSTE.FTC_NOMBRE_CTE,"
+              ,"    IMSS_ISSSTE.FTC_CLAVE_ENT_RECEP,"
+              ,"    BUC_DISP_01.FCN_ID_TIPO_SUBCTA"
+           ]
+        },
+        {
+          "step_id" : "009",
+          "source" : "oracle",
+          "description": [
+          "#PARAM@1# = #P_SR_FOLIO# =" ],
+          "value": [
+            "SELECT "
+            ,"FTC_FOLIO"
+            ,",FTN_NUM_CTA_INVDUAL AS FTN_NUM_CTA_INVDUAL_2"
+            ,",FTN_NSS"
+            ,",FTC_CURP AS FTC_CURP_2"
+            ,",FTN_ESTATUS_DIAG AS FTN_ESTATUS_DIAG_2"
+            ,",FTC_ID_DIAGNOSTICO AS FTC_ID_DIAGNOSTICO_2"
+            ,",FTC_ID_SUBP_NO_VIG AS FTC_ID_SUBP_NO_VIG_2"
+            ,",FTN_CTE_PENSIONADO AS FTN_CTE_PENSIONADO_2"
+            ,",FTD_FECHA_CERTIFICACION AS FTD_FECHA_CERTIFICACION_2"
+            ,"FROM "
+            ,"CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE"
+            ,"WHERE FTC_FOLIO= '#PARAM@1#'"
+          ]
+      },
+        {
+          "step_id" : "010",
+          "source" : "oracle",
+		      "description" : "",
+          "value" : [
+           "WITH IDENT_CTE AS ("
+           ,"SELECT"
+           ,"    FTC_FOLIO,"
+           ,"    FTN_NSS,"                       
+           ,"    FTN_NUM_CTA_INVDUAL_2,"
+           ,"    FTN_ESTATUS_DIAG_2,"
+           ,"    FTC_ID_DIAGNOSTICO_2,"
+           ,"    FTC_ID_SUBP_NO_VIG_2,"
+           ,"    FTN_CTE_PENSIONADO_2,"
+           ,"    FTD_FECHA_CERTIFICACION_2,"
+           ,"    1 AS FLAG"
+           ,"FROM #PARAM@2#.TEMP_VAL_IDENT_CIENTE_01_#PARAM@1# IDENT"
+           ,")"
+           ,"SELECT"
+           ,"    CTAS.FTC_FOLIO,"
+           ,"    CTAS.FTN_ID_ARCHIVO,"
+           ,"    CTAS.FTN_NSS,"
+           ,"    CTAS.FTC_CURP,"
+           ,"    CTAS.FTC_NOMBRE_CTE,"
+           ,"    CTAS.FTN_NUM_CTA_INVDUAL,"
+           ,"    CTAS.FTN_ESTATUS_DIAG,"
+           ,"    CTAS.FTC_ID_DIAGNOSTICO,"
+           ,"    CTAS.FTC_ID_SUBP_NO_VIG,"
+           ,"    CTAS.FTD_FECHA_CERTIFICACION,"
+           ,"    CTAS.FTN_CTE_PENSIONADO,"
+           ,"    IDENT_CTE.FTN_NUM_CTA_INVDUAL_2,"
+           ,"    IDENT_CTE.FTN_ESTATUS_DIAG_2,"
+           ,"    IDENT_CTE.FTC_ID_DIAGNOSTICO_2,"
+           ,"    IDENT_CTE.FTC_ID_SUBP_NO_VIG_2,"
+           ,"    IDENT_CTE.FTN_CTE_PENSIONADO_2,"
+           ,"    IDENT_CTE.FTD_FECHA_CERTIFICACION_2,"
+           ,"    IDENT_CTE.FLAG"
+           ,"FROM #PARAM@2#.TEMP_CTAS_VIG_CARGA_#PARAM@1# CTAS"
+           ,"LEFT JOIN IDENT_CTE"
+           ,"    ON CTAS.FTC_FOLIO = IDENT_CTE.FTC_FOLIO AND CTAS.FTN_NSS = IDENT_CTE.FTN_NSS"
+          ]
+        },
+        {
+          "step_id" : "011",
+          "source" : "oracle",
+		      "description" : [
+
+           " #PARAM@1#  CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION",
+           " #PARAM@2#  CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE ",
+           " #PARAM@3#  CIERREN.TTCRXGRAL_FOLIO ",
+           " #PARAM@4#  FTC_FOLIO "
+          ],
+          "value" : [
+          "SELECT"
+          ,"    pre_dis.FTN_ID_ARCHIVO,"
+          ,"    pre_dis.FTN_NO_LINEA,"
+          ,"    pre_dis.FNN_ID_REFERENCIA,"
+          ,"    pre_dis.FCN_ID_TIPO_SUBCTA,"
+          ,"    pre_dis.FTF_MONTO_PESOS,"
+          ,"    pre_dis.FTF_MONTO_ACCIONES,"
+          ,"    pre_dis.FTC_TABLA_NCI_MOV,"
+          ,"    pre_dis.FNN_ID_VIV_GARANTIA,"
+          ,"    pre_dis.FFN_ID_CONCEPTO_MOV,"
+          ,"    pre_dis.FCN_ID_PROCESO,"
+          ,"    pre_dis.FCN_ID_SUBPROCESO,"
+          ,"    pre_dis.FTC_FOLIO,"
+          ,"    IDEN.FTN_NUM_CTA_INVDUAL,"
+          ,"    pre_dis.FTN_NSS,"
+          ,"    pre_dis.FTC_CURP,"
+          ,"    pre_dis.FTC_NOMBRE,"
+          ,"    pre_dis.FTN_ID_MONTO,"
+          ,"    pre_dis.FCN_ID_REGIMEN,"
+          ,"    pre_dis.FTN_TIPO_REG,"
+          ,"    pre_dis.FLN_ID_LIB_APORT,"
+          ,"    CASE"
+          ,"        WHEN pre_dis.FCN_ID_SUBPROCESO IN (120, 122, 210, 105)"
+          ,"        THEN pre_dis.FTC_CURP"
+          ,"        ELSE pre_dis.FTN_NSS"
+          ,"    END FTN_NSS_CURP,"
+          ,"    pre_dis.FTC_RFC,"
+          ,"    pre_dis.FCN_REG_PATRONAL_IMSS"
+          ,"FROM"
+          ,"    CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION pre_dis"
+          ,"    LEFT JOIN (SELECT"
+          ,"        A.FTC_FOLIO,"
+          ,"        A.FTN_NUM_CTA_INVDUAL,"
+          ,"        CASE"
+          ,"            WHEN B.FCN_ID_SUBPROCESO IN (120, 122, 210, 105)"
+          ,"            THEN A.FTC_CURP"
+          ,"            ELSE A.FTN_NSS"
+          ,"        END FTN_NSS_CURP"
+          ,"    FROM"
+          ,"        CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE A"
+          ,"    INNER JOIN"
+          ,"        CIERREN.TTCRXGRAL_FOLIO B"
+          ,"    ON A.FTC_FOLIO = '#PARAM@2#' AND A.FTC_FOLIO = B.FTC_FOLIO"
+          ,"    ) IDEN"
+          ,"    ON CASE"
+          ,"        WHEN pre_dis.FCN_ID_SUBPROCESO IN (120, 122, 210, 105)"
+          ,"        THEN pre_dis.FTC_CURP"
+          ,"        ELSE pre_dis.FTN_NSS"
+          ,"    END = IDEN.FTN_NSS_CURP AND pre_dis.FTC_FOLIO = IDEN.FTC_FOLIO"
+          ,"WHERE"
+          ,"    PRE_DIS.FTC_FOLIO = '#PARAM@2#'"
+          ]
+        },
+        {
+          "step_id" : "012",
+          "source" : "oracle",
+		      "description" : ["FTC_FOLIO = #PARAM@1#"],
+          "value" : [
+           "SELECT SUBC.FCN_ID_CAT_SUBCTA,"
+           ,"    SUBC.FCN_ID_GRUPO,"
+           ,"    SUBC.FCN_ID_TIPO_SUBCTA,"
+           ,"    CAT.REGIMEN,"
+           ,"    OSS.FCN_ID_SIEFORE,"
+           ,"    OSS.FTN_NUM_CTA_INVDUAL"
+           ,"FROM "
+           ,"    CIERREN.TTAFOGRAL_OSS OSS"
+           ,"    JOIN CIERREN.TCCRXGRAL_SIEFORE S"
+           ,"        ON (OSS.FCN_ID_SIEFORE = s.FCN_ID_SIEFORE)"
+           ,"    JOIN CIERREN.TCCRXGRAL_TIPO_SUBCTA SUBC"
+           ,"        ON (SUBC.FCN_ID_GRUPO = OSS.FCN_ID_GRUPO)"
+           ,"    JOIN ("
+           ,"        SELECT FCN_ID_CAT_CATALOGO REGIMEN"
+           ,"        FROM CIERREN.TCCRXGRAL_TIPO_CAT TC"
+           ,"            INNER JOIN CIERREN.TCCRXGRAL_CAT_CATALOGO CAT"
+           ,"                ON TC.FCN_ID_TIPO_CAT = CAT.FCN_ID_TIPO_CAT"
+           ,"        WHERE"
+           ,"            TC.FCN_ID_TIPO_CAT = 21"
+           ,"            AND TC.FCB_VIGENCIA = 1"
+           ,"            AND CAT.FCB_VIGENCIA = 1"
+           ,"            AND CAT.FCN_ID_CAT_CATALOGO IN (138, 140)"
+           ,"    ) CAT"
+           ,"        ON SUBC.FCN_ID_REGIMEN = CAT.REGIMEN"
+           ,"WHERE OSS.FTC_ESTATUS = 1 AND OSS.FTN_PRIORIDAD = 1"
+           ,"    AND EXISTS"
+           ,"        ("
+           ,"            SELECT FTN_NUM_CTA_INVDUAL"
+           ,"            FROM CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE CTE"
+           ,"            WHERE CTE.FTC_FOLIO = '#PARAM@1#'"
+           ,"                AND CTE.FTN_NUM_CTA_INVDUAL = OSS.FTN_NUM_CTA_INVDUAL"
+           ,"        )"
+          ]
+        },
+        {
+          "step_id" : "013",
+          "source" : "oracle",
+		      "description" : "",
+          "value" : [
+            "SELECT A.FTN_ID_ARCHIVO,"
+            ,"A.FTN_NO_LINEA,"
+            ,"A.FNN_ID_REFERENCIA,"
+            ,"A.FTN_NUM_CTA_INVDUAL,"
+            ,"NVL(B.FCN_ID_SIEFORE,846) FCN_ID_SIEFORE,"
+            ,"A.FCN_ID_TIPO_SUBCTA,"
+            ,"A.FTF_MONTO_PESOS,"
+            ,"A.FTF_MONTO_ACCIONES,"
+            ,"A.FTC_TABLA_NCI_MOV,"
+            ,"A.FNN_ID_VIV_GARANTIA,"
+            ,"A.FFN_ID_CONCEPTO_MOV,"
+            ,"A.FCN_ID_PROCESO,"
+            ,"A.FCN_ID_SUBPROCESO,"
+            ,"A.FTC_FOLIO,"
+            ,"A.FTN_NSS,"
+            ,"A.FTC_CURP,"
+            ,"A.FTC_NOMBRE,"
+            ,"B.REGIMEN FCN_ID_REGIMEN,"
+            ,"A.FTN_ID_MONTO,"
+            ,"A.FTN_TIPO_REG,"
+            ,"A.FLN_ID_LIB_APORT,"
+            ,"A.FTC_RFC,"
+            ,"A.FCN_REG_PATRONAL_IMSS"
+           ,"FROM "
+           ,"    #PARAM@1# A"
+           ,"LEFT JOIN "
+           ,"    #PARAM@2# B"
+           ,"ON "
+           ,"    a.FCN_ID_TIPO_SUBCTA = b.FCN_ID_TIPO_SUBCTA"
+           ,"AND "
+           ,"    a.FTN_NUM_CTA_INVDUAL = b.FTN_NUM_CTA_INVDUAL"
+          ]
+        },
+        {
+          "step_id" : "014",
+          "source" : "oracle",
+		      "description" : [
+                    "#PARAM@1# CIERREN_ETL.TTSISGRAL_ETL_DISPERSION " ,
+                    "#PARAM@2# = #SR_FTC_FOLIO# NUMERO DE FOLIO" 
+            ],
+          "value" : [
+                    "DELETE /*+ PARALLEL(8) */ FROM #PARAM@1# TBL WHERE FTC_FOLIO = '#PARAM@2#'"  
+          ]
+        },
+                {
+          "step_id" : "015",
+          "source" : "oracle",
+		      "description" : [
+                    "#PARAM@1# = #SR_FTC_FOLIO# NUMERO DE FOLIO" ,
+                    "#PARAM@2# = INDICADOR IMSS/iSSSTE" 
+            ],
+          "value" : [
+            "SELECT afo.FCN_ID_IND_CTA_INDV",
+            "    ,afo.FTN_NUM_CTA_INVDUAL",
+            "    ,afo.FFN_ID_CONFIG_INDI",
+            "    ,afo.FCC_VALOR_IND",
+            "    ,afo.FTC_VIGENCIA",
+            "    ,afo.FTN_DETALLE",
+            "FROM (",
+            "    SELECT afo.FCN_ID_IND_CTA_INDV",
+            "        ,afo.FTN_NUM_CTA_INVDUAL",
+            "        ,afo.FFN_ID_CONFIG_INDI",
+            "        ,afo.FCC_VALOR_IND",
+            "        ,afo.FTC_VIGENCIA",
+            "        ,afo.FTN_DETALLE",
+            "        ,CASE WHEN 3 = #PARAM@2# THEN ind.FTN_NSS ",
+            "        ELSE (CASE WHEN 2 = #PARAM@2# THEN ind.FTC_CURP ELSE '0' END) END FTC_NSS_CURP",
+            "    FROM CIERREN.TTAFOGRAL_IND_CTA_INDV afo",
+            "    INNER JOIN CIERREN.TTAFOGRAL_CTA_INVDUAL ind ON afo.FTN_NUM_CTA_INVDUAL = ind.FTN_NUM_CTA_INVDUAL",
+            "    WHERE afo.FFN_ID_CONFIG_INDI IN (2, 5, 11)",
+            "        AND afo.FTC_VIGENCIA = 1",
+            "    ) AFO",
+            "INNER JOIN (",
+            "    SELECT DISTINCT FTC_NSS_CURP",
+            "    FROM CIERREN_ETL.TTSISGRAL_ETL_DISPERSION_CTAS ",
+            "    WHERE FTC_FOLIO = '#PARAM@1#'",
+            "    ) B ON AFO.FTC_NSS_CURP = B.FTC_NSS_CURP"
+          ]
+        },
+        {
+          "step_id": "016",
+          "source": "JP_PANCIN_IDC_IMSS_CIFRAS_CLIENTE​",
+          "description": [
+            "#PARAM@1# = SR_ID_Archivo ="
+                      ],
+          "value": [
+            "SELECT FTN_NSS_CURP",
+            " ,FTC_BANDERA",
+            " ,FTN_NUM_CTA_INVDUAL",
+            " ,FTC_NOMBRE_BUC",
+            " ,FTC_AP_PATERNO_BUC",
+            " ,FTC_AP_MATERNO_BUC",
+            " ,FTC_RFC_BUC",
+            " ,FTC_FOLIO",
+            " ,FTN_ID_ARCHIVO",
+            " ,FTN_NSS",
+            " ,FTC_CURP",
+            " ,FTC_RFC",
+            " ,FTC_NOMBRE_CTE",
+            " ,FTC_CLAVE_ENT_RECEP",
+            " ,FCN_ID_TIPO_SUBCTA",
+            "FROM dbx_mit_dev_1udbvf_workspace.default.TEMP_TRAMITE_01_#PARAM@1#"
+          ]
+        },
+        {
+          "step_id": "017",
+          "source": "JP_PANCIN_IDC_IMSS_CIFRAS_CLIENTE​",
+          "description": [
+            "#PARAM@1# = SR_ID_Archivo ="
+          ],
+          "value": [
+            "SELECT ",
+            "  T01.FTN_NSS_CURP",
+            "    ,T01.FTN_NUM_CTA_INVDUAL",
+            "    ,T01.FTC_NOMBRE_BUC",
+            "    ,T01.FTC_AP_PATERNO_BUC",
+            "    ,T01.FTC_AP_MATERNO_BUC",
+            "    ,T01.FTC_RFC_BUC",
+            "    ,T01.FTC_FOLIO",
+            "    ,T01.FTN_ID_ARCHIVO",
+            "    ,T01.FTN_NSS",
+            "    ,T01.FTC_CURP",
+            "    ,T01.FTC_RFC",
+            "    ,T01.FTC_NOMBRE_CTE",
+            "    ,T01.FTC_CLAVE_ENT_RECEP",
+            "    ,T01.FCN_ID_TIPO_SUBCTA",
+            "  ,CTA_VIG.FCN_ID_IND_CTA_INDV",
+            "  ,CTA_VIG.FFN_ID_CONFIG_INDI",
+            "  ,CTA_VIG.FCC_VALOR_IND",
+            "  ,CTA_VIG.FTC_VIGENCIA",
+            "  ,CTA_VIG.FTN_DETALLE",
+            "FROM #PARAM@2#.TEMP_TRAMITE_01_#PARAM@1# T01",
+            "LEFT JOIN (",
+            "select FCN_ID_IND_CTA_INDV",
+            ",FTN_NUM_CTA_INVDUAL",
+            ",FFN_ID_CONFIG_INDI",
+            ",FCC_VALOR_IND",
+            ",FTC_VIGENCIA",
+            ",FTN_DETALLE",
+            " from #PARAM@2#.TEMP_IND_CTA_VIG_#PARAM@1#) CTA_VIG ",
+            " ON (T01.FTN_NUM_CTA_INVDUAL = CTA_VIG.FTN_NUM_CTA_INVDUAL)",
+            " where T01.FTC_BANDERA IS NOT NULL"
+          ]
+        },
+        {
+          "step_id": "018",
+          "source": "JP_PANCIN_IDC_0600_UPD_CTE_PRE​",
+          "description": [
+            "#PARAM@1# = #SR_FOLIO# =",
+            "#PARAM@2# = #ID_TIPO_IDENTIFICADOR# ="
+          ],
+          "value": [
+             "SELECT ",
+              " A.FTN_NUM_CTA_INVDUAL",
+              ",B.FCN_ID_TIPO_SUBCTA",
+              ",MAX(C.FCN_ID_GRUPO) FCN_ID_GRUPO",
+              ",MAX(D.FCN_ID_SIEFORE) FCN_ID_SIEFORE",
+              "FROM",
+              "(",
+              "    select ",
+              "     a.FTN_NSS_CURP",
+              "    ,a.FTN_NUM_CTA_INVDUAL",
+              "    from",
+              "    (select  ",
+              "    case when 3=#PARAM@2# then FTN_NSS else (case when 2=#PARAM@2#  then FTC_CURP else '0'end) end FTN_NSS_CURP",
+              "    ,FTN_NUM_CTA_INVDUAL",
+              "    from CIERREN.TTAFOGRAL_CTA_INVDUAL) a",
+              "    INNER JOIN (SELECT distinct FTC_NSS_CURP FROM  CIERREN_ETL.TTSISGRAL_ETL_DISPERSION_CTAS WHERE FTC_FOLIO= '#PARAM@1#') b",
+              "    on a.FTN_NSS_CURP = b.FTC_NSS_CURP",
+              ") A",
+              "",
+              "inner join (",
+              "    select  ",
+              "    FCN_ID_TIPO_SUBCTA",
+              "    ,FTC_FOLIO",
+              "    ,case when 3= #PARAM@2# then FTN_NSS else (case when 2= #PARAM@2# then FTC_CURP else '0'end) end FTN_NSS_CURP",
+              "    from CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION a",
+              "    where FTC_FOLIO='#PARAM@1#'",
+              ") B on A.FTN_NSS_CURP = B.FTN_NSS_CURP",
+              "",
+              "inner join ( ",
+              "    select ",
+              "    subc.FCN_ID_CAT_SUBCTA",
+              "    ,subc.FCN_ID_GRUPO",
+              "    ,subc.FCN_ID_TIPO_SUBCTA",
+              "    FROM CIERREN.TCCRXGRAL_TIPO_SUBCTA subc",
+              "    INNER JOIN CIERREN.TCCRXGRAL_CAT_CATALOGO cat ON subc.FCN_ID_REGIMEN = cat.FCN_ID_CAT_CATALOGO",
+              "    INNER JOIN CIERREN.TCCRXGRAL_TIPO_CAT tc ON tc.FCN_ID_TIPO_CAT = cat.FCN_ID_TIPO_CAT",
+              "    WHERE tc.FCN_ID_TIPO_CAT = 21",
+              "    AND tc.FCB_VIGENCIA = 1",
+              "    AND cat.FCB_VIGENCIA = 1",
+              ") C ON B.FCN_ID_TIPO_SUBCTA = C.FCN_ID_TIPO_SUBCTA",
+              "",
+              "LEFT JOIN (",
+              "        select  ",
+              "        O.FCN_ID_SIEFORE,",
+              "        O.FCN_ID_GRUPO,",
+              "        O.FTN_NUM_CTA_INVDUAL",
+              "        from",
+              "        (",
+              "            SELECT ",
+              "            O.FCN_ID_SIEFORE,",
+              "            O.FCN_ID_GRUPO,",
+              "            O.FTN_NUM_CTA_INVDUAL",
+              "            FROM CIERREN.TTAFOGRAL_OSS O",
+              "            INNER JOIN CIERREN.TCCRXGRAL_SIEFORE S ON O.FCN_ID_GRUPO = S.FCN_ID_GRUPO",
+              "            where O.FTC_ESTATUS = 1",
+              "            AND O.FTN_PRIORIDAD = 1",
+              "            AND S.FCC_VIGENCIA = 1",
+              "        )o",
+              "        inner join ",
+              "        (",
+              "            select ",
+              "            a.FTN_NUM_CTA_INVDUAL",
+              "            from",
+              "            (",
+              "            select  ",
+              "            case when 3=#PARAM@2# then FTN_NSS else (case when 2=#PARAM@2# then FTC_CURP else '0'end) end FTN_NSS_CURP",
+              "            ,FTN_NUM_CTA_INVDUAL",
+              "            from CIERREN.TTAFOGRAL_CTA_INVDUAL) a",
+              "            INNER JOIN (SELECT distinct FTC_NSS_CURP FROM  CIERREN_ETL.TTSISGRAL_ETL_DISPERSION_CTAS WHERE FTC_FOLIO= '#PARAM@1#') b",
+              "            on a.FTN_NSS_CURP = b.FTC_NSS_CURP",
+              "        ) a",
+              "        on o.FTN_NUM_CTA_INVDUAL = a.FTN_NUM_CTA_INVDUAL",
+              "        ",
+              ") D ON (A.FTN_NUM_CTA_INVDUAL = D.FTN_NUM_CTA_INVDUAL",
+              "AND C.FCN_ID_GRUPO = D.FCN_ID_GRUPO)",
+              "GROUP BY A.FTN_NUM_CTA_INVDUAL, B.FCN_ID_TIPO_SUBCTA"
+          ]
+        },
+        {
+          "step_id": "020",
+          "source": "JP_PANCIN_IDC_IMSS_CIFRAS_CLIENTE​",
+          "description": [
+            "#PARAM@1# = #CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE# =",
+            "#PARAM@2# = #SR_FOLIO# ="
+          ],
+          "value": [
+            "SELECT FTN_ESTATUS_DIAG,",
+            "FTC_FOLIO",
+            "FROM #PARAM@1# ",
+            "WHERE FTC_FOLIO='#PARAM@2#'"
+          ]
+        },
+        {
+          "step_id" : "019",
+          "source" : "oracle",
+          "description": [],
+          "value": [
+              "WITH CARGA_CLIENTE",
+              "AS (",
+              "    SELECT ENCON.FTN_NSS_CURP",
+              "        ,ENCON.FTC_IDENTIFICADOS",
+              "        ,ENCON.FTN_NUM_CTA_INVDUAL",
+              "        ,ENCON.FTN_ID_DIAGNOSTICO",
+              "        ,ENCON.FTN_ID_SUBP_NO_CONV",
+              "        ,ENCON.FTC_NOMBRE_BUC",
+              "        ,ENCON.FTC_AP_PATERNO_BUC",
+              "        ,ENCON.FTC_AP_MATERNO_BUC",
+              "        ,ENCON.FTC_RFC_BUC",
+              "        ,ENCON.FTC_FOLIO",
+              "        ,ENCON.FTN_ID_ARCHIVO",
+              "        ,ENCON.FTN_NSS",
+              "        ,ENCON.FTC_CURP",
+              "        ,ENCON.FTC_RFC",
+              "        ,ENCON.FTC_NOMBRE_CTE",
+              "        ,ENCON.FTC_CLAVE_ENT_RECEP",
+              "        ,ENCON.FTN_VIGENCIA",
+              "        ,ENCON.MARC_DUP",
+              "        ,ENCON.FCN_ID_TIPO_SUBCTA",
+              "        ,FECHA.FCC_VALOR_IND AS FTD_FECHA_CERTIFICACION",
+              "        ,CASE WHEN PENSION.FCC_VALOR_IND IS NULL THEN '0' ELSE '1' END FTN_CTE_PENSIONADO",
+              "    FROM #PARAM@2#.TEMP_ENCONTRADOS_06_#PARAM@1# ENCON",
+              "    LEFT JOIN #PARAM@2#.TEMP_FECHAAPCTAIND_05_#PARAM@1# FECHA",
+              "        ON ENCON.FTN_NUM_CTA_INVDUAL = FECHA.FTN_NUM_CTA_INVDUAL",
+              "    LEFT JOIN #PARAM@2#.TEMP_PENSIONADO_11_#PARAM@1# PENSION",
+              "        ON ENCON.FTN_NUM_CTA_INVDUAL = PENSION.FTN_NUM_CTA_INVDUAL",
+              "    ",
+              "    UNION",
+              "    ",
+              "    SELECT NOENCON.FTN_NSS_CURP",
+              "        ,'0' AS FTC_IDENTIFICADOS",
+              "        ,NOENCON.FTN_NUM_CTA_INVDUAL",
+              "        ,NOENCON.FTN_ID_DIAGNOSTICO",
+              "        ,NULL AS FTN_ID_SUBP_NO_CONV",
+              "        ,NOENCON.FTC_NOMBRE_BUC",
+              "        ,NOENCON.FTC_AP_PATERNO_BUC",
+              "        ,NOENCON.FTC_AP_MATERNO_BUC",
+              "        ,NOENCON.FTC_RFC_BUC",
+              "        ,NOENCON.FTC_FOLIO",
+              "        ,NOENCON.FTN_ID_ARCHIVO",
+              "        ,NOENCON.FTN_NSS",
+              "        ,NOENCON.FTC_CURP",
+              "        ,NOENCON.FTC_RFC",
+              "        ,NOENCON.FTC_NOMBRE_CTE",
+              "        ,NOENCON.FTC_CLAVE_ENT_RECEP",
+              "        ,NOENCON.FTN_VIGENCIA",
+              "        ,NULL AS MARC_DUP",
+              "        ,NOENCON.FCN_ID_TIPO_SUBCTA",
+              "        ,NULL AS FTD_FECHA_CERTIFICACION",
+              "        ,NULL AS FTN_CTE_PENSIONADO",
+              "    FROM dbx_mit_dev_1udbvf_workspace.default.TEMP_NOENCONTRADOS_#PARAM@1# NOENCON",
+              "    )",
+              "SELECT FTN_NSS_CURP",
+              "    ,FTC_IDENTIFICADOS",
+              "    ,FTN_NUM_CTA_INVDUAL",
+              "    ,FTN_ID_DIAGNOSTICO",
+              "    ,FTN_ID_SUBP_NO_CONV",
+              "    ,FTC_NOMBRE_BUC",
+              "    ,FTC_AP_PATERNO_BUC",
+              "    ,FTC_AP_MATERNO_BUC",
+              "    ,FTC_RFC_BUC",
+              "    ,FTC_FOLIO",
+              "    ,FTN_ID_ARCHIVO",
+              "    ,FTN_NSS",
+              "    ,FTC_CURP",
+              "    ,FTC_RFC",
+              "    ,FTC_NOMBRE_CTE",
+              "    ,FTC_CLAVE_ENT_RECEP",
+              "    ,FTN_VIGENCIA",
+              "    ,MARC_DUP",
+              "    ,FCN_ID_TIPO_SUBCTA",
+              "    ,FTD_FECHA_CERTIFICACION",
+              "    ,FTN_CTE_PENSIONADO",
+              "FROM (",
+              "    SELECT FTN_NSS_CURP",
+              "        ,FTC_IDENTIFICADOS",
+              "        ,FTN_NUM_CTA_INVDUAL",
+              "        ,FTN_ID_DIAGNOSTICO",
+              "        ,FTN_ID_SUBP_NO_CONV",
+              "        ,FTC_NOMBRE_BUC",
+              "        ,FTC_AP_PATERNO_BUC",
+              "        ,FTC_AP_MATERNO_BUC",
+              "        ,FTC_RFC_BUC",
+              "        ,FTC_FOLIO",
+              "        ,FTN_ID_ARCHIVO",
+              "        ,FTN_NSS",
+              "        ,FTC_CURP",
+              "        ,FTC_RFC",
+              "        ,FTC_NOMBRE_CTE",
+              "        ,FTC_CLAVE_ENT_RECEP",
+              "        ,FTN_VIGENCIA",
+              "        ,MARC_DUP",
+              "        ,FCN_ID_TIPO_SUBCTA",
+              "        ,FTD_FECHA_CERTIFICACION",
+              "        ,FTN_CTE_PENSIONADO",
+              "        ,ROW_NUMBER() OVER (",
+              "            PARTITION BY FTN_NSS_CURP",
+              "             ORDER BY FTN_NSS_CURP,FTN_VIGENCIA,FTD_FECHA_CERTIFICACION",
+              "            ) AS rn",
+              "    FROM CARGA_CLIENTE",
+              "    WHERE MARC_DUP <> 'D'",
+              "        OR MARC_DUP = 'D'",
+              "        OR MARC_DUP IS NULL",
+              "    ) A",
+              "WHERE rn = 1"
+           ]
+        },
+        {
+          "step_id": "021",
+          "source": "JP_PANCIN_IDC_IMSS_CIFRAS_CLIENTE​",
+          "description": [
+            "#PARAM@1# = #CIERREN_ETL.TLSISGRAL_ETL_VAL_CIFRAS_CTRL# =",
+            "#PARAM@2# = #CIERREN_ETL.TLAFOGRAL_ETL_VAL_CIFRAS_CONTROL_AUX# ="
+          ],
+          "value": [
+            "MERGE INTO #PARAM@1# ori",
+            "USING (",
+            "    SELECT ",
+            "     FTC_FOLIO,",
+            "     FTC_ID_SUBETAPA,",
+            "     FLN_TOTAL_REGISTROS,",
+            "     FLN_REG_NO_CUMPLIERON,",
+            "     FLC_USU_REG,",
+            "     FLC_DETALLE,",
+            "     FLC_VALIDACION,",
+            "     FLD_FEC_REG,",
+            "     FLN_TOTAL_ERRORES,",
+            "     FLN_REG_CUMPLIERON",
+            "    FROM (",
+            "        SELECT ",
+            "            FTC_FOLIO,",
+            "            FTC_ID_SUBETAPA,",
+            "            FLN_TOTAL_REGISTROS,",
+            "            FLN_REG_NO_CUMPLIERON,",
+            "            FLC_USU_REG,",
+            "            FLC_DETALLE,",
+            "            FLC_VALIDACION,",
+            "            FLD_FEC_REG,",
+            "            FLN_TOTAL_ERRORES,",
+            "            FLN_REG_CUMPLIERON,",
+            "            ROW_NUMBER() OVER (PARTITION BY FTC_FOLIO ORDER BY FTC_FOLIO) AS rn",
+            "        FROM #PARAM@2#",
+            "    ) subquery",
+            "    WHERE rn = 1",
+            ") aux ",
+            "ON (ori.FTC_FOLIO = aux.FTC_FOLIO",
+            "    AND ori.FTC_ID_SUBETAPA = aux.FTC_ID_SUBETAPA)",
+            "WHEN MATCHED THEN",
+            "    UPDATE SET",
+            "     ori.FLN_TOTAL_REGISTROS = aux.FLN_TOTAL_REGISTROS,",
+            "     ori.FLN_REG_NO_CUMPLIERON = aux.FLN_REG_NO_CUMPLIERON,",
+            "     ori.FLC_USU_REG = aux.FLC_USU_REG,",
+            "     ori.FLC_DETALLE = aux.FLC_DETALLE,",
+            "     ori.FLC_VALIDACION = aux.FLC_VALIDACION,",
+            "     ori.FLD_FEC_REG = aux.FLD_FEC_REG,",
+            "     ori.FLN_TOTAL_ERRORES = aux.FLN_TOTAL_ERRORES,",
+            "     ori.FLN_REG_CUMPLIERON = aux.FLN_REG_CUMPLIERON"
+          ]
+        },
+        {
+            "step_id" : "022",
+            "subprocess" : "Generacion de archivos General, extracción de Cuentas Individual",
+            "description": [
+            "#PARAM@1# = #CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE# =",
+            "#PARAM@2# = #CIERREN_DATAUX.TTSISGRAL_ETL_VAL_IDENT_CTE_AUX# ="
+            ],
+          "value":
+          [
+              "MERGE INTO CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE ori"
+              ,"USING ("
+              ,"SELECT "
+              ,"FTC_FOLIO,"
+              ,"FTN_NSS,"
+              ,"FTC_CURP,"
+              ,"FTN_NUM_CTA_INVDUAL,"
+              ,"FTN_ESTATUS_DIAG,"
+              ,"FTC_ID_DIAGNOSTICO,"
+              ,"FTC_ID_SUBP_NO_VIG,"
+              ,"FTN_CTE_PENSIONADO"
+              ,"    FROM ("
+              ,"        SELECT "
+              ,"FTC_FOLIO FTC_FOLIO,"
+              ,"FTC_NSS FTN_NSS,"
+              ,"FTC_CURP FTC_CURP,"
+              ,"FTN_NUM_CTA_INVDUAL FTN_NUM_CTA_INVDUAL,"
+              ,"FTN_ESTATUS_DIAG FTN_ESTATUS_DIAG,"
+              ,"FTN_ID_DIAGNOSTICO FTC_ID_DIAGNOSTICO,"
+              ,"FTN_ID_SUBP_NO_VIG FTC_ID_SUBP_NO_VIG,"
+              ,"FTN_CTE_PENSIONADO FTN_CTE_PENSIONADO,"
+              ,"            ROW_NUMBER() OVER (PARTITION BY FTC_FOLIO, FTC_NSS ORDER BY FTC_FOLIO) AS rn"
+              ,"        FROM CIERREN_DATAUX.TTSISGRAL_ETL_VAL_IDENT_CTE_AUX"
+              ,"        WHERE FTC_FOLIO = '#PARAM@2#'"
+              ,"    ) subquery"
+              ,"    WHERE rn = 1"
+              ,") aux "
+              ,"ON (ori.FTC_FOLIO = aux.FTC_FOLIO"
+              ,"    AND ori.FTN_NSS = aux.FTN_NSS)"
+              ,"WHEN MATCHED THEN"
+              ,"    UPDATE SET"
+              ,"        ori.FTC_CURP = aux.FTC_CURP,"
+              ,"ori.FTN_NUM_CTA_INVDUAL = aux.FTN_NUM_CTA_INVDUAL,"
+              ,"ori.FTN_ESTATUS_DIAG = aux.FTN_ESTATUS_DIAG,"
+              ,"ori.FTC_ID_DIAGNOSTICO = aux.FTC_ID_DIAGNOSTICO,"
+              ,"ori.FTC_ID_SUBP_NO_VIG = aux.FTC_ID_SUBP_NO_VIG,"
+              ,"ori.FTN_CTE_PENSIONADO = aux.FTN_CTE_PENSIONADO"
+              ]
+          },
+          {
+            "step_id" : "023",
+            "subprocess" : "IDC",
+            "description": [
+            "description = Generacion de vista TEMP_CTAS_VIG_CARGA",
+            "#PARAM@1# = #CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE# =",
+            "#PARAM@2# = #CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE_AUX# ="
+            ],
+          "value":
+          [
+              "SELECT FTC_FOLIO",
+              "    ,FTN_ID_ARCHIVO",
+              "    ,FTN_NSS",
+              "    ,FTC_CURP",
+              "    ,FTC_RFC",
+              "    ,FTC_NOMBRE_CTE",
+              "    ,FTC_CLAVE_ENT_RECEP",
+              "    ,FTN_NSS_CURP",
+              "    ,CTAS_CLIENTES.FTN_NUM_CTA_INVDUAL",
+              "    ,CASE WHEN FTN_ID_DIAGNOSTICO IS NULL",
+              "            AND SINSIEFORE > 0 THEN 988 ELSE FTN_ID_DIAGNOSTICO END FTC_ID_DIAGNOSTICO",
+              "    ,FTD_FECHA_CERTIFICACION",
+              "    ,FTN_ID_SUBP_NO_CONV FTC_ID_SUBP_NO_VIG",
+              "    ,CASE WHEN FTN_ESTATUS_DIAG = 0 THEN 0 ELSE (CASE WHEN SINSIEFORE > 0 THEN 0 ELSE FTN_ESTATUS_DIAG END) END FTN_ESTATUS_DIAG",
+              "    ,FTN_CTE_PENSIONADO",
+              "    ,CTAS_CLIENTES.FCN_ID_TIPO_SUBCTA",
+              "    ,FCN_ID_GRUPO",
+              "    ,FCN_ID_SIEFORE",
+              "    ,SINSIEFORE",
+              "FROM (",
+              "    SELECT FTC_FOLIO",
+              "        ,FTN_ID_ARCHIVO",
+              "        ,FTN_NSS",
+              "        ,FTC_CURP",
+              "        ,FTC_RFC",
+              "        ,FTC_NOMBRE_CTE",
+              "        ,FTC_CLAVE_ENT_RECEP",
+              "        ,FTN_NSS_CURP",
+              "        ,TRIM(FTN_NUM_CTA_INVDUAL) FTN_NUM_CTA_INVDUAL",
+              "        ,FTN_ID_DIAGNOSTICO",
+              "        ,FTD_FECHA_CERTIFICACION",
+              "        ,FTN_ID_SUBP_NO_CONV",
+              "        ,FTC_IDENTIFICADOS AS FTN_ESTATUS_DIAG",
+              "        ,FTN_CTE_PENSIONADO",
+              "        ,TRIM(FCN_ID_TIPO_SUBCTA) FCN_ID_TIPO_SUBCTA",
+              "    FROM #PARAM@2#.TEMP_IdentificacionClientes_07_#PARAM@1#",
+              "    ) CTAS_CLIENTES",
+              "LEFT JOIN (",
+              "    SELECT A.FTN_NUM_CTA_INVDUAL",
+              "        ,A.FCN_ID_TIPO_SUBCTA",
+              "        ,A.FCN_ID_GRUPO",
+              "        ,A.FCN_ID_SIEFORE",
+              "        ,B.SINSIEFORE",
+              "    FROM #PARAM@2#.TEMP_Siefore01_#PARAM@1# A",
+              "    INNER JOIN (",
+              "        SELECT FTN_NUM_CTA_INVDUAL",
+              "            ,SUM(MARCA) SINSIEFORE",
+              "        FROM #PARAM@2#.TEMP_Siefore01_#PARAM@1#",
+              "        GROUP BY FTN_NUM_CTA_INVDUAL",
+              "        ) B",
+              "        ON A.FTN_NUM_CTA_INVDUAL = B.FTN_NUM_CTA_INVDUAL",
+              "    ) SIEFORE on SIEFORE.FTN_NUM_CTA_INVDUAL = CTAS_CLIENTES.FTN_NUM_CTA_INVDUAL and SIEFORE.FCN_ID_TIPO_SUBCTA = CTAS_CLIENTES.FCN_ID_TIPO_SUBCTA"
+              ]
+          },
+          {
+          "step_id": "024",
+          "source": "IDC TEMPORAL",
+          "description": [
+            "#PARAM@1# = temp_dispersion_07"
+            
+          ],
+          "value": [
+             "SELECT "
+             ,"FTN_ID_ARCHIVO         "
+             ,",FTN_NO_LINEA           "
+             ,",FNN_ID_REFERENCIA      "
+             ,",FTN_NUM_CTA_INVDUAL    "
+             ,",FCN_ID_SIEFORE         "
+             ,",FCN_ID_TIPO_SUBCTA     "
+             ,",FTF_MONTO_PESOS        "
+             ,",FTF_MONTO_ACCIONES     "
+             ,",FTC_TABLA_NCI_MOV      "
+             ,",FNN_ID_VIV_GARANTIA    "
+             ,",FFN_ID_CONCEPTO_MOV    "
+             ,",FCN_ID_PROCESO         "
+             ,",FCN_ID_SUBPROCESO      "
+             ,",FTC_FOLIO              "
+             ,",FTN_NSS                "
+             ,",FTC_CURP                "
+             ,",FTC_NOMBRE             "
+             ,",FTN_ID_MONTO           "
+             ,",FCN_ID_REGIMEN         "
+             ,",FTN_TIPO_REG           "
+             ,",FLN_ID_LIB_APORT       "
+             ,",FTC_RFC                "
+             ,",FCN_REG_PATRONAL_IMSS  "
+             ,",'DATABRICKS' FTC_USU_CRE  "
+             ,",'DATABRICKS' FTC_USU_ACT  "
+             ,"FROM #PARAM@1#"
+          ]
+        },
+        {
+          "step_id" : "025",
+          "source" : "oracle",
+          "description" : [
+          "QUERYs para la generacion del ARCHIVO DE CLIENTES ################################################################"
+          ],
+          "value" : [
+            "SELECT"
+            ,"     FTN_NSS"
+            ,"    ,FTC_CURP"
+            ,"    ,FTC_NOMBRE_CTE FTC_NOMBRE"
+            ,"    ,NVL(FTN_NUM_CTA_INVDUAL,0) FTC_NUM_CUENTA"
+            ,"    ,FTC_ID_DIAGNOSTICO"
+            ,"    ,FTC_ID_SUBP_NO_VIG"
+            ,"    ,TO_CHAR(FTD_FECHA_CERTIFICACION,'DD/MM/YYYY') as FTD_FECHA_CERTIFICACION"
+            ,"FROM CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE"
+            ,"WHERE 1 = 1"
+            ,"    AND FTN_ESTATUS_DIAG = 0"
+            ,"    AND FTC_FOLIO = '#PARAM@1#'"
+          ]
+        },
+        {
+          "step_id" : "026",
+          "source" : "oracle",
+          "description" : [
+          "descripcion "
+          ,"#PARAM@1# = CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION"
+          ],
+          "value" : [
+            "SELECT"
+            ,"    TC.FCC_NOM_CAT"
+            ,"    ,CAT.FCN_ID_CAT_CATALOGO FTC_ID_SUBP_NO_VIG"
+            ,"    ,CAT.FCC_VALOR"
+            ,"FROM CIERREN.TCCRXGRAL_TIPO_CAT TC"
+            ,"    JOIN  CIERREN.TCCRXGRAL_CAT_CATALOGO CAT ON TC.FCN_ID_TIPO_CAT=CAT.FCN_ID_TIPO_CAT"
+            ,"WHERE (TC.FCN_ID_TIPO_CAT=3"
+            ,"    OR TC.FCN_ID_TIPO_CAT=38)"
+            ,"    AND TC.FCB_VIGENCIA = 1"
+            ,"    AND CAT.FCB_VIGENCIA = 1"
+          ]
+        },
+        {
+          "step_id" : "027",
+          "source" : "oracle",
+          "description" : [
+          "descripcion "
+          ,"#PARAM@1# = CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION"
+          ],
+          "value" : [
+            "SELECT"
+            ,"    FCC_NOM_CAT"
+            ,"    ,FCN_ID_CAT_CATALOGO as FTC_ID_DIAGNOSTICO"
+            ,"    ,CAT.FCC_VALOR"
+            ,"FROM CIERREN.TCCRXGRAL_TIPO_CAT TC"
+            ,"    JOIN CIERREN.TCCRXGRAL_CAT_CATALOGO CAT"
+            ,"        ON TC.FCN_ID_TIPO_CAT=CAT.FCN_ID_TIPO_CAT"
+            ,"WHERE TC.FCN_ID_TIPO_CAT = 20"
+            ,"    AND TC.FCB_VIGENCIA = 1"
+            ,"    AND CAT.FCB_VIGENCIA = 1"
+          ]
+        },
+        {
+          "step_id" : "028",
+          "source" : "oracle",
+          "description" : [
+          "descripcion "
+          ,"#PARAM@1# = CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION"
+          ],
+          "value" : [
+            "SELECT"
+            ,"     A.FTN_NSS"
+            ,"    ,A.FTC_CURP"
+            ,"    ,A.FTC_NOMBRE"
+            ,"    ,A.FTC_NUM_CUENTA"
+            ,"    ,A.FTC_ID_DIAGNOSTICO"
+            ,"    ,A.FTD_FECHA_CERTIFICACION"
+            ,"    ,B.FCC_VALOR FTC_ID_SUBP_NO_VIG"
+            ,"    ,C.FCC_VALOR FTC_DIAGNOSTICO"
+            ,"FROM #PARAM@1# A"
+            ,"    JOIN #PARAM@2# B"
+            ,"        ON A.FTC_ID_SUBP_NO_VIG = B.FTC_ID_SUBP_NO_VIG"
+            ,"    JOIN #PARAM@3# C"
+            ,"        ON A.FTC_ID_DIAGNOSTICO = C.FTC_ID_DIAGNOSTICO"
+            ,"WHERE 1 = 1"
+          ]
+        },
+        {
+          "step_id" : "029",
+          "source" : "oracle",
+          "description" : [
+          "descripcion "
+          ,"#PARAM@1# = CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION"
+          ],
+          "value" : [
+            "SELECT"
+            ,"     A.FTN_NSS"
+            ,"    ,A.FTC_CURP"
+            ,"    ,A.FTC_NOMBRE"
+            ,"    ,A.FTC_NUM_CUENTA"
+            ,"    ,A.FTC_ID_DIAGNOSTICO"
+            ,"    ,A.FTD_FECHA_CERTIFICACION"
+            ,"    ,A.FTC_ID_SUBP_NO_VIG"
+            ,"    ,A.FTC_DIAGNOSTICO"
+            ,"    ,B.FTN_NUM_CTA_INVDUAL"
+            ,"    ,B.FCN_ID_TIPO_SUBCTA"
+            ,"    ,B.FCN_ID_GRUPO"
+            ,"    ,B.FCN_ID_SIEFORE"
+            ,"    ,B.MARCA"
+            ,"FROM #PARAM@1# A"
+            ,"    LEFT JOIN #PARAM@2# B"
+            ,"        ON A.FTC_NUM_CUENTA = B.FTN_NUM_CTA_INVDUAL"
+            ,"WHERE 1 = 1"
+          ]
+        },
+        {
+          "step_id" : "030",
+          "source" : "oracle",
+          "description" : [
+          "descripcion "
+          ,"#PARAM@1# ="
+          ],
+          "value" : [
+            "    SELECT"
+            ,"    FTN_NSS ,FTC_CURP ,FTC_NOMBRE ,FTC_NUM_CUENTA ,FTC_ID_DIAGNOSTICO ,FTD_FECHA_CERTIFICACION ,FTC_ID_SUBP_NO_VIG ,FTC_DIAGNOSTICO ,FTN_NUM_CTA_INVDUAL ,FCN_ID_TIPO_SUBCTA ,FCN_ID_GRUPO ,FCN_ID_SIEFORE ,MARCA"
+            ,"    FROM"
+            ,"    ("
+            ,"    SELECT"
+			      ,"        ROW_NUMBER() OVER (PARTITION BY FTN_NSS ORDER BY FTC_NUM_CUENTA) ROWNUM_NSS"
+			      ,"        ,ROW_NUMBER() OVER (PARTITION BY FTN_NUM_CTA_INVDUAL ORDER BY FTC_NUM_CUENTA) ROWNUM_CTA"
+            ,"        ,FTN_NSS"
+            ,"        ,FTC_CURP"
+            ,"        ,FTC_NOMBRE"
+            ,"        ,FTC_NUM_CUENTA"
+            ,"        ,FTC_ID_DIAGNOSTICO"
+            ,"        ,FTD_FECHA_CERTIFICACION"
+            ,"        ,FTC_ID_SUBP_NO_VIG"
+            ,"        ,FTC_DIAGNOSTICO"
+            ,"        ,FTN_NUM_CTA_INVDUAL"
+            ,"        ,FCN_ID_TIPO_SUBCTA"
+            ,"        ,FCN_ID_GRUPO"
+            ,"        ,FCN_ID_SIEFORE"
+            ,"        ,MARCA"
+            ,"    FROM #PARAM@1#"
+            ,"    WHERE FTC_ID_DIAGNOSTICO <> 988"
+            ,"    )AUX WHERE ROWNUM_NSS = 1 OR ROWNUM_CTA = 1"
+          ]
+        },
+        {
+          "step_id" : "031",
+          "source" : "oracle",
+          "description" : [
+          "descripcion "
+          ,"#PARAM@1# = CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION"
+          ],
+          "value" : [
+            "    SELECT"
+            ,"    FTN_NSS ,FTC_CURP ,FTC_NOMBRE ,FTC_NUM_CUENTA ,FTC_ID_DIAGNOSTICO ,FTD_FECHA_CERTIFICACION ,FTC_ID_SUBP_NO_VIG ,FTC_DIAGNOSTICO ,FTN_NUM_CTA_INVDUAL ,FCN_ID_TIPO_SUBCTA ,FCN_ID_GRUPO ,FCN_ID_SIEFORE ,MARCA"
+            ,"    FROM"
+            ,"    ("
+            ,"    SELECT"
+			      ,"        ROW_NUMBER() OVER (PARTITION BY FCN_ID_GRUPO ORDER BY FTC_NUM_CUENTA) ROWNUM_GROUP"
+			      ,"        ,ROW_NUMBER() OVER (PARTITION BY FTN_NSS ORDER BY FTC_NUM_CUENTA) ROWNUM_NSS"
+            ,"        ,FTN_NSS"
+            ,"        ,FTC_CURP"
+            ,"        ,FTC_NOMBRE"
+            ,"        ,FTC_NUM_CUENTA"
+            ,"        ,FTC_ID_DIAGNOSTICO"
+            ,"        ,FTD_FECHA_CERTIFICACION"
+            ,"        ,FTC_ID_SUBP_NO_VIG"
+            ,"        ,FTC_DIAGNOSTICO"
+            ,"        ,FTN_NUM_CTA_INVDUAL"
+            ,"        ,FCN_ID_TIPO_SUBCTA"
+            ,"        ,FCN_ID_GRUPO"
+            ,"        ,FCN_ID_SIEFORE"
+            ,"        ,MARCA"
+            ,"    FROM #PARAM@1#"
+            ,"    WHERE FTC_ID_DIAGNOSTICO = 988 AND FCN_ID_SIEFORE IS NULL"
+            ,"    )AUX WHERE ROWNUM_GROUP = 1 OR ROWNUM_NSS = 1"
+          ]
+        },
+        {
+          "step_id" : "032",
+          "source" : "oracle",
+          "description" : [
+          "descripcion "
+          ,"#PARAM@1# = CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION"
+          ],
+          "value" : [
+            "    SELECT"
+            ,"    FTN_NSS ,FTC_CURP ,FTC_NOMBRE ,FTC_NUM_CUENTA ,FTC_ID_DIAGNOSTICO ,FTD_FECHA_CERTIFICACION ,FTC_ID_SUBP_NO_VIG ,FTC_DIAGNOSTICO ,FTN_NUM_CTA_INVDUAL ,FCN_ID_TIPO_SUBCTA ,FCN_ID_GRUPO ,FCN_ID_SIEFORE ,MARCA"
+            ,"    FROM"
+            ,"    ("
+            ,"    SELECT"
+			      ,"        ROW_NUMBER() OVER (PARTITION BY FCN_ID_GRUPO BY FTC_FOLIO) ROWNUM_GROUP"
+			      ,"        ,ROW_NUMBER() OVER (PARTITION BY FTN_NSS ORDER BY FTC_FOLIO) ROWNUM_NSS"
+            ,"        ,FTN_NSS"
+            ,"        ,FTC_CURP"
+            ,"        ,FTC_NOMBRE"
+            ,"        ,FTC_NUM_CUENTA"
+            ,"        ,FTC_ID_DIAGNOSTICO"
+            ,"        ,FTD_FECHA_CERTIFICACION"
+            ,"        ,FTC_ID_SUBP_NO_VIG"
+            ,"        ,FTC_DIAGNOSTICO"
+            ,"        ,FTN_NUM_CTA_INVDUAL"
+            ,"        ,FCN_ID_TIPO_SUBCTA"
+            ,"        ,FCN_ID_GRUPO"
+            ,"        ,FCN_ID_SIEFORE"
+            ,"        ,MARCA"
+            ,"    FROM #PARAM@1#"
+            ,"    WHERE FTC_ID_DIAGNOSTICO = 988 AND FCN_ID_SIEFORE IS NULL"
+            ,"    )AUX WHERE ROWNUM_GROUP = 1 OR ROWNUM_NSS = 1"
+          ]
+        },
+        {
+          "step_id" : "033",
+          "source" : "oracle",
+          "description" : [
+          "descripcion "
+          ,"#PARAM@1# = CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION"
+          ],
+          "value" : [
+            "SELECT"
+            ,"    FTN_NSS"
+            ,"    ,FTC_CURP"
+            ,"    ,FTC_NOMBRE"
+            ,"    ,FTC_NUM_CUENTA"
+            ,"    ,FTC_DIAGNOSTICO"
+            ,"    ,FTC_ID_SUBP_NO_VIG"
+            ,"    ,FTD_FECHA_CERTIFICACION"
+            ,"FROM"
+            ,"    ("
+            ,"    SELECT"
+            ,"        ROW_NUMBER() OVER (PARTITION BY A.FCN_ID_GRUPO ORDER BY A.FTD_FECHA_CERTIFICACION) ROWNUM_CURP"
+            ,"        ,ROW_NUMBER() OVER (PARTITION BY A.FTN_NSS ORDER BY A.FTD_FECHA_CERTIFICACION) ROWNUM_NSS"
+            ,"      ,A.FTN_NSS"
+            ,"        ,A.FTC_CURP"
+            ,"        ,A.FTC_NOMBRE"
+            ,"        ,A.FTC_NUM_CUENTA"
+            ,"        ,B.FTC_DIAGNOSTICO"
+            ,"        ,A.FTC_ID_SUBP_NO_VIG"
+            ,"        ,A.FTD_FECHA_CERTIFICACION"
+            ,"    FROM #PARAM@1# A"
+            ,"        JOIN #PARAM@2# B"
+            ,"            ON A.FTN_NSS = B.FTN_NSS"
+            ,"                AND A.FTC_CURP = B.FTC_CURP"
+            ,"                AND A.FTC_NOMBRE = B.FTC_NOMBRE"
+            ,"                AND A.FTC_NUM_CUENTA = B.FTC_NUM_CUENTA"
+            ,"                AND A.FTD_FECHA_CERTIFICACION = B.FTD_FECHA_CERTIFICACION"
+            ,"                AND A.FTC_ID_SUBP_NO_VIG = B.FTC_ID_SUBP_NO_VIG"
+            ,"                AND A.FTC_DIAGNOSTICO = B.FTC_DIAGNOSTICO"
+            ,"    )DATOS"
+            ,"WHERE ROWNUM_CURP = 1 OR ROWNUM_NSS = 1"
+          ]
+        }
+    ]
+}

@@ -1,0 +1,77 @@
+WITH 
+-- 1. Solicited balances (SDO_SOL > 0)
+FL_100_SEL_SDO_SOL AS (
+    SELECT
+        FTN_NUM_CTA_INVDUAL,
+        FTC_NSS,
+        FTN_CONSE_REG_LOTE,
+        SDO_SOL,
+        BANDERA_MONTO,
+        BANDERA_SOL,
+        FCN_ID_TIPO_SUBCTA
+    FROM #DS_400_SDO_SOL_IMSS#
+    WHERE SDO_SOL > 0
+),
+
+-- 2. Join with available balances per subaccount
+JN_200_AG_SDO_DISP AS (
+    SELECT
+        f.FTN_NUM_CTA_INVDUAL,
+        f.FTC_NSS,
+        f.FTN_CONSE_REG_LOTE,
+        f.SDO_SOL,
+        f.BANDERA_MONTO,
+        f.BANDERA_SOL,
+        f.FCN_ID_TIPO_SUBCTA,
+        d.SDO_DISPONIBLE_PESOS,
+        d.SDO_DISPONIBLE_ACCION,
+        d.FCN_ID_SIEFORE,
+        d.FCD_FEH_ACCION,
+        d.FCN_VALOR_ACCION,
+        d.FCN_ID_REGIMEN,
+        d.FCN_ID_VALOR_ACCION
+    FROM FL_100_SEL_SDO_SOL f
+    LEFT JOIN #DS_101_SDO_DISP_SUBCTAS_IMSS# d
+      ON f.FTN_NUM_CTA_INVDUAL = d.FTN_NUM_CTA_INVDUAL
+     AND f.FCN_ID_TIPO_SUBCTA = d.FCN_ID_TIPO_SUBCTA
+),
+
+-- 3. Aggregate available balances per account
+AG_400_SUM_DISP_X_CTA AS (
+    SELECT
+        FTN_NUM_CTA_INVDUAL,
+        SUM(SDO_DISPONIBLE_PESOS) AS SDO_DISPONIBLE_X_CTA
+    FROM #DS_101_SDO_DISP_SUBCTAS_IMSS#
+    GROUP BY FTN_NUM_CTA_INVDUAL
+),
+
+-- 4. Join detailed and aggregated data
+JN_500_AG_DISP AS (
+    SELECT
+        j.*,
+        a.SDO_DISPONIBLE_X_CTA
+    FROM JN_200_AG_SDO_DISP j
+    LEFT JOIN AG_400_SUM_DISP_X_CTA a
+      ON j.FTN_NUM_CTA_INVDUAL = a.FTN_NUM_CTA_INVDUAL
+),
+
+-- 5. Filter for accounts with no available balance
+FL_600_SEP_X_SUBCTA AS (
+    SELECT
+        FTN_NUM_CTA_INVDUAL,
+        FTN_CONSE_REG_LOTE,
+        BANDERA_MONTO,
+        FCN_ID_TIPO_SUBCTA,
+        FCN_ID_SIEFORE
+    FROM JN_500_AG_DISP
+    WHERE SDO_DISPONIBLE_X_CTA <= 0 OR SDO_DISPONIBLE_X_CTA IS NULL
+)
+
+-- 6. Final output for DS_700_CTAS_SIN_DISP_MAS_NSS
+SELECT
+    FTN_NUM_CTA_INVDUAL,
+    FTN_CONSE_REG_LOTE,
+    BANDERA_MONTO,
+    FCN_ID_TIPO_SUBCTA,
+    FCN_ID_SIEFORE
+FROM FL_600_SEP_X_SUBCTA

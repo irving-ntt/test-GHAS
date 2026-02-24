@@ -1,0 +1,207 @@
+{
+  "flow" : "DOIMSS",
+  "id" : "4",
+  "steps" :
+    [
+        {
+          "step_id" : "001",
+          "subprocess" : "precifras",
+          "description" : [
+            "descripcion - Este query genera la tabla TEMP_TABLA_DISPERSIONES_DE_NO_DECLARACIONES_ESPECIALES",
+            "#PARAM@1# = #p_CX_CRE_ESQUEMA#.#p_TL_CRE_DISPERSION# D = TTSISGRAL_ETL_DISPERSION",
+            "#PARAM@2# = #p_CX_CRN_ESQUEMA#.#p_TL_CRN_CONFIG_CONCEP_MOV# ccm = TFAFOGRAL_CONFIG_CONCEP_MOV",
+            "#PARAM@3# = #p_SR_FOLIO# = Numero de folio"
+          ],
+          "value": [
+            "SELECT"
+            ,"    D.FTN_ID_ARCHIVO,"
+            ,"    NVL(D.FTN_NUM_CTA_INVDUAL, 0) FTN_NUM_CTA_INVDUAL,"
+            ,"    D.FCN_ID_SIEFORE,"
+            ,"    D.FCN_ID_SUBPROCESO,"
+            ,"    round("
+            ,"        ("
+            ,"            CASE"
+            ,"                WHEN CCM.FCN_ID_TIPO_MONTO = 184 THEN D.FTF_MONTO_PESOS"
+            ,"                WHEN CCM.FCN_ID_TIPO_MONTO = 199 THEN D.FTF_MONTO_ACCIONES"
+            ,"            END"
+            ,"        ),"
+            ,"        6"
+            ,"    ) FTF_MONTO,"
+            ,"    D.FNN_ID_VIV_GARANTIA,"
+            ,"    D.FFN_ID_CONCEPTO_MOV,"
+            ,"    D.FLN_ID_LIB_APORT,"
+            ,"    D.FTN_NSS,"
+            ,"    D.FTC_CURP,"
+            ,"    D.FTN_NO_LINEA"
+            ,"FROM #PARAM@1#  D"
+            ,","
+            ,"    #PARAM@2# ccm"
+            ,"    WHERE D.FFN_ID_CONCEPTO_MOV = CCM.FFN_ID_CONCEPTO_MOV"
+            ,"    AND D.FTC_FOLIO = '#PARAM@3#'"
+            ,"    AND D.FCN_ID_SUBPROCESO NOT IN (118)"
+            ,"    AND D.FFN_ID_CONCEPTO_MOV NOT IN (231, 637, 638, 1002, 1003)"
+            ,"    AND CCM.FFB_VIGENCIA = 1"
+            ,"    AND ("
+            ,"        CASE"
+            ,"            WHEN D.FCN_ID_SIEFORE IN (82, 83) THEN D.FTF_MONTO_PESOS"
+            ,"            ELSE 1"
+            ,"        END"
+            ,"    ) > 0"
+          ]
+        },
+        {
+            "step_id" : "002",
+            "subprocess" : "precifras",
+            "description" : [
+                "#PARAM@2# = #SR_FTC_FOLIO# NUMERO DE FOLIO" 
+            ],
+            "value": [
+              "DELETE FROM #PARAM@1# WHERE FTC_FOLIO = #PARAM@2#"
+              ]
+        },
+         {
+          "step_id" : "003",
+          "subprocess" : "precifras",
+          "description" : [
+            "#PARAM@1# = TEMP_TABLA_DISPERSIONES_DE_NO_DECLARACIONES_ESPECIALES" 
+          ],
+          "value": [
+                "SELECT"
+                ,"    '#PARAM@2#' FTC_FOLIO,"
+                ,"    #PARAM@3# FTN_ID_ARCHIVO,"
+                ,"    FFN_ID_CONCEPTO_MOV FLN_ID_CONCEPTO_IMP,"
+                ,"    FCN_ID_SIEFORE FCN_ID_SIEFORE,"
+                ,"    FLN_ID_LIB_APORT FLN_ID_LIB_APORT,"
+                ,"    TOTAL_REGS FLN_NUM_REG,"
+                ,"    TOTAL_MONTO FLN_IMPORTE_ACEP,"
+                ,"    FLB_ID_CRED_VIV FLB_ID_CRED_VIV,"
+                ,"    '' FLN_NUM_REG_CONCREDITO,"
+                ,"    '' FLN_NUM_REG_SINCREDITO,"
+                ,"    '#PARAM@4#' FLC_USU_REG,"
+                ,"    to_timestamp(from_utc_timestamp(CURRENT_TIMESTAMP, 'GMT-6')) FLD_FEC_REG"
+                ,"FROM "
+                ,"("
+                ,"    SELECT"
+                ,"        TOTAL_REGS.FCN_ID_SIEFORE,"
+                ,"        FFN_ID_CONCEPTO_MOV,"
+                ,"        FLN_ID_LIB_APORT,"
+                ,"        FNN_ID_VIV_GARANTIA,"
+                ,"        DECODE(FNN_ID_VIV_GARANTIA, 0, '0', DECODE(FNN_ID_VIV_GARANTIA, 1, '1', NULL)) AS FLB_ID_CRED_VIV,"
+                ,"        FTN_ID_ARCHIVO,"
+                ,"        TOTAL_MONTO,"
+                ,"        TOTAL_REGS"
+                ,"    FROM"
+                ,"    ("
+                ,"    SELECT "
+                ,"        FCN_ID_SIEFORE,"
+                ,"        COUNT( DISTINCT FCN_ID_SIEFORE, FTN_NO_LINEA) AS TOTAL_REGS"
+                ,"    FROM #PARAM@1#"
+                ,"    WHERE "
+                ,"            FCN_ID_SUBPROCESO = '101' OR"
+                ,"        (       FCN_ID_SUBPROCESO <> '101' AND"
+                ,"        ("
+                ,"        (FCN_ID_SIEFORE = 82 OR FCN_ID_SIEFORE = 83)"
+                ,"        OR"
+                ,"        (FCN_ID_SIEFORE <> 82 AND FCN_ID_SIEFORE <> 83)"
+                ,"        )"
+                ,"        )"
+                ,"        GROUP BY FCN_ID_SIEFORE"
+                ,"    ) AS TOTAL_REGS"
+                ,"    RIGHT JOIN ("
+                ,"    SELECT"
+                ,"        FCN_ID_SIEFORE,"
+                ,"        FFN_ID_CONCEPTO_MOV,"
+                ,"        FLN_ID_LIB_APORT,"
+                ,"        FNN_ID_VIV_GARANTIA,"
+                ,"        FTN_ID_ARCHIVO,"
+                ,"        SUM(FTF_MONTO) AS TOTAL_MONTO"
+                ,"    FROM #PARAM@1#"
+                ,"    GROUP BY FCN_ID_SIEFORE,FFN_ID_CONCEPTO_MOV,FLN_ID_LIB_APORT,FNN_ID_VIV_GARANTIA,FTN_ID_ARCHIVO"
+                ,"    ) AS TOTAL_MONTO"
+                ,"    ON TOTAL_REGS.FCN_ID_SIEFORE = TOTAL_MONTO.FCN_ID_SIEFORE"
+                ,")AS TOTAL"
+          ]
+        },
+        {
+            "step_id" : "004",
+            "subprocess" : "precifras",
+            "description" : [
+                "#PARAM@5# = #SR_FTC_FOLIO# NUMERO DE FOLIO" 
+            ],
+            "value": [
+                "MERGE INTO #PARAM@1# ORI"
+                ,"USING"
+                ,"    ("
+                ,"        SELECT"
+                ,"            FTC_FOLIO,"
+                ,"            COUNT(CASE WHEN FNN_ID_VIV_GARANTIA = 0 THEN 1 END) REGSINCREDITO,"
+                ,"            COUNT(CASE WHEN FNN_ID_VIV_GARANTIA = 1 THEN 1 END) REGISTROSCONCREDITO"
+                ,"        FROM ("
+                ,"            SELECT"
+                ,"                FTC_FOLIO, "
+                ,"                FTN_NUM_CTA_INVDUAL,"
+                ,"                MAX(FNN_ID_VIV_GARANTIA) AS FNN_ID_VIV_GARANTIA"
+                ,"            FROM #PARAM@2#"
+                ,"            WHERE FTC_FOLIO = '#PARAM@3#' AND FNN_ID_VIV_GARANTIA IS NOT NULL"
+                ,"            GROUP BY FTC_FOLIO, FTN_NUM_CTA_INVDUAL"
+                ,"            )"
+                ,"        GROUP BY FTC_FOLIO"
+                ,"    ) AUX"
+                ,"ON (ORI.FTC_FOLIO = AUX.FTC_FOLIO)"
+                ,"WHEN MATCHED THEN"
+                ,"    UPDATE SET"
+                ,"        ORI.FLN_NUM_REG_CONCREDITO = AUX.REGISTROSCONCREDITO,"
+                ,"        ORI.FLN_NUM_REG_SINCREDITO = AUX.REGSINCREDITO"
+            ]
+          },
+        {
+          "step_id" : "005",
+          "subprocess" : "precifras mejora",
+          "description" : [
+            "descripcion - Este query genera la tabla TEMP_TABLA_DISPERSIONES_DE_NO_DECLARACIONES_ESPECIALES",
+            "#PARAM@1# = #p_CX_CRE_ESQUEMA#.#p_TL_CRE_DISPERSION# D = TTSISGRAL_ETL_DISPERSION",
+            "#PARAM@2# = #p_CX_CRN_ESQUEMA#.#p_TL_CRN_CONFIG_CONCEP_MOV# CCM = TFAFOGRAL_CONFIG_CONCEP_MOV",
+            "#PARAM@3# = #p_SR_FOLIO# = Numero de folio"
+          ],
+          "value": [
+            "SELECT"
+            ,"    DISPER.FTN_ID_ARCHIVO,"
+            ,"    NVL(DISPER.FTN_NUM_CTA_INVDUAL, 0) AS FTN_NUM_CTA_INVDUAL,"
+            ,"    DISPER.FCN_ID_SIEFORE,"
+            ,"    DISPER.FCN_ID_SUBPROCESO,"
+            ,"    ROUND("
+            ,"        ("
+            ,"            CASE"
+            ,"                WHEN CCM.FCN_ID_TIPO_MONTO = 184 THEN DISPER.FTF_MONTO_PESOS"
+            ,"                WHEN CCM.FCN_ID_TIPO_MONTO = 199 THEN DISPER.FTF_MONTO_ACCIONES"
+            ,"            END"
+            ,"        ),"
+            ,"        6"
+            ,"    ) AS FTF_MONTO,"
+            ,"    DISPER.FNN_ID_VIV_GARANTIA,"
+            ,"    DISPER.FFN_ID_CONCEPTO_MOV,"
+            ,"    DISPER.FLN_ID_LIB_APORT,"
+            ,"    DISPER.FTN_NSS,"
+            ,"    DISPER.FTC_CURP,"
+            ,"    DISPER.FTN_NO_LINEA"
+            ,"FROM #PARAM@1#  DISPER"
+            ,"JOIN #PARAM@2# CCM"
+            ,"ON DISPER.FFN_ID_CONCEPTO_MOV = CCM.FFN_ID_CONCEPTO_MOV"
+            ,"INNER JOIN CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE VIDC"
+            ,"ON  DISPER.FTC_FOLIO = VIDC.FTC_FOLIO"
+            ,"AND VIDC.FTN_ESTATUS_DIAG IN ('1')"
+            ,"AND VIDC.FTC_CURP = DISPER.FTC_CURP"
+            ,"WHERE DISPER.FTC_FOLIO = '#PARAM@3#'"
+            ,"AND DISPER.FCN_ID_SUBPROCESO NOT IN (118)"
+            ,"AND DISPER.FFN_ID_CONCEPTO_MOV NOT IN (231, 637, 638, 1002, 1003)"
+            ,"AND CCM.FFB_VIGENCIA = 1"
+            ,"AND ("
+            ,"CASE"
+            ,"WHEN DISPER.FCN_ID_SIEFORE IN (82, 83) THEN DISPER.FTF_MONTO_PESOS"
+            ,"ELSE 1"
+            ,"END"
+            ,") > 0"
+          ]
+		    }
+    ]
+}

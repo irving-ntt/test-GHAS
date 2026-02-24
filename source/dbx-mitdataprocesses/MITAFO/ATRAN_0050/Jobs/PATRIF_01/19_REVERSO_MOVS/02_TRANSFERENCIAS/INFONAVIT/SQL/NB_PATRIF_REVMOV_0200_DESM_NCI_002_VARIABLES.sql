@@ -1,0 +1,44 @@
+-- NB_PATRIF_REVMOV_0200_DESM_NCI_002_VARIABLES.sql
+-- Propósito: Calcular todas las variables de stage del transformer TR_500_CAMPOS
+-- Tipo: Delta (Databricks)
+
+SELECT 
+    -- Campos originales del lookup
+    D.FTN_NUM_CTA_INVDUAL,
+    D.FTC_FOLIO_BITACORA,
+    D.FTN_NUM_CTA_AFORE,
+    D.FTC_CURP_TRABA,
+    D.FTC_NSS_TRABA_AFORE,
+    D.SUBPROCESO,
+    D.PROCESO,
+    D.FTN_ID_MARCA,
+    D.FCN_ID_IND_CTA_INDV,
+    M.TIPO_PROCESO,
+    M.TIPO_SUBPROCESO,
+    
+    -- Variables calculadas (Stage Variables del Transformer)
+    LPAD(DATE_FORMAT(CURRENT_DATE(), 'yyyyMMdd'), 8, ' ') AS vFechaEnvio,
+    
+    CASE 
+        WHEN D.FTC_NSS_TRABA_AFORE IS NULL THEN LPAD('', 11, ' ')
+        ELSE LPAD(D.FTC_NSS_TRABA_AFORE, 11, ' ')
+    END AS vNSS,
+    
+    CASE 
+        WHEN D.FTC_CURP_TRABA IS NULL THEN LPAD('', 18, ' ')
+        ELSE LPAD(D.FTC_CURP_TRABA, 18, ' ')
+    END AS vCURP,
+    
+    RIGHT(RTRIM(REPLACE(CAST(M.TIPO_PROCESO AS STRING), '.', '')), 4) AS vPROCESO,
+    
+    RIGHT(RTRIM(REPLACE(CAST(M.TIPO_SUBPROCESO AS STRING), '.', '')), 4) AS vSUBPROCESO,
+    
+    RIGHT(RTRIM(REPLACE(CAST(D.FTN_NUM_CTA_AFORE AS STRING), '.', '')), 10) AS vCTA,
+    
+    ROW_NUMBER() OVER (ORDER BY D.FTC_FOLIO_BITACORA) AS CONTADOR
+    
+FROM #CATALOG_SCHEMA#.RESULTADO_RECH_PROCESAR_#SR_FOLIO# D
+INNER JOIN #CATALOG_SCHEMA#.TEMP_MAP_NCI_#SR_FOLIO# M
+    ON D.PROCESO = M.PROCESO
+    AND D.SUBPROCESO = M.SUBPROCESO
+

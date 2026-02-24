@@ -1,0 +1,311 @@
+resources:
+  jobs:
+    WF_OPER_ANCIN_MCV:
+      name: WF_OPER_ANCIN_MCV
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: ABONO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: ABONO
+        - task_key: ABONO_AEIM
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: ABONO_AEIM
+        - task_key: ABONO_REPROCESO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: ABONO REPROCESO
+        - task_key: BLOQUEO_SUBSECUENTE
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: BLOQUEO SUBSECUENTE
+        - task_key: BLOQUEO_SUBSECUENTE_AEIM
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: BLOQUEO SUBSECUENTE AEIM
+        - task_key: BLOQUEO_SUBSECUENTE_REPROCESO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: BLOQUEO SUBSECUENTE REPROCESO
+        - task_key: CARGO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: CARGO
+        - task_key: CARGO_AEIM
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: CARGO AEIM
+        - task_key: CARGO_REPROCESO
+          depends_on:
+            - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_stage}}"
+            right: CARGO REPROCESO
+        - task_key: TSK_OPER_ANCIN_MCV_FILTRO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/03_MATRIZ_CONVIVENCIA/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_MCV_COND"
+            base_parameters:
+              sr_aeim: ""
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_fecha_acc: ""
+              sr_folio: ""
+              sr_folio_rel: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_proceso: ""
+              sr_reproceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_mov: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: TSK_WF_OPER_ANCIN_MCV_ABONO
+          depends_on:
+            - task_key: ABONO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_ABONO_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_MCV_ABONO_AEIM
+          depends_on:
+            - task_key: ABONO_AEIM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_ABONO_AEIM_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_MCV_ABONO_REPROCESO
+          depends_on:
+            - task_key: ABONO_REPROCESO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_ABONO_REPR_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_MCV_BLOQUEO_SUB
+          depends_on:
+            - task_key: BLOQUEO_SUBSECUENTE
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_BLOQUEO_SUB_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_MCV_BLOQUEO_SUB_AEIM
+          depends_on:
+            - task_key: BLOQUEO_SUBSECUENTE_AEIM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_BLOQUEO_SUB_AEIM_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_MCV_BLOQUEO_SUB_REPR
+          depends_on:
+            - task_key: BLOQUEO_SUBSECUENTE_REPROCESO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_BLOQUEO_SUB_REPR_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_MCV_CARGO
+          depends_on:
+            - task_key: CARGO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_CARGO_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_MCV_CARGO_AEIM
+          depends_on:
+            - task_key: CARGO_AEIM
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_CARGO_AEIM_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+        - task_key: TSK_WF_OPER_ANCIN_MCV_CARGO_REPROCESO
+          depends_on:
+            - task_key: CARGO_REPROCESO
+              outcome: 'true'
+          run_if: ALL_SUCCESS
+          run_job_task:
+            job_id: OPER_ANCIN_MCV_CARGO_REPR_JOB_ID
+            job_parameters:
+              sr_folio_rel: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio_rel}}"
+              sr_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_proceso}}"
+              sr_tipo_mov: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_tipo_mov}}"
+              sr_reproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_reproceso}}"
+              sr_subproceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subproceso}}"
+              sr_usuario: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_usuario}}"
+              sr_instancia_proceso: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_instancia_proceso}}"
+              sr_dt_org_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_dt_org_arc}}"
+              sr_origen_arc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_origen_arc}}"
+              sr_aeim: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_aeim}}"
+              sr_etapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_etapa}}"
+              sr_id_snapshot: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_id_snapshot}}"
+              sr_fecha_acc: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_fecha_acc}}"
+              sr_folio: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_folio}}"
+              sr_subetapa: "{{tasks.TSK_OPER_ANCIN_MCV_FILTRO.values.sr_subetapa}}"
+      tags:
+        MCV: ""
+      queue:
+        enabled: true

@@ -1,0 +1,30 @@
+resources:
+  jobs:
+    WF_OPER_AGRLS_PRECIFRAS:
+      name: WF_OPER_AGRLS_PRECIFRAS
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_OPER_AGRLS_CON_0010_PRECIFRAS
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Workspace/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/AGRLS_0010/Jobs/03_CONCILIACION/Notebooks/NB_OPER_AGRLS_CON_0010_PRECIFRAS"
+            base_parameters:
+              sr_dt_org_arc: ""
+              sr_etapa: ""
+              sr_fec_arc: ""
+              sr_fec_liq: ""
+              sr_folio: ""
+              sr_id_archivo: ""
+              sr_id_snapshot: ""
+              sr_instancia_proceso: ""
+              sr_origen_arc: ""
+              sr_paso: ""
+              sr_proceso: ""
+              sr_subetapa: ""
+              sr_subproceso: ""
+              sr_tipo_reporte: ""
+              sr_usuario: ""
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

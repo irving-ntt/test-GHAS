@@ -1,0 +1,86 @@
+resources:
+  jobs:
+    WF_OPER_ATRAN_PATRIF_IDC_0010_SOL_DESMARCA:
+      name: WF_OPER_ATRAN_PATRIF_IDC_0010_SOL_DESMARCA
+      max_concurrent_runs: 5
+      tasks:
+        - task_key: NB_IDC_0010_DESM_INFO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/04_SOL_DESMARCA/INFONAVIT/Notebooks/NB_IDC_0100_DESM_INFO"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0300_INDIC_CTE
+          depends_on:
+            - task_key: NB_IDC_0010_DESM_INFO
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/INFONAVIT/Notebooks/NB_IDC_0300_INDIC_CTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0400_CUENTAS_VIG_CTE
+          depends_on:
+            - task_key: NB_IDC_0300_INDIC_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/INFONAVIT/Notebooks/NB_IDC_0400_CUENTAS_VIG_CTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0500_ARCH_CARG_CTE
+          depends_on:
+            - task_key: NB_IDC_0400_CUENTAS_VIG_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/INFONAVIT/Notebooks/NB_IDC_0500_ARCH_CARG_CTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0600_CARGA_IDENT_CTE
+          depends_on:
+            - task_key: NB_IDC_0500_ARCH_CARG_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/INFONAVIT/Notebooks/NB_IDC_0600_CARGA_IDENT_CTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0600_DUP_SOLDESM
+          depends_on:
+            - task_key: NB_IDC_0600_CARGA_IDENT_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/04_SOL_DESMARCA/INFONAVIT/Notebooks/NB_IDC_0600_DUP_SOLDESM"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0700_CARGA_SOLDESM
+          depends_on:
+            - task_key: NB_IDC_0600_DUP_SOLDESM
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/04_SOL_DESMARCA/INFONAVIT/Notebooks/NB_IDC_0700_CARGA_SOLDESM"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_0800_CTES_NO_IDENT
+          depends_on:
+            - task_key: NB_IDC_0700_CARGA_SOLDESM
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/INFONAVIT/Notebooks/NB_IDC_0800_CTES_NO_IDENT"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_IDC_CLEANER
+          depends_on:
+            - task_key: NB_OPER_ANCIN_IDC_0900_CIFRAS_CTE
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ATRAN_0050/Jobs/PATRIF_01/03_IDENTIFICACION_CTE/07_COMUN/INFONAVIT/Notebooks/NB_IDC_CLEANER"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+        - task_key: NB_OPER_ANCIN_IDC_0900_CIFRAS_CTE
+          depends_on:
+            - task_key: NB_IDC_0800_CTES_NO_IDENT
+          run_if: ALL_SUCCESS
+          notebook_task:
+            notebook_path: "/Repos/APPS/SRC/source/dbx-mitdataprocesses/MITAFO/ANCIN_0030/Jobs/01_IDENTIFICACION_DE_CLIENTE/01_DISPERSIONES/Notebooks/NB_OPER_ANCIN_IDC_0900_CIFRAS_CTE"
+            source: WORKSPACE
+          existing_cluster_id: ID_EXPANDED_CLUSTER_DEV
+      queue:
+        enabled: true

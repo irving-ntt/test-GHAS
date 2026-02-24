@@ -1,0 +1,18 @@
+-- Query para generar TOTALES para el arcbivo  69 desde tabla delta 
+WITH ED AS 
+( 
+SELECT 
+  CAST(SPLIT(TOTAL, '\\.')[0] AS STRING) AS CUANTOS 
+  FROM #DELTA_TABLA_NAME1# D
+  LIMIT 1
+  )
+  SELECT 
+9 AS POSICION,
+CONCAT 
+  (
+    '09'
+    ,#FECHA_PROCESO#
+    ,NVL2(ED.CUANTOS,LPAD(CUANTOS,9,'0' ),'0000000000') -- 35 POSICIONES
+    ,RPAD('',18,'0'),LPAD(' ',91) 
+  ) AS DETALLE
+  FROM ED

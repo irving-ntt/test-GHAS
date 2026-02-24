@@ -1,0 +1,50 @@
+SELECT
+  pre_dis.FTN_ID_ARCHIVO,
+  pre_dis.FTN_NO_LINEA,
+  pre_dis.FNN_ID_REFERENCIA,
+  pre_dis.FCN_ID_TIPO_SUBCTA,
+  pre_dis.FTF_MONTO_PESOS,
+  pre_dis.FTF_MONTO_ACCIONES,
+  pre_dis.FTC_TABLA_NCI_MOV,
+  pre_dis.FNN_ID_VIV_GARANTIA,
+  pre_dis.FFN_ID_CONCEPTO_MOV,
+  pre_dis.FCN_ID_PROCESO,
+  pre_dis.FCN_ID_SUBPROCESO,
+  pre_dis.FTC_FOLIO,
+  IDEN.FTN_NUM_CTA_INVDUAL,
+  pre_dis.FTN_NSS,
+  pre_dis.FTC_CURP,
+  pre_dis.FTC_NOMBRE,
+  pre_dis.FTN_ID_MONTO,
+  pre_dis.FCN_ID_REGIMEN,
+  pre_dis.FTN_TIPO_REG,
+  pre_dis.FLN_ID_LIB_APORT,
+  CASE
+    WHEN pre_dis.FCN_ID_SUBPROCESO IN (120, 122, 210, 105) THEN pre_dis.FTC_CURP
+    ELSE pre_dis.FTN_NSS
+  END AS FTN_NSS_CURP,
+  pre_dis.FTC_RFC,
+  pre_dis.FCN_REG_PATRONAL_IMSS
+FROM
+  CIERREN_ETL.TTSISGRAL_ETL_PRE_DISPERSION pre_dis
+    LEFT JOIN (
+      SELECT
+        A.FTC_FOLIO,
+        A.FTN_NUM_CTA_INVDUAL,
+        CASE
+          WHEN B.FCN_ID_SUBPROCESO IN (120, 122, 210, 105) THEN A.FTC_CURP
+          ELSE A.FTN_NSS
+        END AS FTN_NSS_CURP
+      FROM
+        CIERREN_ETL.TTSISGRAL_ETL_VAL_IDENT_CTE A
+          INNER JOIN CIERREN.TTCRXGRAL_FOLIO B
+            ON A.FTC_FOLIO = '#SR_FOLIO#'
+            AND A.FTC_FOLIO = B.FTC_FOLIO
+    ) IDEN
+      ON CASE
+        WHEN pre_dis.FCN_ID_SUBPROCESO IN (120, 122, 210, 105) THEN pre_dis.FTC_CURP
+        ELSE pre_dis.FTN_NSS
+      END = IDEN.FTN_NSS_CURP
+      AND pre_dis.FTC_FOLIO = IDEN.FTC_FOLIO
+WHERE
+  pre_dis.FTC_FOLIO = '#SR_FOLIO#'

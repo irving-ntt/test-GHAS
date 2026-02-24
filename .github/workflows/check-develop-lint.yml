@@ -1,0 +1,62 @@
+name: Check Develop Lint Before Merge to release-qa
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - release-qa
+
+permissions:
+  checks: read
+  contents: read
+
+jobs:
+  check-develop-lint:
+    name: check-develop-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest commit SHA on develop
+        id: get_sha
+        run: |
+          OWNER="${{ github.repository_owner }}"
+          REPO="${{ github.event.repository.name }}"
+          sha=$(curl -sS -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${OWNER}/${REPO}/branches/develop" \
+            | jq -r '.commit.sha')
+          if [[ -z "$sha" || "$sha" == "null" ]]; then
+            echo "Could not determine develop SHA"
+            exit 2
+          fi
+          echo "sha=$sha" >> $GITHUB_OUTPUT
+
+      - name: Check for Develop-lint check-run on develop commit
+        id: check
+        run: |
+          OWNER="${{ github.repository_owner }}"
+          REPO="${{ github.event.repository.name }}"
+          SHA="${{ steps.get_sha.outputs.sha }}"
+          resp=$(curl -sS -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${OWNER}/${REPO}/commits/${SHA}/check-runs")
+          found=$(echo "$resp" | jq -r '
+            .check_runs
+            | map(select(.name=="Develop-lint"))
+            | .[0] // empty
+          ')
+          if [[ -z "$found" ]]; then
+            echo "No check-run named 'Develop-lint' found on develop commit ${SHA}."
+            exit 3
+          fi
+          conclusion=$(echo "$found" | jq -r '.conclusion')
+          status=$(echo "$found" | jq -r '.status')
+          echo "Found Develop-lint: status=$status, conclusion=$conclusion"
+          if [[ "$status" != "completed" ]]; then
+            echo "Develop-lint check-run is not completed yet."
+            exit 4
+          fi
+          if [[ "$conclusion" != "success" ]]; then
+            echo "Develop-lint DID NOT pass (conclusion=$conclusion)."
+            exit 5
+          fi
+          echo "Develop-lint PASSED on develop commit $SHA."

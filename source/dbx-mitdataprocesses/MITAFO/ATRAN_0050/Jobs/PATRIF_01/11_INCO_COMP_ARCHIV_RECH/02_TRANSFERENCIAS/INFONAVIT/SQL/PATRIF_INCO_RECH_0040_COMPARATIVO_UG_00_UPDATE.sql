@@ -1,0 +1,13 @@
+update PROCESOS.TTCRXGRAL_TRANS_INFONA
+   set FTC_CODIGO_RES_OPER=null
+      ,FTC_DIAG_PROCESO=null
+      ,FTC_TIPO_ARCH='01'
+      ,FTC_ESTATUS_REGISTRO='1'
+      ,FTD_FEH_ACTUA_ESTATUS=null
+      ,FTN_MOTIVO_RECHAZO=null
+      ,FTD_FEH_ACT=null
+      ,FCC_USU_ACT=null
+      ,FTN_INTER_SALDO_VIVI97_ULT=null
+      ,FTN_INTER_SALDO_VIVI92=null
+WHERE FTC_FOLIO_BITACORA='#sr_folio#'
+   AND FTC_TIPO_ARCH='#sr_tipo_archivo#'

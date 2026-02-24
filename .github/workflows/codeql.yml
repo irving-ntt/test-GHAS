@@ -1,0 +1,37 @@
+name: CodeQL Baseline
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ release-qa ]
+  pull_request:
+    branches: [ release-qa ]
+  schedule:
+    - cron: "0 3 * * 6"
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+          queries: security-extended
+          config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v4

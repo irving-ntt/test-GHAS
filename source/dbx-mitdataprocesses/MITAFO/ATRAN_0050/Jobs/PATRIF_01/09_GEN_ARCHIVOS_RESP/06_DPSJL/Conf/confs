@@ -1,0 +1,2 @@
+debug = False
+external_location=abfss://nci-repository@datalakedev1udbvf.dfs.core.windows.net/

@@ -1,0 +1,555 @@
+name: Parametrización tras push a develop
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  parametrizar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repositorio completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
+      - name: Crear rama temporal para parametrización
+        run: |
+          fecha=$(date +%Y%m%d%H%M%S)
+          export PARAM_BRANCH="parametrizacion-qa-$fecha"
+          git fetch origin pre-release-qa:pre-release-qa || git checkout -b pre-release-qa origin/pre-release-qa
+          git checkout pre-release-qa
+          git pull origin pre-release-qa
+          git checkout -b "$PARAM_BRANCH"
+          echo "PARAM_BRANCH=$PARAM_BRANCH" >> $GITHUB_ENV
+
+      - name: Sincronizar cambios de develop
+        run: |
+          git fetch origin develop
+          
+          # Hacer reset completo desde develop SOLO en la rama temporal
+          echo "Haciendo reset completo desde develop en rama temporal..."
+          git reset --hard origin/develop
+          
+          # Limpiar archivos no trackeados SOLO en la rama temporal
+          echo "Limpiando archivos no trackeados en rama temporal..."
+          git clean -fd
+          
+          # Verificar estado de la rama temporal
+          echo "Estado de la rama temporal después de sincronización:"
+          git status
+          
+          # Commit de la sincronización completa en la rama temporal
+          git add -A
+          git commit -m "Sync completa desde develop en rama temporal" || echo "Sin cambios para sincronizar"
+
+      - name: Listar todos los archivos a parametrizar
+        run: |
+          find . -type f \( -name "*.env" -o -name "*.properties" -o -name "*.yaml" -o -name "*.yml" \) > all_relevant_files.txt
+
+      - name: Crear scripts de parametrización
+        run: |
+          cat > update_envs.py << 'EOF'
+          import os
+          import re
+
+          replacements = {
+              "WEBHOOK_URL_VAL_STR": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/validation-completion-notification-event",
+              "WEBHOOK_URL_CARG_ARCH": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/loading-completion-notification-event",
+              "WEBHOOK_URL_INTR_CONT": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/substages-orchestration/substages/notify",
+              "WEBHOOK_URL_DEFAULT": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/substages-orchestration/substages/notify",
+              "WEBHOOK_URL_VAL_CONT": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/content-validation-notification-event",
+              "SCOPE_NOTIFICATIONS": "https://api.qa.profuturo.mx/oauth2/token",
+              "CONN_OPTIONS": '{"url":"jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=on)(FAILOVER=on)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.14)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.15)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.13)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=mitafoqa.snashqdbsy02.vcnashgrnvcnqa.oraclevcn.com)(SERVER=DEDICATED))(FAILOVER_MODE=(TYPE=session)(METHOD=basic)(RETRIES=10)(DELAY=5)))","driver":"oracle.jdbc.driver.OracleDriver", "fetchSize": "20000", "numPartitions": "100", "queryTimeout": "0", "connectRetryCount": "10", "connectRetryInterval": "10"}',
+              "CONN_ADITIONAL_OPTIONS": '{"batchsize": "40000", "sessionInitStatement": "BEGIN execute immediate \\"ALTER SESSION ENABLE PARALLEL DML\\"; END;"}',
+              "CATALOG": "dbx_mit_qa_mmeytw_workspace",
+              "SCHEMA": "default",
+              "SCOPE": "Scope_qa_kv",
+              "CONN_USER": "usuario",
+              "CONN_KEY": "password",
+              "EXTERNAL_LOCATION": "abfss://nci-repository@datalakeqammeytw.dfs.core.windows.net/",
+              "debug": "False",
+              "external_location": "abfss://nci-repository@datalakeqammeytw.dfs.core.windows.net/",
+              "conn_options": '{"url":"jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=on)(FAILOVER=on)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.14)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.15)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.13)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=mitafoqa.snashqdbsy02.vcnashgrnvcnqa.oraclevcn.com)(SERVER=DEDICATED))(FAILOVER_MODE=(TYPE=session)(METHOD=basic)(RETRIES=10)(DELAY=5)))","driver":"oracle.jdbc.driver.OracleDriver", "fetchSize": "20000", "numPartitions": "100", "queryTimeout": "0", "connectRetryCount": "10", "connectRetryInterval": "10"}',
+              "conn_url": "jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.14)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.15)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=10.16.91.13)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=mitafoqa.snashqdbsy02.vcnashgrnvcnqa.oraclevcn.com)(SERVER=DEDICATED))(FAILOVER_MODE=(TYPE=session)(METHOD=basic)(RETRIES=10)(DELAY=5)))",
+              "catalog_name": "dbx_mit_qa_mmeytw_workspace",
+              "schema_name": "default",
+              "conn_aditional_options": '{"batchsize": "40000", "sessionInitStatement": "BEGIN execute immediate \\"ALTER SESSION ENABLE PARALLEL DML\\"; END;"}',
+              "webhook_url": "https://hooks.slack.com/services/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",
+              "webhook_url_val_str": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/validation-completion-notification-event",
+              "webhook_url_carg_arch": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/file-loading/loading-completion-notification-event",
+              "webhook_url_intr_cont": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/substages-orchestration/substages/notify",
+              "webhook_url_default": "https://api.qa.profuturo.mx/afore/1/nci-bdnsarintegrationprocess/substages-orchestration/substages/notify",
+              "scope": "Scope_qa_kv",
+              "conn_user": "usuario",
+              "conn_key": "password",
+              "delta_workspace": "dbx_mit_qa_mmeytw_workspace",
+              "DATABRICKS_INSTANCE": "https://adb-3925217763478917.17.azuredatabricks.net",
+              "DATABRICKS_CLUSTER_ID": "1002-165016-5o6q246e",
+              "WEBHOOK_URL_VAL_STR_TRAS": "https://api.qa.profuturo.mx/afore/1/nci-integrationprocessintegrity/file-loading/validation-completion-notification-event",
+              "WEBHOOK_URL_VAL_CONT_TRAS": "https://api.qa.profuturo.mx/afore/1/nci-integrationprocessintegrity/file-loading/content-validation-notification-event",
+              "catalog_001": "dbx_mit_qa_mmeytw_workspace"
+          }
+
+          with open("all_relevant_files.txt") as f:
+              changed_files = [line.strip() for line in f if line.strip().endswith((".env", ".properties"))]
+
+          def replace_in_file(filepath, replacements):
+              with open(filepath, 'r', encoding='utf-8') as f:
+                  content = f.read()
+              
+              # Determinar el formato según la extensión del archivo
+              is_env_file = filepath.endswith('.env')
+              
+              for key, value in replacements.items():
+                  if is_env_file:
+                      # Para archivos .env: preservar el formato original (con o sin espacios alrededor del =)
+                      # Maneja: debug = True, debug=True, debug= True, debug =True
+                      def replace_env(match):
+                          full_match = match.group(0)
+                          if ' = ' in full_match:
+                              return f'{key} = {value}'
+                          elif '=' in full_match:
+                              return f'{key}={value}'
+                          else:
+                              return f'{key}={value}'
+                      content = re.sub(rf'^{key}\s*=\s*.*$', replace_env, content, flags=re.MULTILINE)
+                  else:
+                      # Para archivos .properties: preservar el formato original (con o sin espacios alrededor del :)
+                      # Maneja: debug:True, debug : True, debug :True, debug: True
+                      def replace_properties(match):
+                          full_match = match.group(0)
+                          if ' : ' in full_match:
+                              return f'{key} : {value}'
+                          elif ':' in full_match:
+                              return f'{key}:{value}'
+                          else:
+                              return f'{key} : {value}'
+                      content = re.sub(rf'^{key}\s*:\s*.*$', replace_properties, content, flags=re.MULTILINE)
+              
+              with open(filepath, 'w', encoding='utf-8') as f:
+                  f.write(content)
+
+          for filepath in changed_files:
+              if os.path.exists(filepath):
+                  print(f'Actualizando {filepath}')
+                  replace_in_file(filepath, replacements)
+          EOF
+
+          cat > replace_cluster_ids.py << 'EOF'
+          import os
+          import re
+
+          replacements = {
+              "0926-054128-luke29zq": "ID_EXPANDED_CLUSTER_DEV",
+              "1002-165016-5o6q246e": "ID_EXPANDED_CLUSTER_DEV",
+              "00198DC0731ADD82": "ID_JOB_CLUSTER_POLICY",
+              "1014-234443-arced12-pool-em5ad5sy": "ID_INSTANCE_POOL",
+              "1014-234623-pope1-pool-bh6lrp9e": "ID_DRIVER_POOL"
+          }
+
+          with open("all_relevant_files.txt") as f:
+              changed_yaml = [line.strip() for line in f if line.strip().endswith(".yaml") and "Workflows_hijos" in line]
+
+          for path in changed_yaml:
+              if not os.path.exists(path):
+                  continue
+              with open(path, "r", encoding="utf-8") as f:
+                  lines = f.readlines()
+
+              new_lines = []
+              for line in lines:
+                  match = re.match(r"^(\s*)existing_cluster_id:\s*(\S+)", line)
+                  if match:
+                      indent, current_value = match.groups()
+                      new_line = f"{indent}existing_cluster_id: {replacements.get(current_value, current_value)}\n"
+                      new_lines.append(new_line)
+                  else:
+                      new_lines.append(line)
+
+              with open(path, "w", encoding="utf-8") as f:
+                  f.writelines(new_lines)
+          EOF
+
+          cat > replace_cluster_ids_padres.py << 'EOF'
+          import os
+          import re
+
+          replacements = {
+              "0926-054128-luke29zq": "ID_EXPANDED_CLUSTER_DEV",
+              "1002-165016-5o6q246e": "ID_EXPANDED_CLUSTER_DEV",
+              "00198DC0731ADD82": "ID_JOB_CLUSTER_POLICY",
+              "1014-234443-arced12-pool-em5ad5sy": "ID_INSTANCE_POOL",
+              "1014-234623-pope1-pool-bh6lrp9e": "ID_DRIVER_POOL"
+          }
+
+          with open("all_relevant_files.txt") as f:
+              changed_yaml = [line.strip() for line in f if line.strip().endswith(".yaml") and "Workflows_padres" in line]
+
+          for path in changed_yaml:
+              if not os.path.exists(path):
+                  continue
+              with open(path, "r", encoding="utf-8") as f:
+                  lines = f.readlines()
+
+              new_lines = []
+              for line in lines:
+                  match = re.match(r"^(\s*)existing_cluster_id:\s*(\S+)", line)
+                  if match:
+                      indent, current_value = match.groups()
+                      new_line = f"{indent}existing_cluster_id: {replacements.get(current_value, current_value)}\n"
+                      new_lines.append(new_line)
+                  else:
+                      new_lines.append(line)
+
+              with open(path, "w", encoding="utf-8") as f:
+                  f.writelines(new_lines)
+          EOF
+
+          cat > parametrizar_workflows_padres.py << 'EOF'
+          import os
+          import re
+          import glob
+          import json
+
+          def actualizar_deployment_release_json(txt_files):
+              """Actualiza el archivo deployment-release.json con workflows hijos y padres encontrados en los .txt"""
+              deployment_file = "source/dbx-mitdataprocesses/deployment-release.json"
+              
+              if not os.path.exists(deployment_file):
+                  print(f"WARN: No se encontró el archivo {deployment_file}")
+                  return False
+              
+              try:
+                  # Leer el archivo JSON actual
+                  with open(deployment_file, 'r', encoding='utf-8') as f:
+                      deployment_data = json.load(f)
+                  
+                  # Inicializar las secciones si no existen
+                  if "workflows_hijos" not in deployment_data:
+                      deployment_data["workflows_hijos"] = []
+                  if "workflows_padres" not in deployment_data:
+                      deployment_data["workflows_padres"] = []
+                  
+                  # Recopilar workflows hijos y padres
+                  workflows_hijos = []
+                  workflows_padres = []
+                  
+                  for txt_file in txt_files:
+                      try:
+                          # Obtener el nombre base del archivo .txt (sin extensión)
+                          base_name = os.path.splitext(os.path.basename(txt_file))[0]
+                          
+                          # Verificar si existe el .yaml correspondiente
+                          workflows_padres_dir = "source/dbx-mitdataprocesses/Workflows_padres"
+                          yaml_file = os.path.join(workflows_padres_dir, f"{base_name}.yaml")
+                          
+                          # PRIMERO: Agregar TODOS los workflows del .txt a workflows_hijos (MANTENIENDO el prefijo WF_)
+                          print(f"  Procesando workflows hijos del archivo: {base_name}")
+                          with open(txt_file, 'r', encoding='utf-8') as f:
+                              for line_num, line in enumerate(f, 1):
+                                  line = line.strip()
+                                  if line and '=' in line:
+                                      try:
+                                          job_id, workflow_name = line.split('=', 1)
+                                          workflow_name = workflow_name.strip()
+                                          
+                                          # Agregar el workflow hijo a la lista (MANTENIENDO el prefijo WF_ tal como está en el .txt)
+                                          workflows_hijos.append({"name_wf": workflow_name})
+                                          print(f"    Agregando workflow hijo: {workflow_name}")
+                                      except ValueError as e:
+                                          print(f"    WARN: Error en línea {line_num}: {line} - {e}")
+                                          continue
+                          
+                          # SEGUNDO: Si existe .yaml, también agregar a workflows_padres
+                          if os.path.exists(yaml_file):
+                              print(f"  También es workflow padre válido: {base_name}")
+                              children = []
+                              with open(txt_file, 'r', encoding='utf-8') as f:
+                                  for line_num, line in enumerate(f, 1):
+                                      line = line.strip()
+                                      if line and '=' in line:
+                                          try:
+                                              job_id, workflow_name = line.split('=', 1)
+                                              workflow_name = workflow_name.strip()
+                                              
+                                              # Agregar el workflow hijo a la lista (sin el prefijo WF_)
+                                              child_name = workflow_name.replace('WF_', '')
+                                              children.append(child_name)
+                                          except ValueError as e:
+                                              print(f"    WARN: Error en línea {line_num}: {line} - {e}")
+                                              continue
+                              
+                              if children:
+                                  workflows_padres.append({
+                                      "name_wf": base_name,
+                                      "children": children
+                                  })
+                                  print(f"  SUCCESS: Workflow padre {base_name} agregado con {len(children)} hijos")
+                              else:
+                                  print(f"  WARN: Workflow padre {base_name} no tiene workflows hijos válidos")
+                          else:
+                              print(f"  INFO: Archivo {base_name} es solo workflow hijo (no tiene .yaml)")
+                          
+                          print(f"  SUCCESS: {len(workflows_hijos)} workflows hijos agregados a workflows_hijos (con prefijo WF_ mantenido)")
+                      except Exception as e:
+                          print(f"  ERROR: Error procesando {os.path.basename(txt_file)}: {e}")
+                          continue
+                  
+                  # Verificar si se encontraron workflows
+                  if not workflows_hijos and not workflows_padres:
+                      print(f"  INFO: No se encontraron workflows válidos en los archivos .txt")
+                      print(f"  INFO: No se actualizará {deployment_file}")
+                      return False
+                  
+                  # Actualizar ambas secciones
+                  # Preservando el resto del archivo intacto
+                  if workflows_hijos:
+                      deployment_data["workflows_hijos"] = workflows_hijos
+                      print(f"  SUCCESS: Sección workflows_hijos actualizada con {len(workflows_hijos)} workflows")
+                  
+                  if workflows_padres:
+                      deployment_data["workflows_padres"] = workflows_padres
+                      print(f"  SUCCESS: Sección workflows_padres actualizada con {len(workflows_padres)} workflows")
+                  
+                  # Escribir el archivo JSON actualizado (preservando estructura)
+                  with open(deployment_file, 'w', encoding='utf-8') as f:
+                      json.dump(deployment_data, f, indent=2, ensure_ascii=False)
+                  
+                  total_workflows = len(workflows_hijos) + len(workflows_padres)
+                  print(f"  SUCCESS: Archivo {deployment_file} actualizado con {total_workflows} workflows totales")
+                  print(f"  INFO: Resto del archivo preservado intacto")
+                  return True
+                  
+              except Exception as e:
+                  print(f"  ERROR: Error actualizando {deployment_file}: {e}")
+                  return False
+
+          def parametrizar_workflows_padres():
+              # Ruta de la carpeta Workflows_padres
+              workflows_padres_dir = "source/dbx-mitdataprocesses/Workflows_padres"
+              
+              if not os.path.exists(workflows_padres_dir):
+                  print(f"INFO: No se encontró el directorio {workflows_padres_dir}. Saltando parametrización de workflows padres.")
+                  return
+              
+              # Buscar archivos .txt en Workflows_padres
+              txt_files = glob.glob(os.path.join(workflows_padres_dir, "*.txt"))
+              
+              if not txt_files:
+                  print("INFO: No se encontraron archivos .txt en Workflows_padres. No hay workflows padres para parametrizar.")
+                  print("INFO: No se actualizará deployment-release.json (no hay workflows hijos que agregar)")
+                  return
+              
+              print(f"INFO: Archivos .txt encontrados: {len(txt_files)} archivo(s)")
+              
+              # Actualizar deployment-release.json con workflows hijos
+              print("Actualizando deployment-release.json con workflows hijos...")
+              deployment_updated = actualizar_deployment_release_json(txt_files)
+              
+              processed_count = 0
+              skipped_count = 0
+              
+              for txt_file in txt_files:
+                  # Obtener el nombre base del archivo (sin extensión)
+                  base_name = os.path.splitext(os.path.basename(txt_file))[0]
+                  
+                  # Buscar el archivo .yaml correspondiente
+                  yaml_file = os.path.join(workflows_padres_dir, f"{base_name}.yaml")
+                  
+                  if not os.path.exists(yaml_file):
+                      print(f"INFO: No se encontró el archivo YAML correspondiente para {os.path.basename(txt_file)}. Saltando...")
+                      skipped_count += 1
+                      continue
+                  
+                  print(f"Procesando: {os.path.basename(txt_file)} -> {os.path.basename(yaml_file)}")
+                  
+                  # Leer el archivo .txt y crear el mapeo
+                  job_mappings = {}
+                  try:
+                      with open(txt_file, 'r', encoding='utf-8') as f:
+                          for line_num, line in enumerate(f, 1):
+                              line = line.strip()
+                              if line and '=' in line:
+                                  try:
+                                      job_id, workflow_name = line.split('=', 1)
+                                      job_id = job_id.strip()
+                                      workflow_name = workflow_name.strip()
+                                      
+                                      # Crear el nuevo nombre del job_id según el formato especificado
+                                      # Eliminar el prefijo WF_ y agregar el sufijo _JOB_ID
+                                      new_job_id = workflow_name.replace('WF_', '') + '_JOB_ID'
+                                      
+                                      job_mappings[job_id] = new_job_id
+                                      print(f"  Mapeo: {job_id} -> {new_job_id}")
+                                  except ValueError as e:
+                                      print(f"  WARN: Error en línea {line_num}: {line} - {e}")
+                                      continue
+                  except Exception as e:
+                      print(f"  ERROR: Error leyendo {os.path.basename(txt_file)}: {e}")
+                      skipped_count += 1
+                      continue
+                  
+                  if not job_mappings:
+                      print(f"  INFO: No se encontraron mapeos válidos en {os.path.basename(txt_file)}")
+                      skipped_count += 1
+                      continue
+                  
+                  # Leer y procesar el archivo YAML
+                  try:
+                      with open(yaml_file, 'r', encoding='utf-8') as f:
+                          yaml_content = f.read()
+                      
+                      # Aplicar las sustituciones
+                      original_content = yaml_content
+                      for old_job_id, new_job_id in job_mappings.items():
+                          # Buscar job_id: seguido del ID numérico
+                          pattern = rf'job_id:\s*{re.escape(old_job_id)}'
+                          replacement = f'job_id: {new_job_id}'
+                          yaml_content = re.sub(pattern, replacement, yaml_content)
+                      
+                      # Si hubo cambios, escribir el archivo
+                      if yaml_content != original_content:
+                          with open(yaml_file, 'w', encoding='utf-8') as f:
+                              f.write(yaml_content)
+                          print(f"  SUCCESS: Archivo {os.path.basename(yaml_file)} actualizado con éxito")
+                          processed_count += 1
+                      else:
+                          print(f"  INFO: No se encontraron job_id para reemplazar en {os.path.basename(yaml_file)} (ya estaba parametrizado)")
+                          processed_count += 1
+                          
+                  except Exception as e:
+                      print(f"  ERROR: Error procesando {os.path.basename(yaml_file)}: {e}")
+                      skipped_count += 1
+                      continue
+              
+              # Resumen final
+              print(f"\n=== RESUMEN DE PARAMETRIZACIÓN DE WORKFLOWS PADRES ===")
+              print(f"Archivos procesados exitosamente: {processed_count}")
+              print(f"Archivos saltados: {skipped_count}")
+              print(f"Total de archivos .txt encontrados: {len(txt_files)}")
+              print(f"Deployment-release.json actualizado: {'✅ Sí' if deployment_updated else '❌ No'}")
+              
+              if processed_count > 0:
+                  print("✅ Parametrización de workflows padres completada con éxito")
+              elif skipped_count == len(txt_files):
+                  print("ℹ️  No se parametrizaron workflows padres (no se encontraron coincidencias txt/yaml válidas)")
+              else:
+                  print("⚠️  Parametrización parcial completada")
+
+          if __name__ == "__main__":
+              parametrizar_workflows_padres()
+          EOF
+
+      - name: Ejecutar parametrización y hacer commit en rama temporal
+        run: |
+          python3 update_envs.py || true
+          python3 replace_cluster_ids.py || true
+          python3 replace_cluster_ids_padres.py || true
+          python3 parametrizar_workflows_padres.py || true
+
+          git rm --cached update_envs.py replace_cluster_ids.py replace_cluster_ids_padres.py parametrizar_workflows_padres.py all_relevant_files.txt changed_files.txt || true
+          git add . || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Parametrización automática de archivos para QA"
+            git push origin HEAD
+            
+            echo "Haciendo merge automático a pre-release-qa..."
+            # Cambiar a pre-release-qa y hacer pull de los últimos cambios
+            git checkout pre-release-qa
+            git pull origin pre-release-qa
+            
+            # Hacer merge de la rama temporal dando prioridad a los cambios entrantes (theirs)
+            # Esto significa que si hay conflictos, se mantienen los cambios de la rama temporal
+            git merge --no-ff -X theirs "$PARAM_BRANCH" -m "Merge parametrización automática desde $PARAM_BRANCH" || {
+              echo "Merge falló, resolviendo conflictos automáticamente..."
+              
+              # Resolver conflicto del archivo de workflow: eliminar el archivo (mantener la eliminación)
+              git rm .github/workflows/sync_develop_to_pre_release_qa.yml || true
+              
+              # Asegurar que TODOS los archivos parametrizados se mantengan (prioridad theirs)
+              echo "Aplicando todos los archivos parametrizados de la rama temporal..."
+              git checkout "$PARAM_BRANCH" -- source/ || true
+              
+              git add . || true
+              git commit -m "Merge parametrización automática desde $PARAM_BRANCH (resolviendo conflictos y aplicando todos los archivos)"
+            }
+            
+            # Push de los cambios a pre-release-qa
+            git push origin pre-release-qa
+            
+            echo "Eliminando rama temporal local y remota..."
+            # Eliminar la rama temporal local
+            git branch -D "$PARAM_BRANCH" || true
+            
+            # Eliminar la rama temporal remota
+            if [[ "$PARAM_BRANCH" == parametrizacion-qa-* ]]; then
+              git push origin --delete "$PARAM_BRANCH" || true
+              echo "✅ Rama temporal $PARAM_BRANCH eliminada exitosamente"
+            else
+              echo "⚠️  Nombre de rama temporal no válido, no se elimina remotamente"
+            fi
+            
+            echo "✅ Workflow completado: cambios parametrizados y mergeado a pre-release-qa"
+          else
+            echo "ℹ️  Sin cambios para commitear, no se realizó parametrización"
+            echo "Eliminando rama temporal sin cambios..."
+            git checkout pre-release-qa
+            git branch -D "$PARAM_BRANCH" || true
+            if [[ "$PARAM_BRANCH" == parametrizacion-qa-* ]]; then
+              git push origin --delete "$PARAM_BRANCH" || true
+            fi
+          fi
+
+      - name: Limpiar archivos temporales
+        run: |
+          rm -f update_envs.py replace_cluster_ids.py replace_cluster_ids_padres.py parametrizar_workflows_padres.py all_relevant_files.txt changed_files.txt || true
+
+      - name: Limpieza final y verificación
+        if: always()
+        run: |
+          echo "=== LIMPIEZA FINAL ==="
+          
+          # Verificar si estamos en la rama temporal y cambiarnos a pre-release-qa si es necesario
+          current_branch=$(git branch --show-current)
+          echo "Rama actual: $current_branch"
+          
+          if [[ "$current_branch" == parametrizacion-qa-* ]]; then
+            echo "⚠️  Estamos en rama temporal, cambiando a pre-release-qa..."
+            git checkout pre-release-qa || git checkout -b pre-release-qa origin/pre-release-qa || true
+          fi
+          
+          # Intentar eliminar la rama temporal local si existe
+          if git branch | grep -q "$PARAM_BRANCH"; then
+            echo "Eliminando rama temporal local: $PARAM_BRANCH"
+            git branch -D "$PARAM_BRANCH" || true
+          fi
+          
+          # Intentar eliminar la rama temporal remota si existe
+          if [[ "$PARAM_BRANCH" == parametrizacion-qa-* ]]; then
+            echo "Verificando si existe rama temporal remota: $PARAM_BRANCH"
+            if git ls-remote --heads origin "$PARAM_BRANCH" | grep -q "$PARAM_BRANCH"; then
+              echo "Eliminando rama temporal remota: $PARAM_BRANCH"
+              git push origin --delete "$PARAM_BRANCH" || true
+            else
+              echo "✅ Rama temporal remota ya no existe"
+            fi
+          fi
+          
+          # Verificar estado final
+          echo "=== ESTADO FINAL ==="
+          echo "Rama actual: $(git branch --show-current)"
+          echo "Ramas locales:"
+          git branch -a | head -10
+          echo "✅ Limpieza final completada"

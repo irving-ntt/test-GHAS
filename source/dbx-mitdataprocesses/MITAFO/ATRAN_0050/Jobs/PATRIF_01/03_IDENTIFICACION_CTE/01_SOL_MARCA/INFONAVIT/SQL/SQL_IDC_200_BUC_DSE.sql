@@ -1,0 +1,20 @@
+SELECT DISTINCT
+    B.FTC_CURP                       ,
+    DS.FTC_NSS_AFORE AS FTC_NSS      ,
+    DS.FTC_APELLIDO_PATER_AFORE      ,
+    DS.FTC_APELLIDO_MATER_AFORE      ,
+    DS.FTC_NOMBRE_AFORE              ,
+    DS.FTC_RFC_INFONA AS FTC_RFC     ,
+    DS.FTC_FOLIO                     ,
+    DS.FTN_ID_ARCHIVO                ,
+    DS.FTC_TIPO_ARCH                 ,
+    B.FTN_NUM_CTA_INVDUAL            ,
+    DS.FTC_RFC_INFONA AS FTC_RFC_BUC ,
+    B.FTC_BANDERA                    ,
+    B.FTN_CELULAR                    ,
+    B.FTC_CORREO_ELEC
+FROM CIERREN_ETL.TTAFOTRAS_ETL_DEVO_SALDO_EXC DS
+LEFT JOIN CIERREN_ETL.TLSISGRAL_ETL_BUC B 
+     ON (DS.FTC_NSS_AFORE = B.FTC_NSS)
+WHERE DS.FTN_ID_ARCHIVO = '#SR_ID_ARCHIVO#'
+  AND DS.FTC_FOLIO = '#SR_FOLIO#'
