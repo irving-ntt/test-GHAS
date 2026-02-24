@@ -2,7 +2,7 @@
 # DBTITLE 1,DOCSTRING
 '''
 Descripcion:
-    Realiza la carga del archivo hacia OCI
+    Realiza la carga del archivo hacia OCI  
 Subetapa:
     20 - CARGA DE ARCHIVO
 Trámite:
@@ -32,7 +32,7 @@ Archivos SQL:
 # Se definen los parámetros requeridos para el proceso
 # Crear la instancia con los parámetros esperados
 params = WidgetParams({
-    "sr_proceso": str,
+    "sr_proceso":str,
     "sr_subproceso": str,
     "sr_subetapa": str,
     "sr_id_archivo": str,
