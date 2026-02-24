@@ -2,7 +2,7 @@
 # DBTITLE 1,DOCSTRING
 '''
 Descripcion:
-    Realiza la carga del archivo hacia OCI  
+    Realiza la carga del archivo hacia OCI
 Subetapa:
     20 - CARGA DE ARCHIVO
 Trámite:
